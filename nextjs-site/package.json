@@ -1,0 +1,11 @@
+{
+  "name": "nextjs-site",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "next": "14",
+    "react": "18",
+    "react-dom": "18"
+  }
+}
