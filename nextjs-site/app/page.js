@@ -153,7 +153,7 @@ export default function HomePage() {
             </motion.div>
 
             <motion.div 
-              className="relative h-[500px] lg:h-[600px] rounded-2xl overflow-hidden shadow-2xl"
+              className="relative h-[400px] sm:h-[500px] lg:h-[600px] rounded-2xl overflow-hidden shadow-2xl"
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
@@ -163,23 +163,24 @@ export default function HomePage() {
                 src="/images/Jubal Terry 2025 NMP-42.jpg"
                 alt="Jubal Terry, Your Trusted Insurance Agent in Wheat Ridge"
                 fill
-                className="object-cover"
+                className="object-cover object-center"
                 priority
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 600px"
               />
               {/* Floating Card */}
               <motion.div 
-                className="absolute bottom-8 left-8 right-8 bg-white/95 backdrop-blur-sm p-6 rounded-xl shadow-xl"
+                className="absolute bottom-4 left-4 right-4 sm:bottom-8 sm:left-8 sm:right-8 bg-white/95 backdrop-blur-sm p-4 sm:p-6 rounded-xl shadow-xl"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.8 }}
               >
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center">
-                    <Users className="text-white" size={32} />
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+                    <Users className="text-white" size={24} />
                   </div>
                   <div>
-                    <div className="text-3xl font-bold text-primary">500+</div>
-                    <div className="text-gray-600 font-medium">Happy Clients Served</div>
+                    <div className="text-2xl sm:text-3xl font-bold text-primary">500+</div>
+                    <div className="text-sm sm:text-base text-gray-600 font-medium">Happy Clients Served</div>
                   </div>
                 </div>
               </motion.div>
