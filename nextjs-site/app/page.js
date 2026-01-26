@@ -1,20 +1,19 @@
+'use client'
 import Link from 'next/link'
 import Image from 'next/image'
 import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
 import Testimonials from '@/components/Testimonials'
-import { CheckCircle2, Shield, Users, Clock, Phone, ArrowRight } from 'lucide-react'
+import AnimatedCounter from '@/components/AnimatedCounter'
+import { CheckCircle2, Shield, Users, Clock, Phone, ArrowRight, Award, Heart, TrendingUp, Zap, Car, Home as HomeIcon, Briefcase, Key, Building2, HeartHandshake } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { useInView } from 'react-intersection-observer'
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
-
-export const metadata = {
-  title: 'Home',
-  description: 'Trusted Wheat Ridge insurance company providing auto, home, life, and business coverage. Get personalized quotes, digital service, and local support today.',
-}
 
 export default function HomePage() {
   return (
