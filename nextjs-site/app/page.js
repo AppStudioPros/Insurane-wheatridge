@@ -121,9 +121,12 @@ export default function HomePage() {
                   Get Your Free Quote
                   <ArrowRight className="inline ml-2 group-hover:translate-x-1 transition-transform" size={20} />
                 </Link>
-                <a href="tel:3034641911" className="bg-white/10 backdrop-blur-sm border-2 border-white text-white px-8 py-4 rounded-xl hover:bg-white hover:text-primary font-bold text-center text-lg transition-all duration-300">
-                  <Phone className="inline mr-2" size={20} />
-                  (303) 464-1911
+                <a href="tel:3034641911" className="relative overflow-hidden bg-white/10 backdrop-blur-sm border-2 border-white text-white px-8 py-4 rounded-xl hover:bg-white hover:text-primary font-bold text-center text-lg transition-all duration-300 group">
+                  <span className="absolute inset-0 bg-gradient-to-r from-white via-red-100 to-white bg-[length:200%_100%] animate-gradient opacity-0 group-hover:opacity-100 transition-opacity duration-500"></span>
+                  <span className="relative flex items-center justify-center">
+                    <Phone className="inline mr-2" size={20} />
+                    (303) 464-1911
+                  </span>
                 </a>
               </div>
 

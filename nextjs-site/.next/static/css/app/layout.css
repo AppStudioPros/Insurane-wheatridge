@@ -770,6 +770,9 @@ video {
 .w-full {
   width: 100%;
 }
+.w-auto {
+  width: auto;
+}
 .max-w-2xl {
   max-width: 42rem;
 }
@@ -1121,6 +1124,11 @@ video {
   --tw-gradient-to: rgb(13 148 136 / 0) var(--tw-gradient-to-position);
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
+.from-white {
+  --tw-gradient-from: #fff var(--tw-gradient-from-position);
+  --tw-gradient-to: rgb(255 255 255 / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
 .via-blue-700 {
   --tw-gradient-to: rgb(29 78 216 / 0)  var(--tw-gradient-to-position);
   --tw-gradient-stops: var(--tw-gradient-from), #1d4ed8 var(--tw-gradient-via-position), var(--tw-gradient-to);
@@ -1144,6 +1152,10 @@ video {
 .via-teal-700 {
   --tw-gradient-to: rgb(15 118 110 / 0)  var(--tw-gradient-to-position);
   --tw-gradient-stops: var(--tw-gradient-from), #0f766e var(--tw-gradient-via-position), var(--tw-gradient-to);
+}
+.via-red-100 {
+  --tw-gradient-to: rgb(254 226 226 / 0)  var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), #fee2e2 var(--tw-gradient-via-position), var(--tw-gradient-to);
 }
 .to-blue-600 {
   --tw-gradient-to: #2563eb var(--tw-gradient-to-position);
@@ -1208,8 +1220,15 @@ video {
 .to-teal-900 {
   --tw-gradient-to: #134e4a var(--tw-gradient-to-position);
 }
+.bg-\[length\:200\%_100\%\] {
+  background-size: 200% 100%;
+}
 .fill-yellow-400 {
   fill: #facc15;
+}
+.object-contain {
+  -o-object-fit: contain;
+     object-fit: contain;
 }
 .object-cover {
   -o-object-fit: cover;
@@ -1500,11 +1519,19 @@ video {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
 }
+.transition-opacity {
+  transition-property: opacity;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
 .duration-200 {
   transition-duration: 200ms;
 }
 .duration-300 {
   transition-duration: 300ms;
+}
+.duration-500 {
+  transition-duration: 500ms;
 }
 @keyframes enter {
 
@@ -1525,6 +1552,9 @@ video {
 }
 .duration-300 {
   animation-duration: 300ms;
+}
+.duration-500 {
+  animation-duration: 500ms;
 }
 .animate-blob {
     animation: blob 7s infinite;
