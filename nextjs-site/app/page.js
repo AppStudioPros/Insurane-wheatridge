@@ -185,81 +185,129 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Meet Your Agent */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-6">
-              Jubal Terry | Meet Your Local Insurance Agent in Wheat Ridge
-            </h2>
-            <p className="text-lg text-gray-700 leading-relaxed mb-6">
-              I'm Jubal Terry, your dedicated insurance agent at Wheat Ridge Insurance Company. Located right here in Wheat Ridge at 4251 Kipling St #165, I take pride in offering friendly, knowledgeable, and transparent service to individuals, families, and business owners throughout the area.
-            </p>
-            <p className="text-lg text-gray-700 leading-relaxed mb-8">
-              With hands-on experience and a people-first approach, I help you navigate every aspect of insurance—from understanding your options to selecting coverage that fits your lifestyle and budget. My mission is to educate and empower you to make decisions that protect your future, not just sell you a policy.
-            </p>
-            <Link href="/about" className="inline-flex items-center text-primary font-semibold hover:underline text-lg">
-              Learn More About Me <ArrowRight className="ml-2" size={20} />
-            </Link>
+      {/* Stats Counter Section - NEW */}
+      <section ref={statsRef} className="py-20 bg-gradient-to-r from-primary to-blue-800 text-white relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.4\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")'}}></div>
+        </div>
+        <div className="container mx-auto px-4 relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={statsInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-4xl font-bold mb-4">Trusted by the Wheat Ridge Community</h2>
+            <p className="text-xl text-white/90">Real numbers. Real results. Real peace of mind.</p>
+          </motion.div>
+          
+          <div className="grid md:grid-cols-4 gap-8 max-w-6xl mx-auto">
+            {[
+              { number: 2, suffix: '+', label: 'Years of Service', icon: Award },
+              { number: 500, suffix: '+', label: 'Clients Protected', icon: Users },
+              { number: 98, suffix: '%', label: 'Customer Satisfaction', icon: TrendingUp },
+              { number: 24, suffix: '/7', label: 'Claim Support', icon: Zap }
+            ].map((stat, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                animate={statsInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="text-center bg-white/10 backdrop-blur-sm p-8 rounded-2xl hover:bg-white/20 transition-all duration-300"
+              >
+                <stat.icon className="mx-auto mb-4 text-yellow-300" size={48} />
+                <div className="text-5xl font-bold mb-2">
+                  <AnimatedCounter end={stat.number} suffix={stat.suffix} />
+                </div>
+                <div className="text-lg text-white/80">{stat.label}</div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Services Grid */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">Coverage Options for Every Stage of Life</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">At Wheat Ridge Insurance Company, we understand that insurance isn't one-size-fits-all. That's why we offer a wide range of solutions designed to protect what matters most.</p>
+      {/* Meet Your Agent - Enhanced */}
+      <section className="py-20 bg-white relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-blue-50 to-transparent opacity-50"></div>
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-4xl mx-auto text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <span className="inline-block px-4 py-2 bg-blue-100 text-primary rounded-full text-sm font-semibold mb-4">
+                Meet Your Agent
+              </span>
+              <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+                Jubal Terry | Your Local Insurance Expert
+              </h2>
+              <p className="text-xl text-gray-700 leading-relaxed mb-6">
+                I'm Jubal Terry, your dedicated insurance agent at Wheat Ridge Insurance Company. Located right here in Wheat Ridge at 4251 Kipling St #165, I take pride in offering friendly, knowledgeable, and transparent service to individuals, families, and business owners throughout the area.
+              </p>
+              <p className="text-lg text-gray-600 leading-relaxed mb-8">
+                With hands-on experience and a people-first approach, I help you navigate every aspect of insurance—from understanding your options to selecting coverage that fits your lifestyle and budget. My mission is to educate and empower you to make decisions that protect your future, not just sell you a policy.
+              </p>
+              <Link href="/about" className="inline-flex items-center text-primary font-bold hover:text-blue-700 text-lg group">
+                Learn More About Me 
+                <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
+              </Link>
+            </motion.div>
           </div>
+        </div>
+      </section>
+
+      {/* Services Grid - Enhanced with Icons and Animation */}
+      <section ref={servicesRef} className="py-20 bg-gradient-to-b from-gray-50 to-white">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={servicesInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
+            <span className="inline-block px-4 py-2 bg-blue-100 text-primary rounded-full text-sm font-semibold mb-4">
+              Our Services
+            </span>
+            <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+              Coverage for Every Stage of Life
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              We understand that insurance isn't one-size-fits-all. That's why we offer comprehensive solutions designed to protect what matters most.
+            </p>
+          </motion.div>
+          
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              { 
-                title: 'Auto Insurance Wheat Ridge', 
-                desc: 'Your vehicle gets you where you need to go and it deserves dependable protection. We help you find an auto insurance policy that balances affordability with comprehensive coverage.',
-                link: '/services/auto-insurance', 
-                icon: '🚗' 
-              },
-              { 
-                title: 'Property & Home Insurance Wheat Ridge', 
-                desc: 'Your home is more than an investment; it\'s where memories are made. Our home insurance options safeguard your dwelling, belongings, and liability.',
-                link: '/services/home-insurance', 
-                icon: '🏠' 
-              },
-              { 
-                title: 'Life Insurance Wheat Ridge', 
-                desc: 'Planning for the future means protecting the people you love. With trusted life insurance options, we help you secure financial peace of mind for your family.',
-                link: '/services/life-insurance', 
-                icon: '❤️' 
-              },
-              { 
-                title: 'Business Insurance', 
-                desc: 'Running a business comes with real risks. From liability to property protection, we help business owners find coverage that protects their operations, employees, and assets.',
-                link: '/services/business-insurance', 
-                icon: '💼' 
-              },
-              { 
-                title: 'Renters Insurance', 
-                desc: 'Even if you don\'t own your home, your personal property still matters. Our renters insurance provides financial protection against theft, fire, and other covered losses.',
-                link: '/services/renters-insurance', 
-                icon: '🔑' 
-              },
-              { 
-                title: 'Condo Insurance Wheat Ridge', 
-                desc: 'Condo insurance helps cover what your HOA\'s master policy doesn\'t. We\'ll help you protect what\'s inside your unit with coverage that fits your home and lifestyle.',
-                link: '/services/condo-insurance', 
-                icon: '🏢' 
-              },
-            ].map((service) => (
-              <div key={service.title} className="bg-white p-8 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100">
-                <div className="text-5xl mb-4">{service.icon}</div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">{service.title}</h3>
-                <p className="text-gray-600 mb-6 leading-relaxed">{service.desc}</p>
-                <Link href={service.link} className="inline-flex items-center text-primary font-semibold hover:underline">
-                  Learn More <ArrowRight className="ml-2" size={18} />
-                </Link>
-              </div>
-            ))}
+            {services.map((service, index) => {
+              const Icon = service.icon
+              return (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={servicesInView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                >
+                  <Link href={service.link} className="group block h-full">
+                    <div className="bg-white p-8 rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 border border-gray-100 h-full transform hover:-translate-y-2">
+                      <div className={`w-16 h-16 bg-gradient-to-br ${service.color} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                        <Icon className="text-white" size={32} />
+                      </div>
+                      <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-primary transition-colors">
+                        {service.title}
+                      </h3>
+                      <p className="text-gray-600 mb-6 leading-relaxed">
+                        {service.desc}
+                      </p>
+                      <div className="inline-flex items-center text-primary font-semibold group-hover:gap-3 transition-all">
+                        Learn More 
+                        <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={18} />
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
+              )
+            })}
           </div>
         </div>
       </section>
