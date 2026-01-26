@@ -1,10 +1,10 @@
 'use client'
 import Link from 'next/link'
 import Image from 'next/image'
-import Navigation from '@/components/Navigation'
-import Footer from '@/components/Footer'
-import Testimonials from '@/components/Testimonials'
-import AnimatedCounter from '@/components/AnimatedCounter'
+import Navigation from '../../components/Navigation'
+import Footer from '../../components/Footer'
+import Testimonials from '../../components/Testimonials'
+import AnimatedCounter from '../../components/AnimatedCounter'
 import { CheckCircle2, Shield, Users, Clock, Phone, ArrowRight, Award, Heart, TrendingUp, Zap, Car, Home as HomeIcon, Briefcase, Key, Building2, HeartHandshake } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
@@ -13,7 +13,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion'
+} from '../../components/ui/accordion'
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
