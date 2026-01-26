@@ -295,9 +295,11 @@ export default function HomePage() {
                 >
                   <Link href={service.link} className="group block h-full">
                     <div className="bg-white p-8 rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 border border-gray-100 h-full transform hover:-translate-y-2">
-                      <div className={`w-16 h-16 bg-gradient-to-br ${service.color} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                        <Icon className="text-white" size={32} />
-                      </div>
+                      <AnimatedServiceIcon 
+                        icon={Icon} 
+                        color={service.color}
+                        className="mb-6"
+                      />
                       <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-primary transition-colors">
                         {service.title}
                       </h3>
