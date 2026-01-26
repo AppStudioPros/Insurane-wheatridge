@@ -1,6 +1,4 @@
 {
-  "/page": "app/page.js",
   "/about/page": "app/about/page.js",
-  "/services/auto-insurance/page": "app/services/auto-insurance/page.js",
-  "/services/home-insurance/page": "app/services/home-insurance/page.js"
+  "/page": "app/page.js"
 }

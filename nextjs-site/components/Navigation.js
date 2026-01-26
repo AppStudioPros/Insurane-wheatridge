@@ -12,12 +12,13 @@ export default function Navigation() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
           <Link href="/" className="flex items-center space-x-3">
-            <div className="relative w-16 h-16">
+            <div className="relative h-16 w-auto">
               <Image 
                 src="/images/Jubal Terry 2025 NMP-2.jpg" 
                 alt="Farmers Insurance Logo"
-                fill
-                className="object-cover rounded"
+                width={80}
+                height={64}
+                className="object-contain"
               />
             </div>
             <div>
