@@ -1804,6 +1804,30 @@ video {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
+.group:hover .group-hover\:animate-\[briefcase-open_0\.5s_ease-in-out\] {
+  animation: briefcase-open 0.5s ease-in-out;
+}
+
+.group:hover .group-hover\:animate-\[building-sway_0\.6s_ease-in-out\] {
+  animation: building-sway 0.6s ease-in-out;
+}
+
+.group:hover .group-hover\:animate-\[car-drive_0\.6s_ease-in-out\] {
+  animation: car-drive 0.6s ease-in-out;
+}
+
+.group:hover .group-hover\:animate-\[door-open_0\.6s_ease-in-out\] {
+  animation: door-open 0.6s ease-in-out;
+}
+
+.group:hover .group-hover\:animate-\[heart-shake_0\.5s_ease-in-out\] {
+  animation: heart-shake 0.5s ease-in-out;
+}
+
+.group:hover .group-hover\:animate-\[key-rotate_0\.6s_ease-in-out\] {
+  animation: key-rotate 0.6s ease-in-out;
+}
+
 .group:hover .group-hover\:gap-3 {
   gap: 0.75rem;
 }
