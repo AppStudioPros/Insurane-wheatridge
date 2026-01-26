@@ -39,42 +39,42 @@ export default function HomePage() {
       title: 'Auto Insurance',
       desc: 'Comprehensive protection for your vehicles with competitive rates and excellent coverage options.',
       link: '/services/auto-insurance',
-      icon: Car,
+      iconType: 'car',
       color: 'from-blue-500 to-blue-600'
     },
     { 
       title: 'Home Insurance',
       desc: 'Safeguard your home and belongings with customizable coverage that fits your needs.',
       link: '/services/home-insurance',
-      icon: HomeIcon,
+      iconType: 'home',
       color: 'from-green-500 to-green-600'
     },
     { 
       title: 'Life Insurance',
       desc: 'Secure your family\'s financial future with flexible life insurance solutions.',
       link: '/services/life-insurance',
-      icon: HeartHandshake,
+      iconType: 'life',
       color: 'from-red-500 to-red-600'
     },
     { 
       title: 'Business Insurance',
       desc: 'Protect your business operations, employees, and assets with tailored coverage.',
       link: '/services/business-insurance',
-      icon: Briefcase,
+      iconType: 'business',
       color: 'from-purple-500 to-purple-600'
     },
     { 
       title: 'Renters Insurance',
       desc: 'Affordable protection for your personal property and liability coverage.',
       link: '/services/renters-insurance',
-      icon: Key,
+      iconType: 'renters',
       color: 'from-orange-500 to-orange-600'
     },
     { 
       title: 'Condo Insurance',
       desc: 'Specialized coverage for condo owners that complements your HOA policy.',
       link: '/services/condo-insurance',
-      icon: Building2,
+      iconType: 'condo',
       color: 'from-teal-500 to-teal-600'
     },
   ]
