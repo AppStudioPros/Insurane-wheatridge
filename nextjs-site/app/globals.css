@@ -46,6 +46,9 @@
   .animation-delay-4000 {
     animation-delay: 4s;
   }
+  .animate-gradient {
+    animation: gradient-shift 3s ease infinite;
+  }
 }
 
 @keyframes blob {
@@ -61,4 +64,50 @@
   100% {
     transform: translate(0px, 0px) scale(1);
   }
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Icon Hover Animations */
+@keyframes car-drive {
+  0%, 100% { transform: translateX(0) translateY(0); }
+  50% { transform: translateX(3px) translateY(-2px); }
+}
+
+@keyframes door-open {
+  0%, 100% { transform: perspective(100px) rotateY(0deg); }
+  50% { transform: perspective(100px) rotateY(-20deg); }
+}
+
+@keyframes heart-shake {
+  0%, 100% { transform: translateY(0); }
+  25% { transform: translateY(-3px); }
+  75% { transform: translateY(3px); }
+}
+
+@keyframes briefcase-open {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(1.1); }
+}
+
+@keyframes key-rotate {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(-15deg); }
+  75% { transform: rotate(15deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes building-sway {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  50% { transform: rotate(2deg) translateY(-2px); }
 }
