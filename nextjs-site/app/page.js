@@ -161,8 +161,8 @@ export default function HomePage() {
             >
               <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent z-10"></div>
               <Image 
-                src="/images/Jubal Terry 2025 NMP-7.jpg"
-                alt="Jubal Terry and Team at Insurance Wheat Ridge"
+                src="/images/Jubal Terry 2025 NMP-23.jpg"
+                alt="Insurance Wheat Ridge - Professional Insurance Services"
                 fill
                 className="object-cover object-center"
                 priority
