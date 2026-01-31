@@ -83,8 +83,8 @@ export default function HomePage() {
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <Navigation />
 
-      {/* Hero Section - Enhanced */}
-      <section className="relative bg-gradient-to-br from-primary via-blue-700 to-blue-900 text-white pt-20 pb-32 lg:pt-28 lg:pb-40 overflow-hidden">
+      {/* Hero Section - Single Column */}
+      <section className="relative bg-gradient-to-br from-primary via-blue-700 to-blue-900 text-white pt-20 pb-32 lg:pt-32 lg:pb-48 overflow-hidden">
         {/* Animated Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full mix-blend-overlay filter blur-3xl animate-blob"></div>
@@ -96,14 +96,14 @@ export default function HomePage() {
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-r from-primary to-blue-800 transform origin-bottom-left -skew-y-2"></div>
 
         <div className="container mx-auto px-4 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="max-w-5xl mx-auto text-center">
             <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
               <motion.div 
-                className="inline-block mb-4 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-semibold"
+                className="inline-block mb-6 px-6 py-3 bg-white/20 backdrop-blur-sm rounded-full text-base font-semibold"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
@@ -111,24 +111,24 @@ export default function HomePage() {
                 🏆 Trusted by Wheat Ridge Families Since 2022
               </motion.div>
               
-              <h1 className="text-4xl lg:text-6xl font-bold mb-6 leading-tight">
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-8 leading-tight">
                 Insurance Solutions You Can{' '}
                 <span className="text-yellow-300">Trust</span>
               </h1>
               
-              <p className="text-xl lg:text-2xl mb-8 text-white/90 leading-relaxed">
-                Protecting what matters most—your family, home, car, and business—with personalized coverage and local expertise.
+              <p className="text-xl md:text-2xl lg:text-3xl mb-10 text-white/90 leading-relaxed max-w-4xl mx-auto">
+                Protecting what matters most—your family, home, car, and business—with personalized coverage and local expertise in Wheat Ridge, Colorado.
               </p>
               
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/contact" className="group bg-white text-primary px-8 py-4 rounded-xl hover:bg-yellow-300 hover:text-primary font-bold text-center text-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+                <Link href="/contact" className="group bg-white text-primary px-10 py-5 rounded-xl hover:bg-yellow-300 hover:text-primary font-bold text-center text-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
                   Get Your Free Quote
-                  <ArrowRight className="inline ml-2 group-hover:translate-x-1 transition-transform" size={20} />
+                  <ArrowRight className="inline ml-2 group-hover:translate-x-1 transition-transform" size={24} />
                 </Link>
-                <a href="tel:3034641911" className="relative overflow-hidden bg-white/10 backdrop-blur-sm border-2 border-white text-white px-8 py-4 rounded-xl hover:bg-white hover:text-primary font-bold text-center text-lg transition-all duration-300 group">
+                <a href="tel:3034641911" className="relative overflow-hidden bg-white/10 backdrop-blur-sm border-2 border-white text-white px-10 py-5 rounded-xl hover:bg-white hover:text-primary font-bold text-center text-xl transition-all duration-300 group">
                   <span className="absolute inset-0 bg-gradient-to-r from-white via-red-100 to-white bg-[length:200%_100%] animate-gradient opacity-0 group-hover:opacity-100 transition-opacity duration-500"></span>
                   <span className="relative flex items-center justify-center">
-                    <Phone className="inline mr-2" size={20} />
+                    <Phone className="inline mr-2" size={24} />
                     (303) 464-1911
                   </span>
                 </a>
@@ -136,56 +136,26 @@ export default function HomePage() {
 
               {/* Trust Badges */}
               <motion.div 
-                className="flex flex-wrap gap-6 mt-8 pt-8 border-t border-white/20"
+                className="flex flex-wrap gap-8 justify-center pt-8 border-t border-white/20"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
               >
-                <div className="flex items-center gap-2">
-                  <Shield className="text-yellow-300" size={24} />
-                  <span className="text-sm">Licensed Agent</span>
+                <div className="flex items-center gap-3">
+                  <Shield className="text-yellow-300" size={28} />
+                  <span className="text-base font-medium">Licensed Agent</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Award className="text-yellow-300" size={24} />
-                  <span className="text-sm">Farmers Insurance</span>
+                <div className="flex items-center gap-3">
+                  <Award className="text-yellow-300" size={28} />
+                  <span className="text-base font-medium">Farmers Insurance</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Heart className="text-yellow-300" size={24} />
-                  <span className="text-sm">Local Service</span>
+                <div className="flex items-center gap-3">
+                  <Heart className="text-yellow-300" size={28} />
+                  <span className="text-base font-medium">Local Service</span>
                 </div>
-              </motion.div>
-            </motion.div>
-
-            <motion.div 
-              className="relative h-[400px] sm:h-[500px] lg:h-[600px] rounded-2xl overflow-hidden shadow-2xl"
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent z-10"></div>
-              <Image 
-                src="/images/Jubal Terry 2025 NMP-23.jpg"
-                alt="Insurance Wheat Ridge - Professional Insurance Services"
-                fill
-                className="object-cover object-center"
-                priority
-                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 600px"
-              />
-              {/* Floating Card */}
-              <motion.div 
-                className="absolute bottom-4 left-4 right-4 sm:bottom-8 sm:left-8 sm:right-8 bg-white/95 backdrop-blur-sm p-4 sm:p-6 rounded-xl shadow-xl"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8 }}
-              >
-                <div className="flex items-center gap-3 sm:gap-4">
-                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
-                    <Users className="text-white" size={24} />
-                  </div>
-                  <div>
-                    <div className="text-2xl sm:text-3xl font-bold text-primary">500+</div>
-                    <div className="text-sm sm:text-base text-gray-600 font-medium">Happy Clients Served</div>
-                  </div>
+                <div className="flex items-center gap-3">
+                  <Users className="text-yellow-300" size={28} />
+                  <span className="text-base font-medium">500+ Clients Served</span>
                 </div>
               </motion.div>
             </motion.div>
