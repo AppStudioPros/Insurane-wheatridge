@@ -1,15 +1,16 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
+  "/api/independent-contact/route": "app/api/independent-contact/route.js",
   "/contact/page": "app/contact/page.js",
   "/page": "app/page.js",
-  "/accessibility/page": "app/accessibility/page.js",
   "/about/page": "app/about/page.js",
-  "/privacy/page": "app/privacy/page.js",
   "/services/auto-insurance/page": "app/services/auto-insurance/page.js",
+  "/accessibility/page": "app/accessibility/page.js",
+  "/privacy/page": "app/privacy/page.js",
   "/services/business-insurance/page": "app/services/business-insurance/page.js",
+  "/services/renters-insurance/page": "app/services/renters-insurance/page.js",
   "/services/home-insurance/page": "app/services/home-insurance/page.js",
   "/services/condo-insurance/page": "app/services/condo-insurance/page.js",
-  "/services/life-insurance/page": "app/services/life-insurance/page.js",
   "/terms/page": "app/terms/page.js",
-  "/services/renters-insurance/page": "app/services/renters-insurance/page.js"
+  "/services/life-insurance/page": "app/services/life-insurance/page.js"
 }

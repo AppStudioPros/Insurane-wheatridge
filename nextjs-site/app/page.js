@@ -15,6 +15,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
+import IndependentContactForm from '@/components/IndependentContactForm'
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
@@ -404,6 +405,57 @@ export default function HomePage() {
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
+          </div>
+        </div>
+      </section>
+
+      {/* Independent / Alternative Coverage Section */}
+      <section className="py-16 bg-white border-t border-gray-100">
+        <div className="container mx-auto px-4">
+          <div className="max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+              {/* Left — Copy */}
+              <div>
+                <span className="inline-block bg-blue-50 text-blue-700 text-sm font-semibold px-4 py-1.5 rounded-full mb-4">
+                  Beyond Standard Coverage
+                </span>
+                <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-5 leading-tight">
+                  Need Coverage That Standard Carriers Won&apos;t Provide?
+                </h2>
+                <p className="text-gray-600 text-lg mb-6 leading-relaxed">
+                  While Jubal is proud to represent Farmers Insurance, he understands that every situation is unique. 
+                  For clients whose needs fall outside traditional coverage options, he has access to a broader range 
+                  of solutions through independent markets — so no one gets left without the protection they need.
+                </p>
+                <ul className="space-y-3 mb-6">
+                  {[
+                    'High-risk or non-standard auto coverage',
+                    'Hard-to-place home or property insurance',
+                    'Specialty or niche business coverage',
+                    'Situations where standard carriers have declined',
+                    'Unique life or liability coverage needs',
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-3 text-gray-700">
+                      <span className="text-blue-600 font-bold mt-0.5">✓</span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-sm text-gray-500 italic">
+                  Jubal will always be transparent about your options and help you find the best fit — 
+                  whether that&apos;s through Farmers or another trusted carrier.
+                </p>
+              </div>
+
+              {/* Right — Form */}
+              <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200">
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Tell Us About Your Situation</h3>
+                <p className="text-gray-500 text-sm mb-6">
+                  Fill out the form below and Jubal will personally review your needs and reach out with options.
+                </p>
+                <IndependentContactForm />
+              </div>
+            </div>
           </div>
         </div>
       </section>
