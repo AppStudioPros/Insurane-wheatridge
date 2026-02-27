@@ -8,12 +8,10 @@ const COVERAGE_TYPES = [
   'Renters Insurance',
   'Life Insurance',
   'Business Insurance',
-  'High-Risk / Non-Standard Coverage',
-  'Specialty Coverage',
   'Other',
 ]
 
-export default function IndependentContactForm() {
+export default function IndependentContactForm({ apiEndpoint = '/api/independent-contact' }) {
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -34,7 +32,7 @@ export default function IndependentContactForm() {
     }
 
     try {
-      const res = await fetch('/api/independent-contact', {
+      const res = await fetch(apiEndpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
@@ -112,9 +110,9 @@ export default function IndependentContactForm() {
           <label className="block text-sm font-medium text-gray-700 mb-1">Coverage Type Needed</label>
           <select
             name="insuranceType"
+            defaultValue="Other"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
           >
-            <option value="">Select a type...</option>
             {COVERAGE_TYPES.map((t) => (
               <option key={t} value={t}>{t}</option>
             ))}

@@ -21,10 +21,10 @@ export default function RentersInsurancePage() {
             <div className="inline-block mb-4 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-semibold">
               🔑 Renters Insurance
             </div>
-            <h1 className="text-4xl lg:text-5xl font-bold mb-6">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
               Renters Insurance in Wheat Ridge, CO | Affordable Protection for Your Belongings
             </h1>
-            <p className="text-xl mb-8">
+            <p className="text-base sm:text-xl mb-8">
               Even if you don't own your home, your personal property still matters. Our renters insurance provides financial protection against theft, fire, and other covered losses.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
@@ -40,7 +40,7 @@ export default function RentersInsurancePage() {
       </section>
 
       {/* Why Renters Insurance */}
-      <section className="py-16 bg-white">
+      <section className="py-10 md:py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-gray-900 mb-6">Why Renters Insurance Is Important</h2>
@@ -55,10 +55,10 @@ export default function RentersInsurancePage() {
       </section>
 
       {/* Core Coverage */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-10 md:py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">What Renters Insurance Covers</h2>
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 md:gap-8 max-w-6xl mx-auto">
             {[
               {
                 icon: <Key className="text-orange-600" size={48} />,
@@ -87,7 +87,7 @@ export default function RentersInsurancePage() {
       </section>
 
       {/* Optional Coverage */}
-      <section className="py-16 bg-white">
+      <section className="py-10 md:py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-gray-900 mb-8">Optional Coverage Enhancements</h2>
@@ -114,7 +114,7 @@ export default function RentersInsurancePage() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl font-bold mb-6">Affordable Protection Starting at Just Pennies a Day</h2>
-            <p className="text-xl mb-8">
+            <p className="text-base sm:text-xl mb-8">
               Most renters insurance policies cost less than a cup of coffee each week. Can you really afford not to have it?
             </p>
             <Link href="/contact" className="inline-block bg-white text-orange-700 px-8 py-3 rounded-lg hover:bg-gray-100 font-semibold">
@@ -125,7 +125,7 @@ export default function RentersInsurancePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-10 md:py-16 bg-gray-50">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-6">Ready to Protect Your Belongings?</h2>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">

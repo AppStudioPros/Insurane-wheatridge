@@ -18,10 +18,10 @@ export default function AutoInsurancePage() {
       <section className="relative bg-gradient-to-br from-primary to-primary/80 text-white py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl">
-            <h1 className="text-4xl lg:text-5xl font-bold mb-6">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
               Auto Insurance in Wheat Ridge, CO | Protection Designed for the Way You Live and Drive
             </h1>
-            <p className="text-xl mb-8">
+            <p className="text-base sm:text-xl mb-8">
               Your vehicle gets you where you need to go, and it deserves dependable protection. We help you find an auto insurance policy that balances affordability with comprehensive coverage, including protection from accidents, theft, and unexpected harm.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
@@ -37,7 +37,7 @@ export default function AutoInsurancePage() {
       </section>
 
       {/* Why Auto Insurance Matters */}
-      <section className="py-16 bg-white">
+      <section className="py-10 md:py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-gray-900 mb-6">Why Auto Insurance Is Still Essential in Today's World</h2>
@@ -52,10 +52,10 @@ export default function AutoInsurancePage() {
       </section>
 
       {/* Coverage Types */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-10 md:py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">Main Types of Auto Coverage</h2>
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 md:gap-8 max-w-6xl mx-auto">
             {[
               {
                 icon: <Shield className="text-primary" size={48} />,
@@ -73,7 +73,7 @@ export default function AutoInsurancePage() {
                 description: 'Can cover your vehicle for losses caused by things other than a collision—like theft, vandalism, hail, fire, and animal damage.'
               }
             ].map((item, index) => (
-              <div key={index} className="bg-white p-8 rounded-lg shadow-md">
+              <div key={index} className="bg-white p-5 md:p-8 rounded-lg shadow-md">
                 <div className="mb-4">{item.icon}</div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">{item.title}</h3>
                 <p className="text-gray-600 leading-relaxed">{item.description}</p>
@@ -84,7 +84,7 @@ export default function AutoInsurancePage() {
       </section>
 
       {/* Additional Coverage */}
-      <section className="py-16 bg-white">
+      <section className="py-10 md:py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-gray-900 mb-8">Enhanced Coverage Options</h2>
@@ -107,11 +107,11 @@ export default function AutoInsurancePage() {
       </section>
 
       {/* Benefits */}
-      <section className="py-16 bg-primary text-white">
+      <section className="py-10 md:py-16 bg-primary text-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl font-bold mb-6">The Benefits of Auto Coverage from Farmers®</h2>
-            <p className="text-xl mb-8">
+            <p className="text-base sm:text-xl mb-8">
               If you're in an accident, our goal at Farmers is to help you get back on the road—safely and quickly—with our award-winning claims service.
             </p>
             <Link href="/contact" className="inline-block bg-white text-primary px-8 py-3 rounded-lg hover:bg-gray-100 font-semibold">
@@ -122,7 +122,7 @@ export default function AutoInsurancePage() {
       </section>
 
       {/* Local Agent Advantage */}
-      <section className="py-16 bg-white">
+      <section className="py-10 md:py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-gray-900 mb-6">The Advantage of Working With a Local Agent</h2>
@@ -137,7 +137,7 @@ export default function AutoInsurancePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-10 md:py-16 bg-gray-50">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-6">Ready to Protect Your Vehicle?</h2>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">

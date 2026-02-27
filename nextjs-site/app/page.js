@@ -16,6 +16,9 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion'
 import IndependentContactForm from '@/components/IndependentContactForm'
+import AnimatedCrosshairs from '@/components/AnimatedCrosshairs'
+import AnimatedBulletList from '@/components/AnimatedBulletList'
+import GridHoverEffect from '@/components/GridHoverEffect'
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
@@ -84,17 +87,17 @@ export default function HomePage() {
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <Navigation />
 
-      {/* Hero Section - Single Column */}
-      <section className="relative bg-gradient-to-br from-primary via-blue-700 to-blue-900 text-white pt-20 pb-32 lg:pt-32 lg:pb-48 overflow-hidden">
-        {/* Animated Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full mix-blend-overlay filter blur-3xl animate-blob"></div>
-          <div className="absolute top-0 right-0 w-96 h-96 bg-blue-300 rounded-full mix-blend-overlay filter blur-3xl animate-blob animation-delay-2000"></div>
-          <div className="absolute bottom-0 left-1/2 w-96 h-96 bg-blue-200 rounded-full mix-blend-overlay filter blur-3xl animate-blob animation-delay-4000"></div>
-        </div>
+      {/* Hero + Stats — unified seamless background */}
+      <div className="bg-gradient-to-b from-blue-900 via-blue-800 to-blue-900">
 
-        {/* Diagonal transition to next section */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-r from-primary to-blue-800 transform origin-bottom-left -skew-y-2"></div>
+      {/* Hero Section */}
+      <section className="relative text-white pt-20 pb-16 lg:pt-32 lg:pb-20 overflow-hidden">
+        {/* Drifting orb background — smooth, no grid */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-32 -left-32 w-[600px] h-[600px] bg-blue-500 rounded-full filter blur-[160px] opacity-20 animate-blob"></div>
+          <div className="absolute -top-20 -right-32 w-[500px] h-[500px] bg-indigo-400 rounded-full filter blur-[140px] opacity-[0.15] animate-blob animation-delay-2000"></div>
+          <div className="absolute bottom-0 left-1/3 w-[700px] h-[350px] bg-blue-300 rounded-full filter blur-[180px] opacity-10 animate-blob animation-delay-4000"></div>
+        </div>
 
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-5xl mx-auto text-center">
@@ -112,21 +115,52 @@ export default function HomePage() {
                 🏆 Trusted by Wheat Ridge Families Since 2022
               </motion.div>
               
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-8 leading-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-8 leading-tight">
                 Insurance Solutions You Can{' '}
-                <span className="text-yellow-300">Trust</span>
+                <span className="relative inline-block">
+                  {/* Outer glow — blurred duplicate revealed by sweeping mask */}
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-0 pointer-events-none select-none"
+                    style={{
+                      color: '#FDE047',
+                      filter: 'blur(12px)',
+                      maskImage: 'linear-gradient(90deg, transparent 30%, white 50%, transparent 70%)',
+                      WebkitMaskImage: 'linear-gradient(90deg, transparent 30%, white 50%, transparent 70%)',
+                      maskSize: '300% 100%',
+                      WebkitMaskSize: '300% 100%',
+                      animation: 'glowSweep 7s ease-in-out infinite',
+                    }}
+                  >Trust</span>
+                  {/* Inner tight glow */}
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-0 pointer-events-none select-none"
+                    style={{
+                      color: '#FFF9C4',
+                      filter: 'blur(4px)',
+                      maskImage: 'linear-gradient(90deg, transparent 35%, white 50%, transparent 65%)',
+                      WebkitMaskImage: 'linear-gradient(90deg, transparent 35%, white 50%, transparent 65%)',
+                      maskSize: '300% 100%',
+                      WebkitMaskSize: '300% 100%',
+                      animation: 'glowSweep 7s ease-in-out infinite',
+                    }}
+                  >Trust</span>
+                  {/* Base text — always solid yellow */}
+                  <span className="text-yellow-300">Trust</span>
+                </span>
               </h1>
               
-              <p className="text-xl md:text-2xl lg:text-3xl mb-10 text-white/90 leading-relaxed max-w-4xl mx-auto">
+              <p className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl mb-10 text-white/90 leading-relaxed max-w-4xl mx-auto">
                 Protecting what matters most—your family, home, car, and business—with personalized coverage and local expertise in Wheat Ridge, Colorado.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-                <Link href="/contact" className="group bg-white text-primary px-10 py-5 rounded-xl hover:bg-yellow-300 hover:text-primary font-bold text-center text-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                <Link href="/contact" className="group bg-white text-primary px-6 sm:px-10 py-4 sm:py-5 rounded-xl hover:bg-yellow-300 hover:text-primary font-bold text-center text-lg sm:text-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
                   Get Your Free Quote
-                  <ArrowRight className="inline ml-2 group-hover:translate-x-1 transition-transform" size={24} />
+                  <ArrowRight className="inline ml-2 group-hover:translate-x-1 transition-transform" size={22} />
                 </Link>
-                <a href="tel:3034641911" className="relative overflow-hidden bg-white/10 backdrop-blur-sm border-2 border-white text-white px-10 py-5 rounded-xl hover:bg-white hover:text-primary font-bold text-center text-xl transition-all duration-300 group">
+                <a href="tel:3034641911" className="relative overflow-hidden bg-white/10 backdrop-blur-sm border-2 border-white text-white px-6 sm:px-10 py-4 sm:py-5 rounded-xl hover:bg-white hover:text-primary font-bold text-center text-lg sm:text-xl transition-all duration-300 group">
                   <span className="absolute inset-0 bg-gradient-to-r from-white via-red-100 to-white bg-[length:200%_100%] animate-gradient opacity-0 group-hover:opacity-100 transition-opacity duration-500"></span>
                   <span className="relative flex items-center justify-center">
                     <Phone className="inline mr-2" size={24} />
@@ -164,11 +198,16 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Stats Counter Section - NEW */}
-      <section ref={statsRef} className="relative py-20 bg-gradient-to-r from-primary to-blue-800 text-white overflow-hidden -mt-20">
-        <div className="absolute inset-0 opacity-10">
+      {/* Stats Counter Section */}
+      <section ref={statsRef} className="relative py-12 md:py-20 text-white overflow-hidden">
+        {/* Crosshair grid */}
+        <div className="absolute inset-0 opacity-[0.08]">
           <div className="absolute inset-0" style={{backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.4\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")'}}></div>
         </div>
+        {/* Ambient random flashing crosshairs */}
+        <AnimatedCrosshairs count={10} />
+        {/* Interactive hover highlight */}
+        <GridHoverEffect />
         <div className="container mx-auto px-4 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -180,7 +219,7 @@ export default function HomePage() {
             <p className="text-xl text-white/90">Real numbers. Real results. Real peace of mind.</p>
           </motion.div>
           
-          <div className="grid md:grid-cols-4 gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 max-w-6xl mx-auto">
             {[
               { number: 2, suffix: '+', label: 'Years of Service', icon: Award },
               { number: 500, suffix: '+', label: 'Clients Protected', icon: Users },
@@ -192,21 +231,59 @@ export default function HomePage() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={statsInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="text-center bg-white/10 backdrop-blur-sm p-8 rounded-2xl hover:bg-white/20 transition-all duration-300"
+                className="text-center bg-white/10 backdrop-blur-sm p-4 md:p-8 rounded-2xl hover:bg-white/20 transition-all duration-300"
               >
-                <stat.icon className="mx-auto mb-4 text-yellow-300" size={48} />
-                <div className="text-5xl font-bold mb-2">
+                <stat.icon className="mx-auto mb-3 text-yellow-300" size={36} />
+                <div className="text-3xl md:text-5xl font-bold mb-1 md:mb-2">
                   <AnimatedCounter end={stat.number} suffix={stat.suffix} />
                 </div>
-                <div className="text-lg text-white/80">{stat.label}</div>
+                <div className="text-sm md:text-lg text-white/80">{stat.label}</div>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
+      </div>{/* end hero+stats unified background */}
+
+      {/* Beyond Farmers — Independent Coverage Callout */}
+      <section className="py-10 md:py-16 bg-blue-50 border-y border-blue-100">
+        <div className="container mx-auto px-4">
+          <div className="max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+              {/* Left — headline + copy */}
+              <div>
+                <span className="inline-block px-4 py-1.5 bg-blue-100 text-primary text-sm font-semibold rounded-full mb-4">
+                  Beyond Farmers Insurance
+                </span>
+                <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4 leading-tight">
+                  Not Every Situation Fits the Standard Mold
+                </h2>
+                <p className="text-gray-600 text-lg leading-relaxed">
+                  While Jubal proudly represents Farmers Insurance, he knows that life doesn&apos;t always fit neatly into standard coverage categories. For clients who need something different, he has access to independent markets and specialty carriers — so you never have to go without the protection you need.
+                </p>
+              </div>
+              {/* Right — bullet points + CTA */}
+              <div className="bg-white rounded-2xl p-5 sm:p-8 shadow-sm border border-blue-100">
+                <p className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">
+                  Jubal can help with:
+                </p>
+                <AnimatedBulletList />
+                <Link
+                  href="#independent-coverage"
+                  className="inline-flex items-center gap-2 bg-primary text-white px-7 py-3 rounded-xl font-semibold hover:bg-blue-800 transition-all duration-200 shadow-sm"
+                >
+                  Tell Us About Your Situation
+                  <ArrowRight size={18} />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Meet Your Agent - Enhanced */}
-      <section className="py-20 bg-white relative overflow-hidden">
+      <section className="py-12 md:py-20 bg-white relative overflow-hidden">
         <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-blue-50 to-transparent opacity-50"></div>
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
@@ -238,7 +315,7 @@ export default function HomePage() {
       </section>
 
       {/* Services Grid - Enhanced with Icons and Animation */}
-      <section ref={servicesRef} className="py-20 bg-gradient-to-b from-gray-50 to-white">
+      <section ref={servicesRef} className="py-12 md:py-20 bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -257,7 +334,7 @@ export default function HomePage() {
             </p>
           </motion.div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-8">
             {services.map((service, index) => {
               return (
                 <motion.div
@@ -267,7 +344,7 @@ export default function HomePage() {
                   transition={{ duration: 0.6, delay: index * 0.1 }}
                 >
                   <Link href={service.link} className="group block h-full">
-                    <div className="bg-white p-8 rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 border border-gray-100 h-full transform hover:-translate-y-2">
+                    <div className="bg-white p-5 md:p-8 rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 border border-gray-100 h-full transform hover:-translate-y-2">
                       <div className={`w-16 h-16 bg-gradient-to-br ${service.color} rounded-xl flex items-center justify-center mb-6 transition-transform duration-300`}>
                         <AnimatedServiceIcon type={service.iconType} />
                       </div>
@@ -297,7 +374,7 @@ export default function HomePage() {
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">Why Choose Wheat Ridge Insurance Company?</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">Selecting the right insurance partner isn't just about policies—it's about trust, clarity, and support when it matters most.</p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-8 max-w-6xl mx-auto">
             {[
               {
                 icon: <Users className="text-primary" size={40} />,
@@ -344,7 +421,7 @@ export default function HomePage() {
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">How the Insurance Process Works</h2>
             <p className="text-xl text-gray-600">We make getting insured easy</p>
           </div>
-          <div className="grid md:grid-cols-4 gap-8 max-w-5xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-8 max-w-5xl mx-auto">
             {[
               { number: '1', title: 'Free Consultation', desc: 'Reach out by phone or in person to discuss what coverage you need.' },
               { number: '2', title: 'Personalized Quote', desc: 'We assess your situation and provide a custom quote based on your priorities.' },
@@ -410,10 +487,10 @@ export default function HomePage() {
       </section>
 
       {/* Independent / Alternative Coverage Section */}
-      <section className="py-16 bg-white border-t border-gray-100">
+      <section id="independent-coverage" className="py-10 md:py-16 bg-white border-t border-gray-100">
         <div className="container mx-auto px-4">
           <div className="max-w-5xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
               {/* Left — Copy */}
               <div>
                 <span className="inline-block bg-blue-50 text-blue-700 text-sm font-semibold px-4 py-1.5 rounded-full mb-4">
@@ -427,20 +504,13 @@ export default function HomePage() {
                   For clients whose needs fall outside traditional coverage options, he has access to a broader range 
                   of solutions through independent markets — so no one gets left without the protection they need.
                 </p>
-                <ul className="space-y-3 mb-6">
-                  {[
+                <AnimatedBulletList items={[
                     'High-risk or non-standard auto coverage',
                     'Hard-to-place home or property insurance',
                     'Specialty or niche business coverage',
                     'Situations where standard carriers have declined',
                     'Unique life or liability coverage needs',
-                  ].map((item) => (
-                    <li key={item} className="flex items-start gap-3 text-gray-700">
-                      <span className="text-blue-600 font-bold mt-0.5">✓</span>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
+                  ]} />
                 <p className="text-sm text-gray-500 italic">
                   Jubal will always be transparent about your options and help you find the best fit — 
                   whether that&apos;s through Farmers or another trusted carrier.
@@ -448,7 +518,7 @@ export default function HomePage() {
               </div>
 
               {/* Right — Form */}
-              <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200">
+              <div className="bg-gray-50 rounded-2xl p-5 sm:p-8 border border-gray-200">
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Tell Us About Your Situation</h3>
                 <p className="text-gray-500 text-sm mb-6">
                   Fill out the form below and Jubal will personally review your needs and reach out with options.

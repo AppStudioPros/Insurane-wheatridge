@@ -21,10 +21,10 @@ export default function CondoInsurancePage() {
             <div className="inline-block mb-4 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-semibold">
               🏢 Condo Insurance
             </div>
-            <h1 className="text-4xl lg:text-5xl font-bold mb-6">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
               Condo Insurance in Wheat Ridge, CO | Specialized Protection for Condo Owners
             </h1>
-            <p className="text-xl mb-8">
+            <p className="text-base sm:text-xl mb-8">
               Condo insurance helps cover what your HOA's master policy doesn't. We'll help you protect what's inside your unit with coverage that fits your home and lifestyle.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
@@ -40,7 +40,7 @@ export default function CondoInsurancePage() {
       </section>
 
       {/* Why Condo Insurance */}
-      <section className="py-16 bg-white">
+      <section className="py-10 md:py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-gray-900 mb-6">Why Condo Insurance Is Unique</h2>
@@ -55,10 +55,10 @@ export default function CondoInsurancePage() {
       </section>
 
       {/* Core Coverage */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-10 md:py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">What Condo Insurance Covers</h2>
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 md:gap-8 max-w-6xl mx-auto">
             {[
               {
                 icon: <Home className="text-teal-600" size={48} />,
@@ -87,7 +87,7 @@ export default function CondoInsurancePage() {
       </section>
 
       {/* Understanding HOA Coverage */}
-      <section className="py-16 bg-white">
+      <section className="py-10 md:py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-gray-900 mb-6">Understanding Your HOA's Master Policy</h2>
@@ -105,7 +105,7 @@ export default function CondoInsurancePage() {
       </section>
 
       {/* Optional Coverage */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-10 md:py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-gray-900 mb-8">Optional Coverage Enhancements</h2>
@@ -132,7 +132,7 @@ export default function CondoInsurancePage() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl font-bold mb-6">Complete Protection for Your Condo</h2>
-            <p className="text-xl mb-8">
+            <p className="text-base sm:text-xl mb-8">
               Don't assume your HOA's policy has you covered. Let's make sure you have the right protection for your condo and everything in it.
             </p>
             <Link href="/contact" className="inline-block bg-white text-teal-700 px-8 py-3 rounded-lg hover:bg-gray-100 font-semibold">
@@ -143,7 +143,7 @@ export default function CondoInsurancePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-white">
+      <section className="py-10 md:py-16 bg-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-6">Ready to Protect Your Condo?</h2>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">

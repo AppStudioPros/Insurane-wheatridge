@@ -21,10 +21,10 @@ export default function BusinessInsurancePage() {
             <div className="inline-block mb-4 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-semibold">
               💼 Business Insurance
             </div>
-            <h1 className="text-4xl lg:text-5xl font-bold mb-6">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
               Business Insurance in Wheat Ridge, CO | Protect Your Operations
             </h1>
-            <p className="text-xl mb-8">
+            <p className="text-base sm:text-xl mb-8">
               Running a business comes with real risks. From liability to property protection, we help business owners find coverage that protects their operations, employees, and assets.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
@@ -40,7 +40,7 @@ export default function BusinessInsurancePage() {
       </section>
 
       {/* Why Business Insurance */}
-      <section className="py-16 bg-white">
+      <section className="py-10 md:py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-gray-900 mb-6">Why Business Insurance Is Essential</h2>
@@ -55,10 +55,10 @@ export default function BusinessInsurancePage() {
       </section>
 
       {/* Core Coverage Types */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-10 md:py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">Essential Business Insurance Coverage</h2>
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 md:gap-8 max-w-6xl mx-auto">
             {[
               {
                 icon: <Shield className="text-purple-600" size={48} />,
@@ -87,7 +87,7 @@ export default function BusinessInsurancePage() {
       </section>
 
       {/* Additional Coverage */}
-      <section className="py-16 bg-white">
+      <section className="py-10 md:py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-gray-900 mb-8">Additional Business Coverage Options</h2>
@@ -111,7 +111,7 @@ export default function BusinessInsurancePage() {
       </section>
 
       {/* Industries Served */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-10 md:py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Industries We Serve</h2>
@@ -141,7 +141,7 @@ export default function BusinessInsurancePage() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl font-bold mb-6">Protect Your Business Investment</h2>
-            <p className="text-xl mb-8">
+            <p className="text-base sm:text-xl mb-8">
               We understand that every business is unique. Let's create a customized insurance plan that addresses your specific risks and budget.
             </p>
             <Link href="/contact" className="inline-block bg-white text-purple-700 px-8 py-3 rounded-lg hover:bg-gray-100 font-semibold">
@@ -152,7 +152,7 @@ export default function BusinessInsurancePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-white">
+      <section className="py-10 md:py-16 bg-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-6">Ready to Protect Your Business?</h2>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">

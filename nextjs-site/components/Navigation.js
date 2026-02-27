@@ -58,20 +58,20 @@ export default function Navigation() {
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
           <div className="lg:hidden pb-4 space-y-2">
-            <Link href="/" className="block py-2 text-gray-700 hover:text-primary">Home</Link>
-            <Link href="/about" className="block py-2 text-gray-700 hover:text-primary">About</Link>
+            <Link href="/" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-gray-700 hover:text-primary">Home</Link>
+            <Link href="/about" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-gray-700 hover:text-primary">About</Link>
             <div className="py-2">
               <div className="font-medium text-gray-900 mb-2">Services</div>
               <div className="pl-4 space-y-2">
-                <Link href="/services/auto-insurance" className="block py-1 text-gray-700 hover:text-primary">Auto Insurance</Link>
-                <Link href="/services/home-insurance" className="block py-1 text-gray-700 hover:text-primary">Home Insurance</Link>
-                <Link href="/services/life-insurance" className="block py-1 text-gray-700 hover:text-primary">Life Insurance</Link>
-                <Link href="/services/business-insurance" className="block py-1 text-gray-700 hover:text-primary">Business Insurance</Link>
-                <Link href="/services/renters-insurance" className="block py-1 text-gray-700 hover:text-primary">Renters Insurance</Link>
-                <Link href="/services/condo-insurance" className="block py-1 text-gray-700 hover:text-primary">Condo Insurance</Link>
+                <Link href="/services/auto-insurance" onClick={() => setMobileMenuOpen(false)} className="block py-1 text-gray-700 hover:text-primary">Auto Insurance</Link>
+                <Link href="/services/home-insurance" onClick={() => setMobileMenuOpen(false)} className="block py-1 text-gray-700 hover:text-primary">Home Insurance</Link>
+                <Link href="/services/life-insurance" onClick={() => setMobileMenuOpen(false)} className="block py-1 text-gray-700 hover:text-primary">Life Insurance</Link>
+                <Link href="/services/business-insurance" onClick={() => setMobileMenuOpen(false)} className="block py-1 text-gray-700 hover:text-primary">Business Insurance</Link>
+                <Link href="/services/renters-insurance" onClick={() => setMobileMenuOpen(false)} className="block py-1 text-gray-700 hover:text-primary">Renters Insurance</Link>
+                <Link href="/services/condo-insurance" onClick={() => setMobileMenuOpen(false)} className="block py-1 text-gray-700 hover:text-primary">Condo Insurance</Link>
               </div>
             </div>
-            <Link href="/contact" className="block py-2 text-gray-700 hover:text-primary">Contact</Link>
+            <Link href="/contact" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-gray-700 hover:text-primary">Contact</Link>
             <a href="tel:3034641911" className="block bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 font-medium text-center mt-4">
               Call (303) 464-1911
             </a>

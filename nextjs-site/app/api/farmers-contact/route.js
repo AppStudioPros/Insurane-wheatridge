@@ -12,7 +12,17 @@ export async function POST(req) {
 
     // Honeypot check
     if (website && website.trim() !== '') {
-      return NextResponse.json({ success: true }, { status: 200 });
+      // Log to Supabase
+    supabase.from('inquiries').insert({
+      source: 'farmers',
+      name, email, phone,
+      insurance_type: insuranceType,
+      message,
+    }).then(({ error: dbErr }) => {
+      if (dbErr) console.error('Supabase log error:', dbErr);
+    });
+
+    return NextResponse.json({ success: true }, { status: 200 });
     }
 
     if (!name || !email) {
@@ -21,14 +31,14 @@ export async function POST(req) {
 
     const { error } = await resend.emails.send({
       from: 'Insurance Wheatridge <noreply@mail.insurancewheatridge.com>',
-      to: ['jubal.terry@insurancewheatridge.com'],
+      to: ['jterry1@farmersagent.com'],
       replyTo: email,
-      subject: `New Independent Coverage Inquiry — ${name}`,
+      subject: `New Farmers Quote Request — ${name}`,
       html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; padding: 32px; border-radius: 8px; border: 1px solid #e5e7eb;">
-          <div style="background: #1e3a5f; padding: 20px 24px; border-radius: 6px; margin-bottom: 24px;">
-            <h2 style="color: #ffffff; margin: 0; font-size: 20px;">New Independent Coverage Inquiry</h2>
-            <p style="color: #93c5fd; margin: 4px 0 0; font-size: 14px;">insurancewheatridge.com</p>
+          <div style="background: #cc0000; padding: 20px 24px; border-radius: 6px; margin-bottom: 24px;">
+            <h2 style="color: #ffffff; margin: 0; font-size: 20px;">New Farmers Insurance Quote Request</h2>
+            <p style="color: #fca5a5; margin: 4px 0 0; font-size: 14px;">insurancewheatridge.com — Contact Page</p>
           </div>
           <table style="width: 100%; border-collapse: collapse;">
             <tr>
@@ -66,9 +76,9 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Failed to send message.' }, { status: 500 });
     }
 
-    // Log to Supabase (non-blocking — don't fail the request if this errors)
+    // Log to Supabase
     supabase.from('inquiries').insert({
-      source: 'independent',
+      source: 'farmers',
       name, email, phone,
       insurance_type: insuranceType,
       message,

@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
 import Testimonials from '@/components/Testimonials'
+import IndependentContactForm from '@/components/IndependentContactForm'
 import { GraduationCap, Award, MapPin, Phone } from 'lucide-react'
 
 export const metadata = {
@@ -30,10 +31,10 @@ export default function AboutPage() {
       </section>
 
       {/* Main About Section */}
-      <section className="py-16 bg-white">
+      <section className="py-10 md:py-16 bg-white">
         <div className="container mx-auto px-4">
-          <div className="grid lg:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
-            <div className="relative h-[500px] rounded-lg overflow-hidden shadow-xl">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center max-w-6xl mx-auto">
+            <div className="relative h-[260px] sm:h-[380px] lg:h-[500px] rounded-lg overflow-hidden shadow-xl">
               <Image
                 src="/images/Jubal Terry 2025 NMP-42.jpg"
                 alt="Jubal Terry, Farmers Insurance Agent"
@@ -66,27 +67,27 @@ export default function AboutPage() {
       </section>
 
       {/* Credentials */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-10 md:py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">Credentials & Experience</h2>
-            <div className="grid md:grid-cols-2 gap-8">
-              <div className="bg-white p-8 rounded-lg shadow-md">
+            <div className="grid grid-cols-2 gap-4 md:gap-8">
+              <div className="bg-white p-4 md:p-8 rounded-lg shadow-md">
                 <Award className="text-primary mb-4" size={40} />
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Agent License</h3>
                 <p className="text-gray-700">#653703</p>
               </div>
-              <div className="bg-white p-8 rounded-lg shadow-md">
+              <div className="bg-white p-4 md:p-8 rounded-lg shadow-md">
                 <Award className="text-primary mb-4" size={40} />
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Years with Farmers</h3>
                 <p className="text-gray-700">Over 2 years</p>
               </div>
-              <div className="bg-white p-8 rounded-lg shadow-md">
+              <div className="bg-white p-4 md:p-8 rounded-lg shadow-md">
                 <GraduationCap className="text-primary mb-4" size={40} />
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Education</h3>
                 <p className="text-gray-700">Geology, Wheat Ridge High School</p>
               </div>
-              <div className="bg-white p-8 rounded-lg shadow-md">
+              <div className="bg-white p-4 md:p-8 rounded-lg shadow-md">
                 <MapPin className="text-primary mb-4" size={40} />
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Licensed States</h3>
                 <p className="text-gray-700">Colorado (CO)</p>
@@ -97,11 +98,11 @@ export default function AboutPage() {
       </section>
 
       {/* Background Story */}
-      <section className="py-16 bg-white">
+      <section className="py-10 md:py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-gray-900 mb-6">My Story</h2>
-            <div className="bg-blue-50 p-8 rounded-lg border-l-4 border-primary">
+            <div className="bg-blue-50 p-5 md:p-8 rounded-lg border-l-4 border-primary">
               <h3 className="text-2xl font-bold text-gray-900 mb-4">Out of Work Geologist So I Bought an Insurance Agency!!</h3>
               <p className="text-lg text-gray-700 leading-relaxed">
                 I'm a skilled unconventional and conventional oil and gas prospect generator with wide-ranging experience throughout all Rocky Mountain basins, Appalachian basin, Cherokee basin, and the Illinois basin. My extensive knowledge of stratigraphic concepts in fossil fuel exploration, structural geology, economic evaluation, regional studies, play and prospect generation, evaluation, and development has given me strong analytical and problem-solving skills that I now apply to helping families and businesses protect what matters most.
@@ -112,11 +113,11 @@ export default function AboutPage() {
       </section>
 
       {/* Service Areas */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-10 md:py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Neighborhoods We Serve</h2>
-            <div className="bg-white p-8 rounded-lg shadow-md">
+            <div className="bg-white p-4 md:p-8 rounded-lg shadow-md">
               <div className="grid md:grid-cols-2 gap-6">
                 {[
                   'Jefferson County',
@@ -137,13 +138,66 @@ export default function AboutPage() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-16 bg-white">
+      <section className="py-10 md:py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">What My Clients Say</h2>
             <p className="text-xl text-gray-600">Don't just take my word for it—here's what my clients have to say about their experience.</p>
           </div>
           <Testimonials limit={6} />
+        </div>
+      </section>
+
+      {/* Contact Form Section */}
+      <section className="py-16 bg-gray-50 border-t border-gray-100">
+        <div className="container mx-auto px-4">
+          <div className="max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+              {/* Left — Copy */}
+              <div>
+                <span className="inline-block bg-blue-50 text-blue-700 text-sm font-semibold px-4 py-1.5 rounded-full mb-4">
+                  Get in Touch
+                </span>
+                <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-5 leading-tight">
+                  Let&apos;s Find the Right Coverage for You
+                </h2>
+                <p className="text-gray-600 text-lg mb-6 leading-relaxed">
+                  Whether you&apos;re looking for your first policy, shopping for better rates, or have a situation that standard carriers won&apos;t cover — Jubal is here to help. Fill out the form and he&apos;ll personally reach out with your options.
+                </p>
+                <ul className="space-y-3 mb-6">
+                  {[
+                    'Free, no-obligation consultation',
+                    'Personalized coverage recommendations',
+                    'Response within 24 hours',
+                    'Access to Farmers Insurance + independent markets',
+                    'Local Wheat Ridge expertise',
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-3 text-gray-700">
+                      <span className="text-blue-600 font-bold mt-0.5">✓</span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                <div className="flex flex-col sm:flex-row gap-3 mt-6">
+                  <a
+                    href="tel:3034641911"
+                    className="inline-flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition"
+                  >
+                    <Phone size={18} />
+                    (303) 464-1911
+                  </a>
+                </div>
+              </div>
+              {/* Right — Form */}
+              <div className="bg-white rounded-2xl p-5 sm:p-8 border border-gray-200 shadow-sm">
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Request a Free Quote</h3>
+                <p className="text-gray-500 text-sm mb-6">
+                  Fill out the form and Jubal will be in touch within 24 hours.
+                </p>
+                <IndependentContactForm />
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
