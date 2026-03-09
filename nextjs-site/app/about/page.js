@@ -202,8 +202,15 @@ export default function AboutPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-primary text-white">
-        <div className="container mx-auto px-4 text-center">
+      <section className="relative py-16 text-white overflow-hidden">
+        <Image
+          src="/images/Jubal Terry 2025 NMP-2.jpg"
+          alt="Jubal Terry at the office"
+          fill
+          className="object-cover"
+        />
+        <div className="absolute inset-0 bg-black/60" />
+        <div className="container mx-auto px-4 text-center relative z-10">
           <h2 className="text-3xl font-bold mb-6">Ready to Get Started?</h2>
           <p className="text-xl mb-8 max-w-2xl mx-auto">
             Stop by our office, conveniently located just south of Winchell's Donut Shop, or give me a call. I'd love to answer your questions and provide a free, customized insurance quote.
