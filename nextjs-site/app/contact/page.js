@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
 import Testimonials from '@/components/Testimonials'
