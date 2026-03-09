@@ -427,28 +427,34 @@ export default function HomePage() {
                 desc: 'From your first quote to submitting a claim, we\'re here for you with quick help, ongoing coverage reviews, and answers you can count on.'
               },
               {
+                isPhoto: true,
+                src: '/images/Jubal Terry 2025 NMP-38.jpg',
+              },
+              {
                 icon: <CheckCircle2 className="text-primary" size={40} />,
                 title: 'Flexible Solutions',
                 desc: 'We partner with trusted carriers to offer a range of coverage options, competitive rates, and flexible plans tailored to your needs.'
               },
             ].map((item, index) => (
-              <div key={index} className="text-center p-6">
-                <div className="inline-flex items-center justify-center w-20 h-20 bg-blue-50 rounded-full mb-4">
-                  {item.icon}
+              item.isPhoto ? (
+                <div key={index} className="relative rounded-2xl overflow-hidden shadow-lg min-h-[280px]">
+                  <Image
+                    src={item.src}
+                    alt="Jubal Terry - Your Wheat Ridge Insurance Agent"
+                    fill
+                    className="object-cover object-top"
+                  />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">{item.title}</h3>
-                <p className="text-gray-600 leading-relaxed">{item.desc}</p>
-              </div>
+              ) : (
+                <div key={index} className="text-center p-6">
+                  <div className="inline-flex items-center justify-center w-20 h-20 bg-blue-50 rounded-full mb-4">
+                    {item.icon}
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-3">{item.title}</h3>
+                  <p className="text-gray-600 leading-relaxed">{item.desc}</p>
+                </div>
+              )
             ))}
-            <div className="relative rounded-2xl overflow-hidden shadow-lg">
-              <Image
-                src="/images/Jubal Terry 2025 NMP-38.jpg"
-                alt="Jubal Terry - Your Wheat Ridge Insurance Agent"
-                width={400}
-                height={500}
-                className="w-full h-full object-cover object-top"
-              />
-            </div>
           </div>
         </div>
       </section>
