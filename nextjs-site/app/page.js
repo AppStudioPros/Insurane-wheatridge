@@ -286,30 +286,60 @@ export default function HomePage() {
       <section className="py-12 md:py-20 bg-white relative overflow-hidden">
         <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-blue-50 to-transparent opacity-50"></div>
         <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl mx-auto text-center">
+          <div className="max-w-5xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
+              className="text-center mb-10"
             >
               <span className="inline-block px-4 py-2 bg-blue-100 text-primary rounded-full text-sm font-semibold mb-4">
                 Meet Your Agent
               </span>
-              <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+              <h2 className="text-4xl lg:text-5xl font-bold text-gray-900">
                 Jubal Terry | Your Local Insurance Expert
               </h2>
-              <p className="text-xl text-gray-700 leading-relaxed mb-6">
-                I'm Jubal Terry, your dedicated insurance agent at Wheat Ridge Insurance Company. Located right here in Wheat Ridge at 4251 Kipling St #165, I take pride in offering friendly, knowledgeable, and transparent service to individuals, families, and business owners throughout the area.
-              </p>
-              <p className="text-lg text-gray-600 leading-relaxed mb-8">
-                With hands-on experience and a people-first approach, I help you navigate every aspect of insurance—from understanding your options to selecting coverage that fits your lifestyle and budget. My mission is to educate and empower you to make decisions that protect your future, not just sell you a policy.
-              </p>
-              <Link href="/about" className="inline-flex items-center text-primary font-bold hover:text-blue-700 text-lg group">
-                Learn More About Me 
-                <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
-              </Link>
             </motion.div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+              {/* Photo */}
+              <motion.div
+                initial={{ opacity: 0, x: -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+              >
+                <div className="relative rounded-2xl overflow-hidden shadow-xl">
+                  <Image
+                    src="/images/Jubal Terry 2025 NMP-7.jpg"
+                    alt="Jubal Terry - Your Local Insurance Agent"
+                    width={600}
+                    height={750}
+                    className="w-full h-auto object-cover"
+                  />
+                </div>
+              </motion.div>
+
+              {/* Text */}
+              <motion.div
+                initial={{ opacity: 0, x: 30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
+                <p className="text-xl text-gray-700 leading-relaxed mb-6">
+                  I\u2019m Jubal Terry, your dedicated insurance agent at Wheat Ridge Insurance Company. Located right here in Wheat Ridge at 4251 Kipling St #165, I take pride in offering friendly, knowledgeable, and transparent service to individuals, families, and business owners throughout the area.
+                </p>
+                <p className="text-lg text-gray-600 leading-relaxed mb-8">
+                  With hands-on experience and a people-first approach, I help you navigate every aspect of insurance\u2014from understanding your options to selecting coverage that fits your lifestyle and budget. My mission is to educate and empower you to make decisions that protect your future, not just sell you a policy.
+                </p>
+                <Link href="/about" className="inline-flex items-center text-primary font-bold hover:text-blue-700 text-lg group">
+                  Learn More About Me 
+                  <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
+                </Link>
+              </motion.div>
+            </div>
           </div>
         </div>
       </section>
