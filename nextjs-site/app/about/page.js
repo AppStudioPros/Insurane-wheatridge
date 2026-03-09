@@ -39,7 +39,7 @@ export default function AboutPage() {
                 src="/images/Jubal Terry 2025 NMP-42.jpg"
                 alt="Jubal Terry, Farmers Insurance Agent"
                 fill
-                className="object-cover object-[center_65%]"
+                className="object-cover object-[center_60%]"
               />
             </div>
             <div>
