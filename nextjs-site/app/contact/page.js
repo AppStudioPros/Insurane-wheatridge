@@ -75,7 +75,15 @@ export default function ContactPage() {
             {/* Map */}
             <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-6">Visit Our Office</h2>
-              <div className="bg-white rounded-lg shadow-md overflow-hidden h-[260px] sm:h-[380px] md:h-[500px]">
+              <div className="relative rounded-lg overflow-hidden shadow-md h-[250px] mb-6">
+                <Image
+                  src="/images/Jubal Terry 2025 NMP-23.jpg"
+                  alt="Jubal Terry at the office"
+                  fill
+                  className="object-cover object-center"
+                />
+              </div>
+              <div className="bg-white rounded-lg shadow-md overflow-hidden h-[260px] sm:h-[300px] md:h-[350px]">
                 <iframe
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3067.3088849956974!2d-105.11819842345086!3d39.76647197154825!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x876b872f4a8c8e9f%3A0x1234567890abcdef!2s4251%20Kipling%20St%20%23165%2C%20Wheat%20Ridge%2C%20CO%2080033!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus"
                   width="100%"
