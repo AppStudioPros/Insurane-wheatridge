@@ -440,6 +440,15 @@ export default function HomePage() {
                 <p className="text-gray-600 leading-relaxed">{item.desc}</p>
               </div>
             ))}
+            <div className="relative rounded-2xl overflow-hidden shadow-lg">
+              <Image
+                src="/images/Jubal Terry 2025 NMP-38.jpg"
+                alt="Jubal Terry - Your Wheat Ridge Insurance Agent"
+                width={400}
+                height={500}
+                className="w-full h-full object-cover object-top"
+              />
+            </div>
           </div>
         </div>
       </section>
