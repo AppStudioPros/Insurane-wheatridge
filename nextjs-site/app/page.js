@@ -329,10 +329,10 @@ export default function HomePage() {
                 transition={{ duration: 0.6, delay: 0.2 }}
               >
                 <p className="text-xl text-gray-700 leading-relaxed mb-6">
-                  I\u2019m Jubal Terry, your dedicated insurance agent at Wheat Ridge Insurance Company. Located right here in Wheat Ridge at 4251 Kipling St #165, I take pride in offering friendly, knowledgeable, and transparent service to individuals, families, and business owners throughout the area.
+                  I'm Jubal Terry, your dedicated insurance agent at Wheat Ridge Insurance Company. Located right here in Wheat Ridge at 4251 Kipling St #165, I take pride in offering friendly, knowledgeable, and transparent service to individuals, families, and business owners throughout the area.
                 </p>
                 <p className="text-lg text-gray-600 leading-relaxed mb-8">
-                  With hands-on experience and a people-first approach, I help you navigate every aspect of insurance\u2014from understanding your options to selecting coverage that fits your lifestyle and budget. My mission is to educate and empower you to make decisions that protect your future, not just sell you a policy.
+                  With hands-on experience and a people-first approach, I help you navigate every aspect of insurance—from understanding your options to selecting coverage that fits your lifestyle and budget. My mission is to educate and empower you to make decisions that protect your future, not just sell you a policy.
                 </p>
                 <Link href="/about" className="inline-flex items-center text-primary font-bold hover:text-blue-700 text-lg group">
                   Learn More About Me 
