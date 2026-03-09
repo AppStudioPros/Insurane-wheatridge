@@ -39,7 +39,7 @@ export default function AboutPage() {
                 src="/images/Jubal Terry 2025 NMP-42.jpg"
                 alt="Jubal Terry, Farmers Insurance Agent"
                 fill
-                className="object-cover"
+                className="object-cover object-top"
               />
             </div>
             <div>
@@ -207,7 +207,7 @@ export default function AboutPage() {
           src="/images/Jubal Terry 2025 NMP-2.jpg"
           alt="Jubal Terry at the office"
           fill
-          className="object-cover"
+          className="object-cover object-top"
         />
         <div className="absolute inset-0 bg-black/60" />
         <div className="container mx-auto px-4 text-center relative z-10">
