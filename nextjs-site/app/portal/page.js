@@ -89,6 +89,9 @@ export default function PortalLogin() {
             <p className="text-center text-sm text-gray-400">
               <a href="#" className="hover:text-[#0954a5] transition">Forgot password?</a>
             </p>
+            <p className="text-center text-sm text-gray-400 mt-2">
+              Don&apos;t have an account? Contact your insurance agent.
+            </p>
           </form>
         </div>
         <p className="text-center text-xs text-gray-400 mt-6">

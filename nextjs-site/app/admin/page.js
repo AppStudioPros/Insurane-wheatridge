@@ -91,9 +91,10 @@ function ClientList({ token, onSelectClient }) {
   const [clients, setClients] = useState([])
   const [loading, setLoading] = useState(true)
   const [showAdd, setShowAdd] = useState(false)
-  const [form, setForm] = useState({ first_name: '', last_name: '', email: '', phone: '', password: '' })
+  const [form, setForm] = useState({ first_name: '', last_name: '', email: '' })
   const [saving, setSaving] = useState(false)
-  const [tempPw, setTempPw] = useState(null)
+  const [message, setMessage] = useState(null)
+  const [resending, setResending] = useState(null)
 
   const fetchClients = async () => {
     const res = await fetch('/api/admin/clients', { headers: { Authorization: `Bearer ${token}` } })
@@ -105,18 +106,34 @@ function ClientList({ token, onSelectClient }) {
   const addClient = async (e) => {
     e.preventDefault()
     setSaving(true)
+    setMessage(null)
     const res = await fetch('/api/admin/clients', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify(form),
     })
+    const data = await res.json()
     if (res.ok) {
-      const data = await res.json()
-      setTempPw(data.temp_password)
-      setForm({ first_name: '', last_name: '', email: '', phone: '', password: '' })
+      setMessage({ type: 'success', text: `Invite sent to ${form.email}!` })
+      setForm({ first_name: '', last_name: '', email: '' })
+      setShowAdd(false)
       fetchClients()
+    } else {
+      setMessage({ type: 'error', text: data.error || 'Failed to create client' })
     }
     setSaving(false)
+  }
+
+  const resendInvite = async (client) => {
+    setResending(client.id)
+    const res = await fetch(`/api/admin/clients/${client.id}/resend-invite`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (res.ok) setMessage({ type: 'success', text: `Invite resent to ${client.email}!` })
+    else setMessage({ type: 'error', text: 'Failed to resend invite' })
+    setResending(null)
+    fetchClients()
   }
 
   const deleteClient = async (id) => {
@@ -125,26 +142,27 @@ function ClientList({ token, onSelectClient }) {
     fetchClients()
   }
 
+  const CLIENT_STATUS = { pending: 'bg-yellow-100 text-yellow-700', active: 'bg-green-100 text-green-700' }
+
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold text-gray-900">Clients</h3>
-        <button onClick={() => { setShowAdd(!showAdd); setTempPw(null) }}
+        <button onClick={() => { setShowAdd(!showAdd); setMessage(null) }}
           className="bg-[#0954a5] text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-[#073d7a] transition flex items-center gap-1">
           <Plus size={14} /> Add Client
         </button>
       </div>
 
-      {tempPw && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
-          <p className="text-sm text-green-800 font-medium">Client created! Temporary password:</p>
-          <p className="text-lg font-mono font-bold text-green-900 mt-1">{tempPw}</p>
-          <p className="text-xs text-green-600 mt-1">Share this with the client. They can change it in their profile.</p>
+      {message && (
+        <div className={`rounded-lg p-3 mb-4 text-sm font-medium ${message.type === 'success' ? 'bg-green-50 border border-green-200 text-green-800' : 'bg-red-50 border border-red-200 text-red-800'}`}>
+          {message.text}
         </div>
       )}
 
       {showAdd && (
         <form onSubmit={addClient} className="bg-white rounded-xl border border-gray-200 p-4 mb-4 space-y-3">
+          <p className="text-sm text-gray-500">An invite email will be sent to the client to set up their account.</p>
           <div className="grid grid-cols-2 gap-3">
             <input placeholder="First Name *" required value={form.first_name} onChange={e => setForm({...form, first_name: e.target.value})}
               className="px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900" />
@@ -153,13 +171,9 @@ function ClientList({ token, onSelectClient }) {
           </div>
           <input placeholder="Email *" type="email" required value={form.email} onChange={e => setForm({...form, email: e.target.value})}
             className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900" />
-          <input placeholder="Phone" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})}
-            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900" />
-          <input placeholder="Password (leave empty for auto-generated)" value={form.password} onChange={e => setForm({...form, password: e.target.value})}
-            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900" />
           <button type="submit" disabled={saving}
             className="bg-[#0954a5] text-white px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-60">
-            {saving ? 'Creating...' : 'Create Client'}
+            {saving ? 'Sending Invite...' : 'Send Invite'}
           </button>
         </form>
       )}
@@ -171,13 +185,24 @@ function ClientList({ token, onSelectClient }) {
           {clients.map(c => (
             <div key={c.id} className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm flex items-center justify-between gap-3">
               <button onClick={() => onSelectClient(c)} className="flex-1 text-left min-w-0">
-                <div className="font-semibold text-gray-900">{c.first_name} {c.last_name}</div>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-gray-900">{c.first_name} {c.last_name}</span>
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium capitalize ${CLIENT_STATUS[c.status] || 'bg-gray-100 text-gray-600'}`}>{c.status || 'pending'}</span>
+                </div>
                 <div className="text-sm text-gray-500 flex flex-wrap gap-x-4">
                   <span>{c.email}</span>
-                  <span>{c.policy_count} {c.policy_count === 1 ? 'policy' : 'policies'}</span>
+                  <span>{formatShortDate(c.created_at)}</span>
                 </div>
               </button>
-              <button onClick={() => deleteClient(c.id)} className="text-red-400 hover:text-red-600"><Trash2 size={16} /></button>
+              <div className="flex items-center gap-2">
+                {(c.status === 'pending' || !c.status) && (
+                  <button onClick={() => resendInvite(c)} disabled={resending === c.id}
+                    className="text-[#0954a5] hover:text-[#073d7a] text-xs font-medium px-2 py-1 border border-blue-200 rounded-lg disabled:opacity-50">
+                    {resending === c.id ? '...' : 'Resend'}
+                  </button>
+                )}
+                <button onClick={() => deleteClient(c.id)} className="text-red-400 hover:text-red-600"><Trash2 size={16} /></button>
+              </div>
             </div>
           ))}
         </div>

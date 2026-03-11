@@ -1,5 +1,7 @@
 import { supabase } from '@/lib/supabase'
-import { hashPassword } from '@/lib/portal-auth'
+import { Resend } from 'resend'
+import { buildInviteEmail } from '@/lib/invite-email'
+import crypto from 'crypto'
 
 export const dynamic = "force-dynamic"
 
@@ -13,12 +15,11 @@ export async function GET(request) {
 
   const { data: clients, error } = await supabase
     .from('clients')
-    .select('id, email, first_name, last_name, phone, address, created_at')
+    .select('id, email, first_name, last_name, phone, address, status, invite_sent_at, created_at')
     .order('created_at', { ascending: false })
 
   if (error) return Response.json({ error: error.message }, { status: 500 })
 
-  // Get policy counts
   const { data: policies } = await supabase.from('policies').select('client_id')
   const counts = {}
   ;(policies ?? []).forEach(p => { counts[p.client_id] = (counts[p.client_id] || 0) + 1 })
@@ -35,24 +36,39 @@ export async function POST(request) {
     return Response.json({ error: 'Email, first name, and last name required' }, { status: 400 })
   }
 
-  const tempPassword = body.password || Math.random().toString(36).slice(-8)
-  const password_hash = await hashPassword(tempPassword)
+  const invite_token = crypto.randomUUID()
 
   const { data, error } = await supabase
     .from('clients')
     .insert({
       email: body.email.toLowerCase().trim(),
-      password_hash,
-      first_name: body.first_name,
-      last_name: body.last_name,
-      phone: body.phone || null,
-      address: body.address || null,
+      first_name: body.first_name.trim(),
+      last_name: body.last_name.trim(),
+      status: 'pending',
+      invite_token,
+      invite_sent_at: new Date().toISOString(),
     })
-    .select('id, email, first_name, last_name, phone, address, created_at')
+    .select('id, email, first_name, last_name, status, created_at')
     .single()
 
   if (error) return Response.json({ error: error.message }, { status: 500 })
-  return Response.json({ ...data, temp_password: tempPassword })
+
+  // Send invite email
+  try {
+    const resend = new Resend(process.env.RESEND_API_KEY)
+    const email = buildInviteEmail(body.first_name.trim(), invite_token)
+    await resend.emails.send({
+      from: email.from,
+      to: [body.email.toLowerCase().trim()],
+      subject: email.subject,
+      html: email.html,
+    })
+  } catch (emailErr) {
+    console.error('Failed to send invite email:', emailErr)
+    // Client is created but email failed — admin can resend
+  }
+
+  return Response.json({ ...data, invite_sent: true })
 }
 
 export async function PATCH(request) {
@@ -67,14 +83,13 @@ export async function PATCH(request) {
   if (body.email) updates.email = body.email.toLowerCase().trim()
   if (body.phone !== undefined) updates.phone = body.phone
   if (body.address !== undefined) updates.address = body.address
-  if (body.password) updates.password_hash = await hashPassword(body.password)
   updates.updated_at = new Date().toISOString()
 
   const { data, error } = await supabase
     .from('clients')
     .update(updates)
     .eq('id', body.id)
-    .select('id, email, first_name, last_name, phone, address')
+    .select('id, email, first_name, last_name, phone, address, status')
     .single()
 
   if (error) return Response.json({ error: error.message }, { status: 500 })
