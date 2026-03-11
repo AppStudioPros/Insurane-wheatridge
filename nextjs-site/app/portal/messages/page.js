@@ -23,8 +23,11 @@ export default function MessagesPage() {
   const hasMessages = messages.length > 0
 
   const fetchMessages = async () => {
-    const r = await authFetch('/api/portal/messages')
-    const d = await r?.json()
+    const t = sessionStorage.getItem('portal_token')
+    if (!t) return
+    const r = await fetch('/api/portal/messages', { headers: { Authorization: 'Bearer ' + t } })
+    if (!r.ok) return
+    const d = await r.json()
     if (d) {
       const sorted = [...d].sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
       setMessages(sorted)
@@ -32,7 +35,24 @@ export default function MessagesPage() {
     setLoading(false)
   }
 
-  useEffect(() => { if (ready) fetchMessages() }, [ready])
+  useEffect(() => { 
+    if (ready) { 
+      setLoading(true)
+      fetchMessages() 
+    }
+  }, [ready])
+
+  // Re-fetch when page becomes visible (navigating back)
+  useEffect(() => {
+    const handleFocus = () => { if (ready) fetchMessages() }
+    const handleVisible = () => { if (document.visibilityState === 'visible' && ready) fetchMessages() }
+    window.addEventListener('focus', handleFocus)
+    document.addEventListener('visibilitychange', handleVisible)
+    return () => {
+      window.removeEventListener('focus', handleFocus)
+      document.removeEventListener('visibilitychange', handleVisible)
+    }
+  }, [ready])
 
   useEffect(() => {
     if (!ready) return
@@ -50,9 +70,10 @@ export default function MessagesPage() {
     setSending(true)
     const payload = { body }
     if (!hasMessages && subject.trim()) payload.subject = subject
-    const res = await authFetch('/api/portal/messages', {
+    const t = sessionStorage.getItem('portal_token')
+    const res = await fetch('/api/portal/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + t },
       body: JSON.stringify(payload),
     })
     if (res?.ok) {
