@@ -3,7 +3,8 @@ import { supabase } from '@/lib/supabase'
 
 export const dynamic = "force-dynamic"
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+let resend;
+function getResend() { if (!resend) resend = new Resend(process.env.RESEND_API_KEY); return resend; }
 
 export async function POST(request) {
   try {
@@ -19,7 +20,7 @@ export async function POST(request) {
       return Response.json({ error: 'Name and email are required.' }, { status: 400 })
     }
 
-    await resend.emails.send({
+    await getResend().emails.send({
       from: 'Insurance Wheatridge <noreply@mail.insurancewheatridge.com>',
       to: ['jubal.terry@insurancewheatridge.com'],
       subject: `🎯 New Lead: ${firstName} is interested in a quote`,

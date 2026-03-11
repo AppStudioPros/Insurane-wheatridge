@@ -32,14 +32,6 @@
       "static/chunks/802-59cf56f895d7944e.js",
       "static/chunks/app/page-4ff8cda72e04d23f.js"
     ],
-    "/accessibility/page": [
-      "static/chunks/webpack-e65163ae80cb7512.js",
-      "static/chunks/fd9d1056-a7129889b45a2c4a.js",
-      "static/chunks/117-8927ab50fe01d31c.js",
-      "static/chunks/main-app-2e3454bbff07df99.js",
-      "static/chunks/389-ecd2f4c4128571fa.js",
-      "static/chunks/app/accessibility/page-229720655401f211.js"
-    ],
     "/about/page": [
       "static/chunks/webpack-e65163ae80cb7512.js",
       "static/chunks/fd9d1056-a7129889b45a2c4a.js",
@@ -48,6 +40,14 @@
       "static/chunks/389-ecd2f4c4128571fa.js",
       "static/chunks/802-59cf56f895d7944e.js",
       "static/chunks/app/about/page-cfaa2307cac7d912.js"
+    ],
+    "/accessibility/page": [
+      "static/chunks/webpack-e65163ae80cb7512.js",
+      "static/chunks/fd9d1056-a7129889b45a2c4a.js",
+      "static/chunks/117-8927ab50fe01d31c.js",
+      "static/chunks/main-app-2e3454bbff07df99.js",
+      "static/chunks/389-ecd2f4c4128571fa.js",
+      "static/chunks/app/accessibility/page-229720655401f211.js"
     ],
     "/contact/page": [
       "static/chunks/webpack-e65163ae80cb7512.js",
@@ -58,29 +58,13 @@
       "static/chunks/802-59cf56f895d7944e.js",
       "static/chunks/app/contact/page-2441129c6a642796.js"
     ],
-    "/privacy/page": [
-      "static/chunks/webpack-e65163ae80cb7512.js",
-      "static/chunks/fd9d1056-a7129889b45a2c4a.js",
-      "static/chunks/117-8927ab50fe01d31c.js",
-      "static/chunks/main-app-2e3454bbff07df99.js",
-      "static/chunks/389-ecd2f4c4128571fa.js",
-      "static/chunks/app/privacy/page-25e54d3a2629226d.js"
-    ],
     "/services/auto-insurance/page": [
       "static/chunks/webpack-e65163ae80cb7512.js",
       "static/chunks/fd9d1056-a7129889b45a2c4a.js",
       "static/chunks/117-8927ab50fe01d31c.js",
       "static/chunks/main-app-2e3454bbff07df99.js",
       "static/chunks/389-ecd2f4c4128571fa.js",
-      "static/chunks/app/services/auto-insurance/page-a1306ee16d6a53ee.js"
-    ],
-    "/services/condo-insurance/page": [
-      "static/chunks/webpack-e65163ae80cb7512.js",
-      "static/chunks/fd9d1056-a7129889b45a2c4a.js",
-      "static/chunks/117-8927ab50fe01d31c.js",
-      "static/chunks/main-app-2e3454bbff07df99.js",
-      "static/chunks/389-ecd2f4c4128571fa.js",
-      "static/chunks/app/services/condo-insurance/page-32fbd2e4d8dfd82e.js"
+      "static/chunks/app/services/auto-insurance/page-ca0147d9c6f235b4.js"
     ],
     "/services/business-insurance/page": [
       "static/chunks/webpack-e65163ae80cb7512.js",
@@ -90,13 +74,29 @@
       "static/chunks/389-ecd2f4c4128571fa.js",
       "static/chunks/app/services/business-insurance/page-f3247d3d59a09995.js"
     ],
+    "/privacy/page": [
+      "static/chunks/webpack-e65163ae80cb7512.js",
+      "static/chunks/fd9d1056-a7129889b45a2c4a.js",
+      "static/chunks/117-8927ab50fe01d31c.js",
+      "static/chunks/main-app-2e3454bbff07df99.js",
+      "static/chunks/389-ecd2f4c4128571fa.js",
+      "static/chunks/app/privacy/page-25e54d3a2629226d.js"
+    ],
+    "/services/condo-insurance/page": [
+      "static/chunks/webpack-e65163ae80cb7512.js",
+      "static/chunks/fd9d1056-a7129889b45a2c4a.js",
+      "static/chunks/117-8927ab50fe01d31c.js",
+      "static/chunks/main-app-2e3454bbff07df99.js",
+      "static/chunks/389-ecd2f4c4128571fa.js",
+      "static/chunks/app/services/condo-insurance/page-32fbd2e4d8dfd82e.js"
+    ],
     "/services/renters-insurance/page": [
       "static/chunks/webpack-e65163ae80cb7512.js",
       "static/chunks/fd9d1056-a7129889b45a2c4a.js",
       "static/chunks/117-8927ab50fe01d31c.js",
       "static/chunks/main-app-2e3454bbff07df99.js",
       "static/chunks/389-ecd2f4c4128571fa.js",
-      "static/chunks/app/services/renters-insurance/page-526ba7c9387bfe1e.js"
+      "static/chunks/app/services/renters-insurance/page-75cccce8209d422f.js"
     ],
     "/services/life-insurance/page": [
       "static/chunks/webpack-e65163ae80cb7512.js",
@@ -104,7 +104,7 @@
       "static/chunks/117-8927ab50fe01d31c.js",
       "static/chunks/main-app-2e3454bbff07df99.js",
       "static/chunks/389-ecd2f4c4128571fa.js",
-      "static/chunks/app/services/life-insurance/page-af32cc0a94a5836b.js"
+      "static/chunks/app/services/life-insurance/page-4a66442a4f888880.js"
     ],
     "/terms/page": [
       "static/chunks/webpack-e65163ae80cb7512.js",
@@ -120,7 +120,7 @@
       "static/chunks/117-8927ab50fe01d31c.js",
       "static/chunks/main-app-2e3454bbff07df99.js",
       "static/chunks/389-ecd2f4c4128571fa.js",
-      "static/chunks/app/services/home-insurance/page-0282fb3aa189e233.js"
+      "static/chunks/app/services/home-insurance/page-b6fa8516cf9b3b7a.js"
     ]
   }
 }

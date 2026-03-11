@@ -4,7 +4,8 @@ import { supabase } from '@/lib/supabase';
 
 export const dynamic = "force-dynamic"
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let resend;
+function getResend() { if (!resend) resend = new Resend(process.env.RESEND_API_KEY); return resend; }
 
 export async function POST(req) {
   try {
@@ -29,7 +30,7 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Missing required fields.' }, { status: 400 });
     }
 
-    const { error } = await resend.emails.send({
+    const { error } = await getResend().emails.send({
       from: 'Insurance Wheatridge <noreply@mail.insurancewheatridge.com>',
       to: ['jterry1@farmersagent.com'],
       replyTo: email,
