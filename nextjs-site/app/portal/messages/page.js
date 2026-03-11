@@ -56,7 +56,7 @@ export default function MessagesPage() {
 
   useEffect(() => {
     if (!ready) return
-    const id = setInterval(fetchMessages, 10000)
+    const id = setInterval(() => fetchMessages(), 5000)
     return () => clearInterval(id)
   }, [ready])
 
@@ -79,7 +79,7 @@ export default function MessagesPage() {
     if (res?.ok) {
       setBody('')
       setSubject('')
-      await fetchMessages()
+      setTimeout(() => fetchMessages(), 300)
     }
     setSending(false)
   }
