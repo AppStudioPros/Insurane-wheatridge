@@ -101,7 +101,7 @@ function ClientList({ token, onSelectClient }) {
     if (res.ok) setClients(await res.json())
     setLoading(false)
   }
-  useEffect(() => { fetchClients() }, [])
+  useEffect(() => { if (token) fetchClients() }, [token])
 
   const addClient = async (e) => {
     e.preventDefault()
