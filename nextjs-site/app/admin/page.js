@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { LogOut, RefreshCw, Users, MessageSquare, Phone, Mail, Calendar, Plus, Trash2, Edit, ChevronLeft, FileText, CreditCard, Upload, Send, X, Eye, Car, Home, Heart, Briefcase, Building } from 'lucide-react'
 
 const SESSION_KEY = 'iwr_admin_token'
@@ -504,54 +504,91 @@ function DocumentsTab({ token, clientId, docs, onRefresh }) {
 
 function MessagesTab({ token, clientId, messages, onRefresh }) {
   const [body, setBody] = useState('')
-  const [subject, setSubject] = useState('')
   const [sending, setSending] = useState(false)
+  const bottomRef = useRef(null)
+  const unreadCount = messages.filter(m => m.sender === 'client' && !m.read).length
 
   const send = async (e) => {
-    e.preventDefault()
+    e?.preventDefault?.()
     if (!body.trim()) return
     setSending(true)
     await fetch('/api/admin/messages', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ client_id: clientId, subject, body }),
+      body: JSON.stringify({ client_id: clientId, body }),
     })
     setBody('')
-    setSubject('')
     setSending(false)
     onRefresh()
   }
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      send()
+    }
+  }
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
+
+  const formatTime = (d) => new Date(d).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+
   return (
-    <div>
-      <form onSubmit={send} className="bg-gray-50 rounded-xl p-4 mb-4 space-y-3">
-        <input placeholder="Subject (optional)" value={subject} onChange={e => setSubject(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900" />
-        <div className="flex gap-2">
-          <textarea placeholder="Reply to client..." value={body} onChange={e => setBody(e.target.value)} rows={2}
-            className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900 resize-none" />
-          <button type="submit" disabled={!body.trim() || sending}
-            className="bg-[#0954a5] text-white px-4 rounded-lg disabled:opacity-60 self-end">
-            <Send size={16} />
-          </button>
-        </div>
-      </form>
-      {messages.length === 0 ? <p className="text-gray-400 text-center py-6">No messages.</p> : (
-        <div className="space-y-2">
-          {messages.map(m => (
-            <div key={m.id} className={`rounded-xl p-3 ${m.sender === 'agent' ? 'bg-blue-50 border border-blue-100' : 'bg-white border border-gray-100'}`}>
-              <div className="flex items-center justify-between mb-1">
-                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${m.sender === 'agent' ? 'bg-[#0954a5] text-white' : 'bg-gray-200 text-gray-700'}`}>
-                  {m.sender === 'agent' ? 'Agent' : 'Client'}
-                </span>
-                <span className="text-xs text-gray-400">{formatDate(m.created_at)}</span>
-              </div>
-              {m.subject && <p className="text-sm font-medium text-gray-700">{m.subject}</p>}
-              <p className="text-sm text-gray-600 whitespace-pre-wrap">{m.body}</p>
-            </div>
-          ))}
+    <div className="flex flex-col" style={{ height: '500px' }}>
+      {unreadCount > 0 && (
+        <div className="bg-orange-50 border border-orange-200 rounded-lg px-3 py-2 mb-3 text-sm text-orange-700">
+          {unreadCount} unread message{unreadCount > 1 ? 's' : ''} from client
         </div>
       )}
+      <div className="flex-1 overflow-y-auto rounded-xl bg-gray-50 border border-gray-100 p-4 space-y-1 mb-3">
+        {messages.length === 0 ? (
+          <p className="text-gray-400 text-center py-12">No messages yet. Send the first message below.</p>
+        ) : (
+          messages.map(m => {
+            const isAgent = m.sender === 'agent'
+            return (
+              <div key={m.id} className={`flex ${isAgent ? 'justify-end' : 'justify-start'} mb-2`}>
+                <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 ${
+                  isAgent
+                    ? 'bg-[#0954a5] text-white rounded-br-md'
+                    : 'bg-white border border-gray-200 text-gray-900 rounded-bl-md'
+                }`}>
+                  <div className={`flex items-center gap-2 mb-0.5 ${isAgent ? 'text-blue-100' : 'text-gray-400'}`}>
+                    <span className="text-xs font-semibold">{isAgent ? 'You' : 'Client'}</span>
+                    <span className="text-xs">{formatTime(m.created_at)}</span>
+                  </div>
+                  {m.subject && (
+                    <p className={`text-sm font-semibold mb-1 ${isAgent ? 'text-white' : 'text-gray-800'}`}>{m.subject}</p>
+                  )}
+                  <p className={`text-sm whitespace-pre-wrap ${isAgent ? 'text-white' : 'text-gray-700'}`}>{m.body}</p>
+                </div>
+              </div>
+            )
+          })
+        )}
+        <div ref={bottomRef} />
+      </div>
+      <form onSubmit={send} className="flex gap-2">
+        <textarea
+          value={body}
+          onChange={e => setBody(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Type a message..."
+          rows={1}
+          className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0954a5] resize-none"
+          style={{ minHeight: '44px', maxHeight: '120px' }}
+        />
+        <button
+          type="submit"
+          disabled={!body.trim() || sending}
+          className="bg-[#0954a5] text-white px-5 rounded-xl font-medium hover:bg-[#073d7a] transition disabled:opacity-60 flex items-center gap-2 text-sm"
+        >
+          <Send size={16} />
+          {sending ? '...' : 'Send'}
+        </button>
+      </form>
     </div>
   )
 }
