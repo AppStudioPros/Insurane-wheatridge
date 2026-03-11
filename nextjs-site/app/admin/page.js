@@ -536,6 +536,7 @@ export default function AdminPage() {
   const [token, setToken] = useState(null)
   const [pw, setPw] = useState('')
   const [pwErr, setPwErr] = useState('')
+  const [showPw, setShowPw] = useState(false)
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(false)
   const [tab, setTab] = useState('inquiries')
@@ -578,8 +579,8 @@ export default function AdminPage() {
             <form onSubmit={login} className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                <input type="password" value={pw} onChange={e => setPw(e.target.value)} autoFocus
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter admin password" />
+                <div className="relative"><input type={showPw ? "text" : "password"} value={pw} onChange={e => setPw(e.target.value)} autoFocus
+                  className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter admin password" /><button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-sm">{showPw ? "Hide" : "Show"}</button></div>
               </div>
               {pwErr && <p className="text-red-500 text-sm">{pwErr}</p>}
               <button type="submit" disabled={loading}
