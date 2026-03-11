@@ -1,4 +1,4 @@
-// File: /home/ubuntu/.openclaw/workspace/insurance-wheatridge/nextjs-site/app/services/business-insurance/page.js
+// File: /tmp/iw/nextjs-site/app/services/business-insurance/page.js
 import * as entry from '../../../../../app/services/business-insurance/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

@@ -1,4 +1,4 @@
-// File: /home/ubuntu/.openclaw/workspace/insurance-wheatridge/nextjs-site/app/api/independent-contact/route.js
+// File: /tmp/iw/nextjs-site/app/api/independent-contact/route.js
 import * as entry from '../../../../../app/api/independent-contact/route.js'
 import type { NextRequest } from 'next/server.js'
 

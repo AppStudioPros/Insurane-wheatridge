@@ -1,19 +1,25 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
 import LeadCapturePopup from '@/components/LeadCapturePopup'
+import GoogleAnalytics from '@/components/GoogleAnalytics'
+import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
+  metadataBase: new URL('https://www.insurancewheatridge.com'),
   title: {
-    default: 'Insurance Wheat Ridge | Jubal Terry, Farmers Insurance Agent',
-    template: '%s | Insurance Wheat Ridge',
+    default: 'Insurance Wheatridge | Farmers Insurance Agent J. Terry | Wheat Ridge, CO',
+    template: '%s | Insurance Wheatridge',
   },
-  description: 'Trusted Wheat Ridge insurance company providing auto, home, life, and business coverage. Get personalized quotes, digital service, and local support today.',
+  description: 'Your local Farmers Insurance agent in Wheat Ridge, Colorado. Auto, home, life, business, renters, and condo insurance. Get a free quote today.',
   keywords: ['insurance', 'Wheat Ridge', 'Farmers Insurance', 'auto insurance', 'home insurance', 'life insurance', 'business insurance', 'Colorado insurance'],
   authors: [{ name: 'Jubal Terry' }],
-  creator: 'Insurance Wheat Ridge',
+  creator: 'Insurance Wheatridge',
   publisher: 'Farmers Insurance',
+  alternates: {
+    canonical: 'https://www.insurancewheatridge.com',
+  },
   formatDetection: {
     email: false,
     address: false,
@@ -22,21 +28,21 @@ export const metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://insurancewheatridge.com',
-    siteName: 'Insurance Wheat Ridge',
-    title: 'Insurance Wheat Ridge | Jubal Terry, Farmers Insurance Agent',
-    description: 'Trusted Wheat Ridge insurance company providing auto, home, life, and business coverage.',
+    url: 'https://www.insurancewheatridge.com',
+    siteName: 'Insurance Wheatridge',
+    title: 'Insurance Wheatridge | Farmers Insurance Agent J. Terry | Wheat Ridge, CO',
+    description: 'Your local Farmers Insurance agent in Wheat Ridge, Colorado. Auto, home, life, business, renters, and condo insurance. Get a free quote today.',
     images: [{
       url: '/images/og-image.jpg',
       width: 1200,
       height: 630,
-      alt: 'Insurance Wheat Ridge - Jubal Terry, Farmers Insurance Agent',
+      alt: 'Insurance Wheatridge - Jubal Terry, Farmers Insurance Agent',
     }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Insurance Wheat Ridge | Jubal Terry, Farmers Insurance Agent',
-    description: 'Trusted Wheat Ridge insurance company providing auto, home, life, and business coverage.',
+    title: 'Insurance Wheatridge | Farmers Insurance Agent J. Terry | Wheat Ridge, CO',
+    description: 'Your local Farmers Insurance agent in Wheat Ridge, Colorado. Auto, home, life, business, renters, and condo insurance. Get a free quote today.',
     images: ['/images/og-image.jpg'],
   },
   robots: {
@@ -50,15 +56,24 @@ export const metadata = {
       'max-snippet': -1,
     },
   },
+  manifest: '/manifest.json',
   verification: {
     google: 'your-google-verification-code',
+  },
+  icons: {
+    apple: '/icons/icon-192x192.png',
   },
 }
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        <meta name="theme-color" content="#0954a5" />
+      </head>
       <body className={inter.className}>
+        <GoogleAnalytics />
+        <ServiceWorkerRegistration />
         {children}
         <LeadCapturePopup />
       </body>
