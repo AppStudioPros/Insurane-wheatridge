@@ -1,11 +1,13 @@
 'use client'
 import { useState, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 import { X, Phone } from 'lucide-react'
 
 const STORAGE_KEY = 'iwr_lead_popup_dismissed'
 const DELAY_MS = 30000 // 30 seconds
 
 export default function LeadCapturePopup() {
+  const pathname = usePathname()
   const [visible, setVisible]     = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading]     = useState(false)
@@ -14,6 +16,7 @@ export default function LeadCapturePopup() {
   useEffect(() => {
     // Don't show if already dismissed or submitted
     if (typeof window !== 'undefined' && localStorage.getItem(STORAGE_KEY)) return
+    if (pathname?.startsWith('/admin') || pathname?.startsWith('/portal') || pathname?.startsWith('/setup')) return
 
     const timer = setTimeout(() => setVisible(true), DELAY_MS)
     return () => clearTimeout(timer)
