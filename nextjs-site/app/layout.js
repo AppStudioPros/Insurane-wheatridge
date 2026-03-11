@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import LeadCapturePopup from '@/components/LeadCapturePopup'
 import GoogleAnalytics from '@/components/GoogleAnalytics'
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration'
+import InstallPrompt from '@/components/InstallPrompt'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -74,6 +75,7 @@ export default function RootLayout({ children }) {
       <body className={inter.className}>
         <GoogleAnalytics />
         <ServiceWorkerRegistration />
+        <InstallPrompt />
         {children}
         <LeadCapturePopup />
       </body>
