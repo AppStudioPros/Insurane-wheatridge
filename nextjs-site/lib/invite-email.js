@@ -1,7 +1,7 @@
 export function buildInviteEmail(firstName, token) {
   const setupUrl = `https://www.insurancewheatridge.com/portal/setup?token=${token}`
   return {
-    from: 'Insurance Wheat Ridge <onboarding@resend.dev>',
+    from: 'Insurance Wheat Ridge <noreply@mail.insurancewheatridge.com>',
     subject: "You're Invited to Your Insurance Portal",
     html: `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
