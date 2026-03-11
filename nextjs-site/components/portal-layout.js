@@ -37,12 +37,13 @@ export function usePortalAuth() {
   }
 
   const authFetch = async (url, options = {}) => {
-    const t = token || sessionStorage.getItem('portal_token')
+    const t = sessionStorage.getItem('portal_token')
+    if (!t) { logout(); return null }
     const res = await fetch(url, {
       ...options,
       headers: {
         ...options.headers,
-        Authorization: `Bearer ${t}`,
+        Authorization: 'Bearer ' + t,
       },
     })
     if (res.status === 401) {
