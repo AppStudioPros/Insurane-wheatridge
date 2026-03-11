@@ -7,6 +7,9 @@ export default function InstallPrompt() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+    // Mobile only — skip on desktop
+    const isMobile = /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (!isMobile) return;
     if (window.matchMedia("(display-mode: standalone)").matches) return;
     if (localStorage.getItem("pwa-dismissed")) {
       const dismissed = parseInt(localStorage.getItem("pwa-dismissed"), 10);
