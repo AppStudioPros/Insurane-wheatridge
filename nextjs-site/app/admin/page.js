@@ -387,7 +387,7 @@ function AnalyticsTab({ token }) {
             {dailyTrend.map((d, i) => (
               <div key={i} className="flex-1 flex flex-col items-center gap-1 group relative">
                 <div className="absolute -top-6 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap z-10">{d.date}: {d.sessions} visits</div>
-                <div className="w-full bg-[#0954a5] rounded-t transition-all hover:bg-[#0b6ad4]" style={{ height: `${Math.max(d.sessions > 0 ? 15 : 2, (d.sessions / maxTrendSessions) * 100)}%` }} />
+                <div className="w-full bg-[#0954a5] rounded-t transition-all hover:bg-[#0b6ad4]" style={{ height: `${d.sessions > 0 ? Math.max(8, Math.round((d.sessions / maxTrendSessions) * 120)) : 2}px` }} />
               </div>
             ))}
           </div>
@@ -1454,9 +1454,7 @@ export default function AdminPage() {
           )
         ) : null}
 
-        {tab !== 'clients' && (
-          <p className="text-center text-xs text-gray-300 mt-8">Tap a status badge to cycle: new &rarr; contacted &rarr; closed</p>
-        )}
+
       </div>
     </div>
   )
