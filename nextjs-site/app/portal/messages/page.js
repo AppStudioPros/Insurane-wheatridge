@@ -22,16 +22,25 @@ export default function MessagesPage() {
 
   const hasMessages = messages.length > 0
 
-  const fetchMessages = async () => {
+  const fetchMessages = async (retries = 3) => {
     const t = sessionStorage.getItem('portal_token')
-    if (!t) return
-    const r = await fetch('/api/portal/messages', { headers: { Authorization: 'Bearer ' + t } })
-    if (!r.ok) return
-    const d = await r.json()
-    if (d) {
-      const sorted = [...d].sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
-      setMessages(sorted)
+    if (!t) {
+      if (retries > 0) {
+        await new Promise(r => setTimeout(r, 300))
+        return fetchMessages(retries - 1)
+      }
+      setLoading(false)
+      return
     }
+    try {
+      const r = await fetch('/api/portal/messages', { headers: { Authorization: 'Bearer ' + t } })
+      if (!r.ok) { setLoading(false); return }
+      const d = await r.json()
+      if (d) {
+        const sorted = [...d].sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+        setMessages(sorted)
+      }
+    } catch (e) { /* network error, will retry on next poll */ }
     setLoading(false)
   }
 
