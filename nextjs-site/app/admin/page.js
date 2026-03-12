@@ -227,8 +227,8 @@ function ClientList({ token, onSelectClient }) {
   )
 }
 
-function ClientDetail({ token, client, onBack }) {
-  const [tab, setTab] = useState('policies')
+function ClientDetail({ token, client, onBack, initialTab }) {
+  const [tab, setTab] = useState(initialTab || 'policies')
   const [policies, setPolicies] = useState([])
   const [idCards, setIdCards] = useState([])
   const [docs, setDocs] = useState([])
@@ -1332,6 +1332,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false)
   const [tab, setTab] = useState('inquiries')
   const [selectedClient, setSelectedClient] = useState(null)
+  const [clientInitialTab, setClientInitialTab] = useState(null)
   const [showNotifs, setShowNotifs] = useState(false)
   const [unreadMessages, setUnreadMessages] = useState([])
   const notifRef = useRef(null)
@@ -1443,7 +1444,7 @@ export default function AdminPage() {
   const notifications = [
     ...newInquiries.map(i => ({ type: 'inquiry', id: i.id, label: `New inquiry from ${i.name || i.email || 'Unknown'}`, time: i.created_at, action: () => { setTab('inquiries'); setShowNotifs(false) } })),
     ...newLeads.map(l => ({ type: 'lead', id: l.id, label: `New lead: ${l.name || l.email || 'Unknown'}`, time: l.created_at, action: () => { setTab('leads'); setShowNotifs(false) } })),
-    ...unreadMessages.map(m => ({ type: 'message', id: m.id, label: `Message from ${m.client_name || 'Client'}`, time: m.created_at, action: () => { setSelectedClient(m.client); setTab('clients'); setShowNotifs(false) } })),
+    ...unreadMessages.map(m => ({ type: 'message', id: m.id, label: `Message from ${m.client_name || 'Client'}`, time: m.created_at, action: () => { setClientInitialTab('messages'); setSelectedClient(m.client); setTab('clients'); setShowNotifs(false) } })),
   ].sort((a, b) => new Date(b.time) - new Date(a.time))
 
   const notifCount = notifications.length
@@ -1531,7 +1532,7 @@ export default function AdminPage() {
           <AnalyticsTab token={token} />
         ) : tab === 'clients' ? (
           selectedClient ? (
-            <ClientDetail token={token} client={selectedClient} onBack={() => setSelectedClient(null)} />
+            <ClientDetail token={token} client={selectedClient} onBack={() => { setSelectedClient(null); setClientInitialTab(null) }} initialTab={clientInitialTab} />
           ) : (
             <ClientList token={token} onSelectClient={setSelectedClient} />
           )
