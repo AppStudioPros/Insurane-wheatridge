@@ -3,8 +3,40 @@ import { NextResponse } from 'next/server'
 const PROPERTY_ID = '468298104'
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Jubal2026'
 
+function getCreds() {
+  const b64 = process.env.GOOGLE_SERVICE_ACCOUNT_KEY_B64
+  if (b64) return JSON.parse(Buffer.from(b64, 'base64').toString('utf-8'))
+  const raw = process.env.GOOGLE_SERVICE_ACCOUNT_KEY
+  if (raw) return JSON.parse(raw)
+  throw new Error('No Google service account credentials found')
+}
+
+async function createJWT(creds) {
+  const header = Buffer.from(JSON.stringify({ alg: 'RS256', typ: 'JWT' })).toString('base64url')
+  const now = Math.floor(Date.now() / 1000)
+  const payload = Buffer.from(JSON.stringify({
+    iss: creds.client_email,
+    scope: 'https://www.googleapis.com/auth/analytics.readonly',
+    aud: 'https://oauth2.googleapis.com/token',
+    iat: now,
+    exp: now + 3600,
+  })).toString('base64url')
+
+  const pem = creds.private_key.replace(/-----BEGIN PRIVATE KEY-----/, '').replace(/-----END PRIVATE KEY-----/, '').replace(/\n/g, '')
+  const binaryKey = Buffer.from(pem, 'base64')
+
+  const cryptoKey = await crypto.subtle.importKey(
+    'pkcs8', binaryKey, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['sign']
+  )
+
+  const signature = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', cryptoKey, new TextEncoder().encode(`${header}.${payload}`))
+  const sig = Buffer.from(signature).toString('base64url')
+
+  return `${header}.${payload}.${sig}`
+}
+
 async function getAccessToken() {
-  const creds = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY || '{}')
+  const creds = getCreds()
   const jwt = await createJWT(creds)
   const res = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST',
@@ -12,38 +44,8 @@ async function getAccessToken() {
     body: `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${jwt}`,
   })
   const data = await res.json()
+  if (!data.access_token) throw new Error(`Token error: ${JSON.stringify(data)}`)
   return data.access_token
-}
-
-async function createJWT(creds) {
-  const header = btoa(JSON.stringify({ alg: 'RS256', typ: 'JWT' }))
-  const now = Math.floor(Date.now() / 1000)
-  const payload = btoa(JSON.stringify({
-    iss: creds.client_email,
-    scope: 'https://www.googleapis.com/auth/analytics.readonly',
-    aud: 'https://oauth2.googleapis.com/token',
-    iat: now,
-    exp: now + 3600,
-  }))
-
-  const textEncoder = new TextEncoder()
-  const inputArrayBuffer = textEncoder.encode(`${header}.${payload}`)
-
-  const pem = creds.private_key.replace(/-----BEGIN PRIVATE KEY-----/, '').replace(/-----END PRIVATE KEY-----/, '').replace(/\n/g, '')
-  const binaryKey = Uint8Array.from(atob(pem), c => c.charCodeAt(0))
-
-  const cryptoKey = await crypto.subtle.importKey(
-    'pkcs8', binaryKey, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['sign']
-  )
-
-  const signature = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', cryptoKey, inputArrayBuffer)
-  const sig = btoa(String.fromCharCode(...new Uint8Array(signature)))
-    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
-
-  const h = header.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
-  const p = payload.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
-
-  return `${h}.${p}.${sig}`
 }
 
 async function gaReport(token, body) {
@@ -51,7 +53,9 @@ async function gaReport(token, body) {
     `https://analyticsdata.googleapis.com/v1beta/properties/${PROPERTY_ID}:runReport`,
     { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
   )
-  return res.json()
+  const data = await res.json()
+  if (data.error) throw new Error(data.error.message)
+  return data
 }
 
 export async function GET(request) {
@@ -125,6 +129,6 @@ export async function GET(request) {
     })
   } catch (err) {
     console.error('Analytics API error:', err)
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    return NextResponse.json({ error: err.message, stack: err.stack }, { status: 500 })
   }
 }
