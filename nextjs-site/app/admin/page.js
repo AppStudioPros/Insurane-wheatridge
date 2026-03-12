@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { LogOut, RefreshCw, Users, MessageSquare, Phone, Mail, Calendar, Plus, Trash2, Edit, ChevronLeft, FileText, CreditCard, Upload, Send, X, Eye, Car, Home, Heart, Briefcase, Building, Download, Save, BarChart3, Globe, Monitor, Smartphone, MapPin } from 'lucide-react'
+import { LogOut, RefreshCw, Users, MessageSquare, Phone, Mail, Calendar, Plus, Trash2, Edit, ChevronLeft, FileText, CreditCard, Upload, Send, X, Eye, Car, Home, Heart, Briefcase, Building, Download, Save, BarChart3, Globe, Monitor, Smartphone, MapPin, Bell } from 'lucide-react'
 
 const SESSION_KEY = 'iwr_admin_token'
 
@@ -1391,7 +1391,41 @@ export default function AdminPage() {
 
   const inquiries = data.inquiries ?? []
   const leads = data.leads ?? []
-  const newCount = inquiries.filter(i => i.status === 'new').length + leads.filter(l => l.status === 'new').length
+  const newInquiries = inquiries.filter(i => i.status === 'new')
+  const newLeads = leads.filter(l => l.status === 'new')
+  const [showNotifs, setShowNotifs] = useState(false)
+  const [unreadMessages, setUnreadMessages] = useState([])
+  const notifRef = useRef(null)
+
+  // Fetch unread messages across all clients
+  useEffect(() => {
+    if (!token) return
+    const checkMessages = async () => {
+      try {
+        const res = await fetch(`/api/admin/notifications?_t=${Date.now()}`, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store' })
+        if (res.ok) { const d = await res.json(); setUnreadMessages(d.unreadMessages || []) }
+      } catch(e) {}
+    }
+    checkMessages()
+    const id = setInterval(checkMessages, 10000)
+    return () => clearInterval(id)
+  }, [token])
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e) => { if (notifRef.current && !notifRef.current.contains(e.target)) setShowNotifs(false) }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  const notifications = [
+    ...newInquiries.map(i => ({ type: 'inquiry', label: `New inquiry from ${i.name || i.email || 'Unknown'}`, time: i.created_at, action: () => { setTab('inquiries'); setShowNotifs(false) } })),
+    ...newLeads.map(l => ({ type: 'lead', label: `New lead: ${l.name || l.email || 'Unknown'}`, time: l.created_at, action: () => { setTab('leads'); setShowNotifs(false) } })),
+    ...unreadMessages.map(m => ({ type: 'message', label: `Message from ${m.client_name || 'Client'}`, time: m.created_at, action: () => { setSelectedClient(m.client); setTab('clients'); setShowNotifs(false) } })),
+  ].sort((a, b) => new Date(b.time) - new Date(a.time))
+
+  const notifCount = notifications.length
+  const notifIcon = { inquiry: '📩', lead: '👤', message: '💬' }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -1402,7 +1436,33 @@ export default function AdminPage() {
             <p className="text-blue-200 text-xs">Insurance Wheat Ridge</p>
           </div>
           <div className="flex items-center gap-3">
-            {newCount > 0 && <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">{newCount} new</span>}
+            <div className="relative" ref={notifRef}>
+              <button onClick={() => setShowNotifs(!showNotifs)} className="text-blue-200 hover:text-white transition relative">
+                <Bell size={18} />
+                {notifCount > 0 && <span className="absolute -top-1.5 -right-1.5 bg-red-500 w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold text-white">{notifCount > 9 ? '9+' : notifCount}</span>}
+              </button>
+              {showNotifs && (
+                <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden">
+                  <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
+                    <span className="text-sm font-semibold text-gray-700">Notifications</span>
+                    {notifCount > 0 && <span className="ml-2 text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-medium">{notifCount}</span>}
+                  </div>
+                  <div className="max-h-64 overflow-y-auto">
+                    {notifications.length === 0 ? (
+                      <div className="px-4 py-6 text-center text-sm text-gray-400">All caught up! 🎉</div>
+                    ) : notifications.map((n, i) => (
+                      <button key={i} onClick={n.action} className="w-full text-left px-4 py-3 hover:bg-blue-50 transition border-b border-gray-50 flex items-start gap-3">
+                        <span className="text-lg">{notifIcon[n.type] || '🔔'}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-gray-700 truncate">{n.label}</p>
+                          <p className="text-xs text-gray-400 mt-0.5">{n.time ? new Date(n.time).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : ''}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
             <button onClick={() => fetchData(token)} className="text-blue-200 hover:text-white transition">
               <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
             </button>
