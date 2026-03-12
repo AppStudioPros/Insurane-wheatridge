@@ -305,6 +305,131 @@ function ClientDetail({ token, client, onBack }) {
   )
 }
 
+const _pInputCls = "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900"
+const _pLabelCls = "block text-xs text-gray-500 mb-1"
+
+function TypeFields({ f, setF }) {
+  const t = f.policy_type
+  const sectionCls = "text-xs font-semibold text-gray-600 border-b border-gray-200 pb-1"
+  return (<>
+    {/* Shared extra fields */}
+    <div className="grid grid-cols-2 gap-3">
+      <div><label className={_pLabelCls}>Deductible</label><input value={f.deductible || ''} onChange={e => setF({...f, deductible: e.target.value})} placeholder="e.g. $500" className={_pInputCls} /></div>
+      <div><label className={_pLabelCls}>Agent / Broker</label><input value={f.agent_name || ''} onChange={e => setF({...f, agent_name: e.target.value})} placeholder="Agent name" className={_pInputCls} /></div>
+    </div>
+
+    {t === 'auto' && (<><p className={sectionCls}>🚗 Auto Details</p>
+      <div className="grid grid-cols-2 gap-3">
+        <div><label className={_pLabelCls}>Vehicles Covered</label><input value={f.vehicles_covered || ''} onChange={e => setF({...f, vehicles_covered: e.target.value})} placeholder="e.g. 2023 Toyota Camry" className={_pInputCls} /></div>
+        <div><label className={_pLabelCls}>VIN(s)</label><input value={f.vin || ''} onChange={e => setF({...f, vin: e.target.value})} placeholder="Vehicle ID Number" className={_pInputCls} /></div>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div><label className={_pLabelCls}>Drivers Listed</label><input value={f.drivers_listed || ''} onChange={e => setF({...f, drivers_listed: e.target.value})} placeholder="e.g. John, Jane Smith" className={_pInputCls} /></div>
+        <div><label className={_pLabelCls}>Liability (BI/PD)</label><input value={f.liability_bi_pd || ''} onChange={e => setF({...f, liability_bi_pd: e.target.value})} placeholder="e.g. 100/300/100" className={_pInputCls} /></div>
+      </div>
+      <div className="grid grid-cols-3 gap-3">
+        <div><label className={_pLabelCls}>Collision Deductible</label><input value={f.collision_deductible || ''} onChange={e => setF({...f, collision_deductible: e.target.value})} placeholder="$500" className={_pInputCls} /></div>
+        <div><label className={_pLabelCls}>Comp Deductible</label><input value={f.comp_deductible || ''} onChange={e => setF({...f, comp_deductible: e.target.value})} placeholder="$250" className={_pInputCls} /></div>
+        <div><label className={_pLabelCls}>Uninsured Motorist</label><input value={f.uninsured_motorist || ''} onChange={e => setF({...f, uninsured_motorist: e.target.value})} placeholder="100/300" className={_pInputCls} /></div>
+      </div>
+    </>)}
+
+    {t === 'homeowners' && (<><p className={sectionCls}>🏠 Homeowners Details</p>
+      <div><label className={_pLabelCls}>Property Address</label><input value={f.property_address || ''} onChange={e => setF({...f, property_address: e.target.value})} className={_pInputCls} /></div>
+      <div className="grid grid-cols-2 gap-3">
+        <div><label className={_pLabelCls}>Dwelling Coverage</label><input value={f.dwelling_coverage || ''} onChange={e => setF({...f, dwelling_coverage: e.target.value})} placeholder="$350,000" className={_pInputCls} /></div>
+        <div><label className={_pLabelCls}>Personal Property</label><input value={f.personal_property || ''} onChange={e => setF({...f, personal_property: e.target.value})} placeholder="$175,000" className={_pInputCls} /></div>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div><label className={_pLabelCls}>Liability Limit</label><input value={f.liability_limit || ''} onChange={e => setF({...f, liability_limit: e.target.value})} placeholder="$300,000" className={_pInputCls} /></div>
+        <div><label className={_pLabelCls}>Loss of Use</label><input value={f.loss_of_use || ''} onChange={e => setF({...f, loss_of_use: e.target.value})} placeholder="$70,000" className={_pInputCls} /></div>
+      </div>
+      <div><label className={_pLabelCls}>Special Endorsements</label><input value={f.endorsements || ''} onChange={e => setF({...f, endorsements: e.target.value})} placeholder="e.g. Earthquake, Sewer backup" className={_pInputCls} /></div>
+    </>)}
+
+    {t === 'renters' && (<><p className={sectionCls}>🏢 Renters Details</p>
+      <div><label className={_pLabelCls}>Property Address</label><input value={f.property_address || ''} onChange={e => setF({...f, property_address: e.target.value})} className={_pInputCls} /></div>
+      <div className="grid grid-cols-2 gap-3">
+        <div><label className={_pLabelCls}>Personal Property Coverage</label><input value={f.personal_property || ''} onChange={e => setF({...f, personal_property: e.target.value})} placeholder="$30,000" className={_pInputCls} /></div>
+        <div><label className={_pLabelCls}>Liability Limit</label><input value={f.liability_limit || ''} onChange={e => setF({...f, liability_limit: e.target.value})} placeholder="$100,000" className={_pInputCls} /></div>
+      </div>
+    </>)}
+
+    {t === 'life' && (<><p className={sectionCls}>❤️ Life Insurance Details</p>
+      <div className="grid grid-cols-2 gap-3">
+        <div><label className={_pLabelCls}>Insured Person</label><input value={f.insured_person || ''} onChange={e => setF({...f, insured_person: e.target.value})} className={_pInputCls} /></div>
+        <div><label className={_pLabelCls}>Beneficiary</label><input value={f.beneficiary || ''} onChange={e => setF({...f, beneficiary: e.target.value})} className={_pInputCls} /></div>
+      </div>
+      <div className="grid grid-cols-3 gap-3">
+        <div><label className={_pLabelCls}>Death Benefit</label><input value={f.death_benefit || ''} onChange={e => setF({...f, death_benefit: e.target.value})} placeholder="$500,000" className={_pInputCls} /></div>
+        <div><label className={_pLabelCls}>Policy Type</label><select value={f.life_policy_type || ''} onChange={e => setF({...f, life_policy_type: e.target.value})} className={_pInputCls}><option value="">Select...</option><option value="term">Term</option><option value="whole">Whole Life</option><option value="universal">Universal</option></select></div>
+        <div><label className={_pLabelCls}>Term Length</label><input value={f.term_length || ''} onChange={e => setF({...f, term_length: e.target.value})} placeholder="e.g. 20 years" className={_pInputCls} /></div>
+      </div>
+    </>)}
+
+    {t === 'business' && (<><p className={sectionCls}>💼 Business / Commercial Details</p>
+      <div className="grid grid-cols-2 gap-3">
+        <div><label className={_pLabelCls}>Business Name</label><input value={f.business_name || ''} onChange={e => setF({...f, business_name: e.target.value})} className={_pInputCls} /></div>
+        <div><label className={_pLabelCls}>Business Type</label><input value={f.business_type || ''} onChange={e => setF({...f, business_type: e.target.value})} placeholder="e.g. LLC, Restaurant" className={_pInputCls} /></div>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div><label className={_pLabelCls}>General Liability Limit</label><input value={f.gl_limit || ''} onChange={e => setF({...f, gl_limit: e.target.value})} placeholder="$1,000,000" className={_pInputCls} /></div>
+        <div><label className={_pLabelCls}>Property Coverage</label><input value={f.property_coverage || ''} onChange={e => setF({...f, property_coverage: e.target.value})} placeholder="$500,000" className={_pInputCls} /></div>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div><label className={_pLabelCls}>Workers Comp</label><select value={f.workers_comp || ''} onChange={e => setF({...f, workers_comp: e.target.value})} className={_pInputCls}><option value="">N/A</option><option value="yes">Yes</option><option value="no">No</option></select></div>
+        <div><label className={_pLabelCls}>Professional Liability</label><input value={f.professional_liability || ''} onChange={e => setF({...f, professional_liability: e.target.value})} placeholder="$1,000,000" className={_pInputCls} /></div>
+      </div>
+    </>)}
+
+    {t === 'umbrella' && (<><p className={sectionCls}>☂️ Umbrella Details</p>
+      <div><label className={_pLabelCls}>Underlying Policies Covered</label><input value={f.underlying_policies || ''} onChange={e => setF({...f, underlying_policies: e.target.value})} placeholder="e.g. Auto + Homeowners" className={_pInputCls} /></div>
+      <div><label className={_pLabelCls}>Umbrella Limit</label><input value={f.umbrella_limit || ''} onChange={e => setF({...f, umbrella_limit: e.target.value})} placeholder="$1,000,000" className={_pInputCls} /></div>
+    </>)}
+
+    {t === 'flood' && (<><p className={sectionCls}>🌊 Flood Insurance Details</p>
+      <div><label className={_pLabelCls}>Property Address</label><input value={f.property_address || ''} onChange={e => setF({...f, property_address: e.target.value})} className={_pInputCls} /></div>
+      <div className="grid grid-cols-2 gap-3">
+        <div><label className={_pLabelCls}>Building Coverage</label><input value={f.building_coverage || ''} onChange={e => setF({...f, building_coverage: e.target.value})} placeholder="$250,000" className={_pInputCls} /></div>
+        <div><label className={_pLabelCls}>Contents Coverage</label><input value={f.contents_coverage || ''} onChange={e => setF({...f, contents_coverage: e.target.value})} placeholder="$100,000" className={_pInputCls} /></div>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div><label className={_pLabelCls}>NFIP Policy Number</label><input value={f.nfip_number || ''} onChange={e => setF({...f, nfip_number: e.target.value})} className={_pInputCls} /></div>
+        <div><label className={_pLabelCls}>Flood Zone</label><input value={f.flood_zone || ''} onChange={e => setF({...f, flood_zone: e.target.value})} placeholder="e.g. Zone AE" className={_pInputCls} /></div>
+      </div>
+    </>)}
+
+    {t === 'health' && (<><p className={sectionCls}>🏥 Health Insurance Details</p>
+      <div className="grid grid-cols-2 gap-3">
+        <div><label className={_pLabelCls}>Plan Name</label><input value={f.plan_name || ''} onChange={e => setF({...f, plan_name: e.target.value})} placeholder="e.g. Blue Cross PPO" className={_pInputCls} /></div>
+        <div><label className={_pLabelCls}>Network Type</label><select value={f.network_type || ''} onChange={e => setF({...f, network_type: e.target.value})} className={_pInputCls}><option value="">Select...</option><option value="HMO">HMO</option><option value="PPO">PPO</option><option value="EPO">EPO</option><option value="POS">POS</option></select></div>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div><label className={_pLabelCls}>Member ID</label><input value={f.member_id || ''} onChange={e => setF({...f, member_id: e.target.value})} className={_pInputCls} /></div>
+        <div><label className={_pLabelCls}>Group Number</label><input value={f.group_number || ''} onChange={e => setF({...f, group_number: e.target.value})} className={_pInputCls} /></div>
+      </div>
+      <div className="grid grid-cols-3 gap-3">
+        <div><label className={_pLabelCls}>Deductible</label><input value={f.health_deductible || ''} onChange={e => setF({...f, health_deductible: e.target.value})} placeholder="$1,500" className={_pInputCls} /></div>
+        <div><label className={_pLabelCls}>Out-of-Pocket Max</label><input value={f.oop_max || ''} onChange={e => setF({...f, oop_max: e.target.value})} placeholder="$6,000" className={_pInputCls} /></div>
+        <div><label className={_pLabelCls}>Copay Amounts</label><input value={f.copay_amounts || ''} onChange={e => setF({...f, copay_amounts: e.target.value})} placeholder="$25/$50" className={_pInputCls} /></div>
+      </div>
+    </>)}
+
+    {t === 'condo' && (<><p className={sectionCls}>🏘️ Condo / HOA Details</p>
+      <div><label className={_pLabelCls}>Property Address</label><input value={f.property_address || ''} onChange={e => setF({...f, property_address: e.target.value})} className={_pInputCls} /></div>
+      <div className="grid grid-cols-2 gap-3">
+        <div><label className={_pLabelCls}>Interior/Dwelling Coverage</label><input value={f.interior_coverage || ''} onChange={e => setF({...f, interior_coverage: e.target.value})} placeholder="$100,000" className={_pInputCls} /></div>
+        <div><label className={_pLabelCls}>Personal Property</label><input value={f.personal_property || ''} onChange={e => setF({...f, personal_property: e.target.value})} placeholder="$50,000" className={_pInputCls} /></div>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div><label className={_pLabelCls}>Liability Limit</label><input value={f.liability_limit || ''} onChange={e => setF({...f, liability_limit: e.target.value})} placeholder="$300,000" className={_pInputCls} /></div>
+        <div><label className={_pLabelCls}>HO6 Endorsements</label><input value={f.ho6_endorsements || ''} onChange={e => setF({...f, ho6_endorsements: e.target.value})} placeholder="e.g. Loss assessment" className={_pInputCls} /></div>
+      </div>
+    </>)}
+  </>)
+}
+
+
 function PoliciesTab({ token, clientId, policies, onRefresh }) {
   const defaultForm = { policy_number: '', policy_type: 'auto', status: 'active', carrier: 'Farmers Insurance', start_date: '', end_date: '', premium_amount: '', coverage_summary: '',
     deductible: '', agent_name: '',
@@ -381,126 +506,7 @@ function PoliciesTab({ token, clientId, policies, onRefresh }) {
   const inputCls = "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900"
   const labelCls = "block text-xs text-gray-500 mb-1"
 
-  const TypeFields = ({ f, setF, prefix = '' }) => {
-    const t = f.policy_type
-    const sectionCls = "text-xs font-semibold text-gray-600 border-b border-gray-200 pb-1"
-    return (<>
-      {/* Shared extra fields */}
-      <div className="grid grid-cols-2 gap-3">
-        <div><label className={labelCls}>Deductible</label><input value={f.deductible || ''} onChange={e => setF({...f, deductible: e.target.value})} placeholder="e.g. $500" className={inputCls} /></div>
-        <div><label className={labelCls}>Agent / Broker</label><input value={f.agent_name || ''} onChange={e => setF({...f, agent_name: e.target.value})} placeholder="Agent name" className={inputCls} /></div>
-      </div>
-
-      {t === 'auto' && (<><p className={sectionCls}>🚗 Auto Details</p>
-        <div className="grid grid-cols-2 gap-3">
-          <div><label className={labelCls}>Vehicles Covered</label><input value={f.vehicles_covered || ''} onChange={e => setF({...f, vehicles_covered: e.target.value})} placeholder="e.g. 2023 Toyota Camry" className={inputCls} /></div>
-          <div><label className={labelCls}>VIN(s)</label><input value={f.vin || ''} onChange={e => setF({...f, vin: e.target.value})} placeholder="Vehicle ID Number" className={inputCls} /></div>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div><label className={labelCls}>Drivers Listed</label><input value={f.drivers_listed || ''} onChange={e => setF({...f, drivers_listed: e.target.value})} placeholder="e.g. John, Jane Smith" className={inputCls} /></div>
-          <div><label className={labelCls}>Liability (BI/PD)</label><input value={f.liability_bi_pd || ''} onChange={e => setF({...f, liability_bi_pd: e.target.value})} placeholder="e.g. 100/300/100" className={inputCls} /></div>
-        </div>
-        <div className="grid grid-cols-3 gap-3">
-          <div><label className={labelCls}>Collision Deductible</label><input value={f.collision_deductible || ''} onChange={e => setF({...f, collision_deductible: e.target.value})} placeholder="$500" className={inputCls} /></div>
-          <div><label className={labelCls}>Comp Deductible</label><input value={f.comp_deductible || ''} onChange={e => setF({...f, comp_deductible: e.target.value})} placeholder="$250" className={inputCls} /></div>
-          <div><label className={labelCls}>Uninsured Motorist</label><input value={f.uninsured_motorist || ''} onChange={e => setF({...f, uninsured_motorist: e.target.value})} placeholder="100/300" className={inputCls} /></div>
-        </div>
-      </>)}
-
-      {t === 'homeowners' && (<><p className={sectionCls}>🏠 Homeowners Details</p>
-        <div><label className={labelCls}>Property Address</label><input value={f.property_address || ''} onChange={e => setF({...f, property_address: e.target.value})} className={inputCls} /></div>
-        <div className="grid grid-cols-2 gap-3">
-          <div><label className={labelCls}>Dwelling Coverage</label><input value={f.dwelling_coverage || ''} onChange={e => setF({...f, dwelling_coverage: e.target.value})} placeholder="$350,000" className={inputCls} /></div>
-          <div><label className={labelCls}>Personal Property</label><input value={f.personal_property || ''} onChange={e => setF({...f, personal_property: e.target.value})} placeholder="$175,000" className={inputCls} /></div>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div><label className={labelCls}>Liability Limit</label><input value={f.liability_limit || ''} onChange={e => setF({...f, liability_limit: e.target.value})} placeholder="$300,000" className={inputCls} /></div>
-          <div><label className={labelCls}>Loss of Use</label><input value={f.loss_of_use || ''} onChange={e => setF({...f, loss_of_use: e.target.value})} placeholder="$70,000" className={inputCls} /></div>
-        </div>
-        <div><label className={labelCls}>Special Endorsements</label><input value={f.endorsements || ''} onChange={e => setF({...f, endorsements: e.target.value})} placeholder="e.g. Earthquake, Sewer backup" className={inputCls} /></div>
-      </>)}
-
-      {t === 'renters' && (<><p className={sectionCls}>🏢 Renters Details</p>
-        <div><label className={labelCls}>Property Address</label><input value={f.property_address || ''} onChange={e => setF({...f, property_address: e.target.value})} className={inputCls} /></div>
-        <div className="grid grid-cols-2 gap-3">
-          <div><label className={labelCls}>Personal Property Coverage</label><input value={f.personal_property || ''} onChange={e => setF({...f, personal_property: e.target.value})} placeholder="$30,000" className={inputCls} /></div>
-          <div><label className={labelCls}>Liability Limit</label><input value={f.liability_limit || ''} onChange={e => setF({...f, liability_limit: e.target.value})} placeholder="$100,000" className={inputCls} /></div>
-        </div>
-      </>)}
-
-      {t === 'life' && (<><p className={sectionCls}>❤️ Life Insurance Details</p>
-        <div className="grid grid-cols-2 gap-3">
-          <div><label className={labelCls}>Insured Person</label><input value={f.insured_person || ''} onChange={e => setF({...f, insured_person: e.target.value})} className={inputCls} /></div>
-          <div><label className={labelCls}>Beneficiary</label><input value={f.beneficiary || ''} onChange={e => setF({...f, beneficiary: e.target.value})} className={inputCls} /></div>
-        </div>
-        <div className="grid grid-cols-3 gap-3">
-          <div><label className={labelCls}>Death Benefit</label><input value={f.death_benefit || ''} onChange={e => setF({...f, death_benefit: e.target.value})} placeholder="$500,000" className={inputCls} /></div>
-          <div><label className={labelCls}>Policy Type</label><select value={f.life_policy_type || ''} onChange={e => setF({...f, life_policy_type: e.target.value})} className={inputCls}><option value="">Select...</option><option value="term">Term</option><option value="whole">Whole Life</option><option value="universal">Universal</option></select></div>
-          <div><label className={labelCls}>Term Length</label><input value={f.term_length || ''} onChange={e => setF({...f, term_length: e.target.value})} placeholder="e.g. 20 years" className={inputCls} /></div>
-        </div>
-      </>)}
-
-      {t === 'business' && (<><p className={sectionCls}>💼 Business / Commercial Details</p>
-        <div className="grid grid-cols-2 gap-3">
-          <div><label className={labelCls}>Business Name</label><input value={f.business_name || ''} onChange={e => setF({...f, business_name: e.target.value})} className={inputCls} /></div>
-          <div><label className={labelCls}>Business Type</label><input value={f.business_type || ''} onChange={e => setF({...f, business_type: e.target.value})} placeholder="e.g. LLC, Restaurant" className={inputCls} /></div>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div><label className={labelCls}>General Liability Limit</label><input value={f.gl_limit || ''} onChange={e => setF({...f, gl_limit: e.target.value})} placeholder="$1,000,000" className={inputCls} /></div>
-          <div><label className={labelCls}>Property Coverage</label><input value={f.property_coverage || ''} onChange={e => setF({...f, property_coverage: e.target.value})} placeholder="$500,000" className={inputCls} /></div>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div><label className={labelCls}>Workers Comp</label><select value={f.workers_comp || ''} onChange={e => setF({...f, workers_comp: e.target.value})} className={inputCls}><option value="">N/A</option><option value="yes">Yes</option><option value="no">No</option></select></div>
-          <div><label className={labelCls}>Professional Liability</label><input value={f.professional_liability || ''} onChange={e => setF({...f, professional_liability: e.target.value})} placeholder="$1,000,000" className={inputCls} /></div>
-        </div>
-      </>)}
-
-      {t === 'umbrella' && (<><p className={sectionCls}>☂️ Umbrella Details</p>
-        <div><label className={labelCls}>Underlying Policies Covered</label><input value={f.underlying_policies || ''} onChange={e => setF({...f, underlying_policies: e.target.value})} placeholder="e.g. Auto + Homeowners" className={inputCls} /></div>
-        <div><label className={labelCls}>Umbrella Limit</label><input value={f.umbrella_limit || ''} onChange={e => setF({...f, umbrella_limit: e.target.value})} placeholder="$1,000,000" className={inputCls} /></div>
-      </>)}
-
-      {t === 'flood' && (<><p className={sectionCls}>🌊 Flood Insurance Details</p>
-        <div><label className={labelCls}>Property Address</label><input value={f.property_address || ''} onChange={e => setF({...f, property_address: e.target.value})} className={inputCls} /></div>
-        <div className="grid grid-cols-2 gap-3">
-          <div><label className={labelCls}>Building Coverage</label><input value={f.building_coverage || ''} onChange={e => setF({...f, building_coverage: e.target.value})} placeholder="$250,000" className={inputCls} /></div>
-          <div><label className={labelCls}>Contents Coverage</label><input value={f.contents_coverage || ''} onChange={e => setF({...f, contents_coverage: e.target.value})} placeholder="$100,000" className={inputCls} /></div>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div><label className={labelCls}>NFIP Policy Number</label><input value={f.nfip_number || ''} onChange={e => setF({...f, nfip_number: e.target.value})} className={inputCls} /></div>
-          <div><label className={labelCls}>Flood Zone</label><input value={f.flood_zone || ''} onChange={e => setF({...f, flood_zone: e.target.value})} placeholder="e.g. Zone AE" className={inputCls} /></div>
-        </div>
-      </>)}
-
-      {t === 'health' && (<><p className={sectionCls}>🏥 Health Insurance Details</p>
-        <div className="grid grid-cols-2 gap-3">
-          <div><label className={labelCls}>Plan Name</label><input value={f.plan_name || ''} onChange={e => setF({...f, plan_name: e.target.value})} placeholder="e.g. Blue Cross PPO" className={inputCls} /></div>
-          <div><label className={labelCls}>Network Type</label><select value={f.network_type || ''} onChange={e => setF({...f, network_type: e.target.value})} className={inputCls}><option value="">Select...</option><option value="HMO">HMO</option><option value="PPO">PPO</option><option value="EPO">EPO</option><option value="POS">POS</option></select></div>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div><label className={labelCls}>Member ID</label><input value={f.member_id || ''} onChange={e => setF({...f, member_id: e.target.value})} className={inputCls} /></div>
-          <div><label className={labelCls}>Group Number</label><input value={f.group_number || ''} onChange={e => setF({...f, group_number: e.target.value})} className={inputCls} /></div>
-        </div>
-        <div className="grid grid-cols-3 gap-3">
-          <div><label className={labelCls}>Deductible</label><input value={f.health_deductible || ''} onChange={e => setF({...f, health_deductible: e.target.value})} placeholder="$1,500" className={inputCls} /></div>
-          <div><label className={labelCls}>Out-of-Pocket Max</label><input value={f.oop_max || ''} onChange={e => setF({...f, oop_max: e.target.value})} placeholder="$6,000" className={inputCls} /></div>
-          <div><label className={labelCls}>Copay Amounts</label><input value={f.copay_amounts || ''} onChange={e => setF({...f, copay_amounts: e.target.value})} placeholder="$25/$50" className={inputCls} /></div>
-        </div>
-      </>)}
-
-      {t === 'condo' && (<><p className={sectionCls}>🏘️ Condo / HOA Details</p>
-        <div><label className={labelCls}>Property Address</label><input value={f.property_address || ''} onChange={e => setF({...f, property_address: e.target.value})} className={inputCls} /></div>
-        <div className="grid grid-cols-2 gap-3">
-          <div><label className={labelCls}>Interior/Dwelling Coverage</label><input value={f.interior_coverage || ''} onChange={e => setF({...f, interior_coverage: e.target.value})} placeholder="$100,000" className={inputCls} /></div>
-          <div><label className={labelCls}>Personal Property</label><input value={f.personal_property || ''} onChange={e => setF({...f, personal_property: e.target.value})} placeholder="$50,000" className={inputCls} /></div>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div><label className={labelCls}>Liability Limit</label><input value={f.liability_limit || ''} onChange={e => setF({...f, liability_limit: e.target.value})} placeholder="$300,000" className={inputCls} /></div>
-          <div><label className={labelCls}>HO6 Endorsements</label><input value={f.ho6_endorsements || ''} onChange={e => setF({...f, ho6_endorsements: e.target.value})} placeholder="e.g. Loss assessment" className={inputCls} /></div>
-        </div>
-      </>)}
-    </>)
-  }
+  // TypeFields defined at module level
 
   return (
     <div>
