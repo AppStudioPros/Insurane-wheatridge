@@ -4,6 +4,7 @@ import LeadCapturePopup from '@/components/LeadCapturePopup'
 import GoogleAnalytics from '@/components/GoogleAnalytics'
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration'
 import InstallPrompt from '@/components/InstallPrompt'
+import StructuredData from '@/components/StructuredData'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -60,6 +61,7 @@ export const metadata = {
   manifest: '/manifest.json',
   verification: {
     google: 'your-google-verification-code',
+    other: { 'msvalidate.01': 'pending' },
   },
   icons: {
     apple: '/icons/icon-192x192.png',
@@ -71,6 +73,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <head>
         <meta name="theme-color" content="#0954a5" />
+        <StructuredData />
       </head>
       <body className={inter.className}>
         <GoogleAnalytics />

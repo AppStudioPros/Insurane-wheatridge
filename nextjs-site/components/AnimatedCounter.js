@@ -26,7 +26,7 @@ export default function AnimatedCounter({ end, duration = 2.5, suffix = '', pref
           }}
         />
       ) : (
-        <span>0{suffix}</span>
+        <span>{end}{suffix}</span>
       )}
     </div>
   )
