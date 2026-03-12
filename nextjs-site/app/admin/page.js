@@ -617,7 +617,7 @@ function PoliciesTab({ token, clientId, policies, onRefresh }) {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div><label className="block text-xs text-gray-500 mb-1">Status</label><select value={editForm.status} onChange={e => setEditForm({...editForm, status: e.target.value})} className={inputCls}><option value="active">Active</option><option value="expired">Expired</option><option value="cancelled">Cancelled</option></select></div>
-              <div><label className="block text-xs text-gray-500 mb-1">Carrier</label><input value={editForm.carrier} onChange={e => setEditForm({...editForm, carrier: e.target.value})} className={inputCls} /></div>
+              <div><label className="block text-xs text-gray-500 mb-1">Carrier</label><select value={carrierOptions.includes(editForm.carrier) ? editForm.carrier : 'Other'} onChange={e => { const v = e.target.value; setEditForm({...editForm, carrier: v === 'Other' ? '' : v}) }} className={inputCls}>{carrierOptions.map(c => <option key={c} value={c}>{c}</option>)}<option value="Other">Other</option></select>{!carrierOptions.includes(editForm.carrier) && <input placeholder="Enter carrier name" value={editForm.carrier} onChange={e => setEditForm({...editForm, carrier: e.target.value})} className={inputCls + " mt-2"} />}</div>
             </div>
             <div className="grid grid-cols-3 gap-3">
               <div><label className="block text-xs text-gray-500 mb-1">Effective Date</label><input type="date" value={editForm.start_date} onChange={e => setEditForm({...editForm, start_date: e.target.value})} className={inputCls} /></div>
