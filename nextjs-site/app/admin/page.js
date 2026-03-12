@@ -502,11 +502,42 @@ function DocumentsTab({ token, clientId, docs, onRefresh }) {
   )
 }
 
-function MessagesTab({ token, clientId, messages, onRefresh }) {
+function MessagesTab({ token, clientId, messages: initialMessages, onRefresh }) {
   const [body, setBody] = useState('')
   const [sending, setSending] = useState(false)
+  const [messages, setMessages] = useState(initialMessages)
   const bottomRef = useRef(null)
   const unreadCount = messages.filter(m => m.sender === 'client' && !m.read).length
+
+  useEffect(() => { setMessages(initialMessages) }, [initialMessages])
+
+  const fetchMessages = async () => {
+    try {
+      const r = await fetch(`/api/admin/messages?client_id=${clientId}&_t=` + Date.now(), {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: 'no-store',
+      })
+      if (!r.ok) return
+      const d = await r.json()
+      if (d) setMessages(d)
+    } catch (e) { /* will retry next poll */ }
+  }
+
+  useEffect(() => {
+    const id = setInterval(fetchMessages, 5000)
+    return () => clearInterval(id)
+  }, [clientId, token])
+
+  useEffect(() => {
+    const handleFocus = () => fetchMessages()
+    const handleVisible = () => { if (document.visibilityState === 'visible') fetchMessages() }
+    window.addEventListener('focus', handleFocus)
+    document.addEventListener('visibilitychange', handleVisible)
+    return () => {
+      window.removeEventListener('focus', handleFocus)
+      document.removeEventListener('visibilitychange', handleVisible)
+    }
+  }, [clientId, token])
 
   const send = async (e) => {
     e?.preventDefault?.()
@@ -519,7 +550,7 @@ function MessagesTab({ token, clientId, messages, onRefresh }) {
     })
     setBody('')
     setSending(false)
-    onRefresh()
+    fetchMessages()
   }
 
   const handleKeyDown = (e) => {
