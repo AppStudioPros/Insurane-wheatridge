@@ -1361,6 +1361,32 @@ export default function AdminPage() {
     return () => document.removeEventListener('mousedown', handler)
   }, [])
 
+  const markNotifRead = async (n) => {
+    if (n.type === 'inquiry' || n.type === 'lead') {
+      const table = n.type === 'inquiry' ? 'inquiries' : 'leads'
+      await fetch('/api/admin/data', { method: 'PATCH', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ table, id: n.id, status: 'contacted' }) })
+      fetchData(token)
+    } else if (n.type === 'message') {
+      await fetch(`/api/admin/notifications`, { method: 'PATCH', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ messageId: n.id }) })
+      setUnreadMessages(prev => prev.filter(m => m.id !== n.id))
+    }
+    if (n.action) n.action()
+  }
+
+  const clearAllNotifs = async () => {
+    for (const n of notifications) {
+      if (n.type === 'inquiry' || n.type === 'lead') {
+        const table = n.type === 'inquiry' ? 'inquiries' : 'leads'
+        await fetch('/api/admin/data', { method: 'PATCH', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ table, id: n.id, status: 'contacted' }) })
+      } else if (n.type === 'message') {
+        await fetch(`/api/admin/notifications`, { method: 'PATCH', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ messageId: n.id }) })
+      }
+    }
+    setUnreadMessages([])
+    fetchData(token)
+    setShowNotifs(false)
+  }
+
 
   useEffect(() => {
     const saved = sessionStorage.getItem(SESSION_KEY)
@@ -1419,9 +1445,9 @@ export default function AdminPage() {
   const newInquiries = inquiries.filter(i => i.status === 'new')
   const newLeads = leads.filter(l => l.status === 'new')
   const notifications = [
-    ...newInquiries.map(i => ({ type: 'inquiry', label: `New inquiry from ${i.name || i.email || 'Unknown'}`, time: i.created_at, action: () => { setTab('inquiries'); setShowNotifs(false) } })),
-    ...newLeads.map(l => ({ type: 'lead', label: `New lead: ${l.name || l.email || 'Unknown'}`, time: l.created_at, action: () => { setTab('leads'); setShowNotifs(false) } })),
-    ...unreadMessages.map(m => ({ type: 'message', label: `Message from ${m.client_name || 'Client'}`, time: m.created_at, action: () => { setSelectedClient(m.client); setTab('clients'); setShowNotifs(false) } })),
+    ...newInquiries.map(i => ({ type: 'inquiry', id: i.id, label: `New inquiry from ${i.name || i.email || 'Unknown'}`, time: i.created_at, action: () => { setTab('inquiries'); setShowNotifs(false) } })),
+    ...newLeads.map(l => ({ type: 'lead', id: l.id, label: `New lead: ${l.name || l.email || 'Unknown'}`, time: l.created_at, action: () => { setTab('leads'); setShowNotifs(false) } })),
+    ...unreadMessages.map(m => ({ type: 'message', id: m.id, label: `Message from ${m.client_name || 'Client'}`, time: m.created_at, action: () => { setSelectedClient(m.client); setTab('clients'); setShowNotifs(false) } })),
   ].sort((a, b) => new Date(b.time) - new Date(a.time))
 
   const notifCount = notifications.length
@@ -1443,15 +1469,16 @@ export default function AdminPage() {
               </button>
               {showNotifs && (
                 <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden">
-                  <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
-                    <span className="text-sm font-semibold text-gray-700">Notifications</span>
-                    {notifCount > 0 && <span className="ml-2 text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-medium">{notifCount}</span>}
+                  <div className="px-4 py-3 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
+                    <div><span className="text-sm font-semibold text-gray-700">Notifications</span>
+                    {notifCount > 0 && <span className="ml-2 text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-medium">{notifCount}</span>}</div>
+                    {notifCount > 0 && <button onClick={clearAllNotifs} className="text-xs text-blue-600 hover:text-blue-800 font-medium">Clear all</button>}
                   </div>
                   <div className="max-h-64 overflow-y-auto">
                     {notifications.length === 0 ? (
                       <div className="px-4 py-6 text-center text-sm text-gray-400">All caught up! 🎉</div>
                     ) : notifications.map((n, i) => (
-                      <button key={i} onClick={n.action} className="w-full text-left px-4 py-3 hover:bg-blue-50 transition border-b border-gray-50 flex items-start gap-3">
+                      <button key={i} onClick={() => markNotifRead(n)} className="w-full text-left px-4 py-3 hover:bg-blue-50 transition border-b border-gray-50 flex items-start gap-3">
                         <span className="text-lg">{notifIcon[n.type] || '🔔'}</span>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm text-gray-700 truncate">{n.label}</p>

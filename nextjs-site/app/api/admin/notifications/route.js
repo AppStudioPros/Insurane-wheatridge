@@ -49,3 +49,24 @@ export async function GET(request) {
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
 }
+
+export async function PATCH(request) {
+  const token = request.headers.get('authorization')?.replace('Bearer ', '')
+  if (token !== ADMIN_PASSWORD) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const { messageId } = await request.json()
+  if (!messageId) return NextResponse.json({ error: 'Missing messageId' }, { status: 400 })
+
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/messages?id=eq.${messageId}`, {
+    method: 'PATCH',
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      Prefer: 'return=minimal',
+    },
+    body: JSON.stringify({ read: true }),
+  })
+
+  return NextResponse.json({ success: true })
+}
