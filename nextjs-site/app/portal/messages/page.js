@@ -33,7 +33,7 @@ export default function MessagesPage() {
       return
     }
     try {
-      const r = await fetch('/api/portal/messages', { headers: { Authorization: 'Bearer ' + t } })
+      const r = await fetch('/api/portal/messages?_t=' + Date.now(), { headers: { Authorization: 'Bearer ' + t }, cache: 'no-store' })
       if (!r.ok) { setLoading(false); return }
       const d = await r.json()
       if (d) {
