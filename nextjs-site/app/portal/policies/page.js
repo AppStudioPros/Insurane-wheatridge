@@ -17,12 +17,23 @@ export default function PoliciesPage() {
   const [loading, setLoading] = useState(true)
   const [expanded, setExpanded] = useState(null)
 
+  const fetchPolicies = async () => {
+    const t = sessionStorage.getItem('portal_token')
+    if (!t) return
+    try {
+      const r = await fetch('/api/portal/policies?_t=' + Date.now(), { headers: { Authorization: 'Bearer ' + t }, cache: 'no-store' })
+      if (!r.ok) return
+      const d = await r.json()
+      setPolicies(d ?? [])
+    } catch (e) {}
+    setLoading(false)
+  }
+
+  useEffect(() => { if (ready) fetchPolicies() }, [ready])
   useEffect(() => {
     if (!ready) return
-    authFetch('/api/portal/policies').then(r => r?.json()).then(d => {
-      setPolicies(d ?? [])
-      setLoading(false)
-    })
+    const id = setInterval(fetchPolicies, 5000)
+    return () => clearInterval(id)
   }, [ready])
 
   if (!ready) return null

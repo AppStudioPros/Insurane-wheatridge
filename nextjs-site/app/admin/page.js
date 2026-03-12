@@ -222,11 +222,13 @@ function ClientDetail({ token, client, onBack }) {
   const fetchAll = async () => {
     setLoading(true)
     const headers = { Authorization: `Bearer ${token}` }
+    const _t = Date.now()
+    const opts = { headers, cache: 'no-store' }
     const [p, ic, d, m] = await Promise.all([
-      fetch(`/api/admin/policies?client_id=${client.id}`, { headers }).then(r => r.json()),
-      fetch(`/api/admin/id-cards?client_id=${client.id}`, { headers }).then(r => r.json()),
-      fetch(`/api/admin/documents?client_id=${client.id}`, { headers }).then(r => r.json()),
-      fetch(`/api/admin/messages?client_id=${client.id}`, { headers }).then(r => r.json()),
+      fetch(`/api/admin/policies?client_id=${client.id}&_t=${_t}`, opts).then(r => r.json()),
+      fetch(`/api/admin/id-cards?client_id=${client.id}&_t=${_t}`, opts).then(r => r.json()),
+      fetch(`/api/admin/documents?client_id=${client.id}&_t=${_t}`, opts).then(r => r.json()),
+      fetch(`/api/admin/messages?client_id=${client.id}&_t=${_t}`, opts).then(r => r.json()),
     ])
     setPolicies(p ?? [])
     setIdCards(ic ?? [])
@@ -235,6 +237,10 @@ function ClientDetail({ token, client, onBack }) {
     setLoading(false)
   }
   useEffect(() => { fetchAll() }, [client.id])
+  useEffect(() => {
+    const id = setInterval(() => { fetchAll() }, 5000)
+    return () => clearInterval(id)
+  }, [client.id])
 
   const tabs = [
     { key: 'policies', label: 'Policies', icon: FileText, count: policies.length },

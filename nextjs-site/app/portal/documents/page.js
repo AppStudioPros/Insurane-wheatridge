@@ -26,14 +26,24 @@ export default function DocumentsPage() {
   const [file, setFile] = useState(null)
   const [preview, setPreview] = useState(null)
 
-  const fetchDocs = () => {
-    authFetch('/api/portal/documents').then(r => r?.json()).then(d => {
+  const fetchDocs = async () => {
+    const t = sessionStorage.getItem('portal_token')
+    if (!t) return
+    try {
+      const r = await fetch('/api/portal/documents?_t=' + Date.now(), { headers: { Authorization: 'Bearer ' + t }, cache: 'no-store' })
+      if (!r.ok) return
+      const d = await r.json()
       setDocs(d ?? [])
-      setLoading(false)
-    })
+    } catch (e) {}
+    setLoading(false)
   }
 
   useEffect(() => { if (ready) fetchDocs() }, [ready])
+  useEffect(() => {
+    if (!ready) return
+    const id = setInterval(fetchDocs, 5000)
+    return () => clearInterval(id)
+  }, [ready])
 
   const handleUpload = async (e) => {
     e.preventDefault()

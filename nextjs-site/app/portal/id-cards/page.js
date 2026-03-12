@@ -98,12 +98,23 @@ export default function IDCardsPage() {
   const [cards, setCards] = useState([])
   const [loading, setLoading] = useState(true)
 
+  const fetchCards = async () => {
+    const t = sessionStorage.getItem('portal_token')
+    if (!t) return
+    try {
+      const r = await fetch('/api/portal/id-cards?_t=' + Date.now(), { headers: { Authorization: 'Bearer ' + t }, cache: 'no-store' })
+      if (!r.ok) return
+      const d = await r.json()
+      setCards(d ?? [])
+    } catch (e) {}
+    setLoading(false)
+  }
+
+  useEffect(() => { if (ready) fetchCards() }, [ready])
   useEffect(() => {
     if (!ready) return
-    authFetch('/api/portal/id-cards').then(r => r?.json()).then(d => {
-      setCards(d ?? [])
-      setLoading(false)
-    })
+    const id = setInterval(fetchCards, 5000)
+    return () => clearInterval(id)
   }, [ready])
 
   if (!ready) return null
