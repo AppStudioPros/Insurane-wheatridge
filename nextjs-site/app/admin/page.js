@@ -219,8 +219,8 @@ function ClientDetail({ token, client, onBack }) {
   const [messages, setMessages] = useState([])
   const [loading, setLoading] = useState(true)
 
-  const fetchAll = async () => {
-    setLoading(true)
+  const fetchAll = async (silent = false) => {
+    if (!silent) setLoading(true)
     const headers = { Authorization: `Bearer ${token}` }
     const _t = Date.now()
     const opts = { headers, cache: 'no-store' }
@@ -234,11 +234,11 @@ function ClientDetail({ token, client, onBack }) {
     setIdCards(ic ?? [])
     setDocs(d ?? [])
     setMessages(m ?? [])
-    setLoading(false)
+    if (!silent) setLoading(false)
   }
   useEffect(() => { fetchAll() }, [client.id])
   useEffect(() => {
-    const id = setInterval(() => { fetchAll() }, 5000)
+    const id = setInterval(() => { fetchAll(true) }, 5000)
     return () => clearInterval(id)
   }, [client.id])
 
