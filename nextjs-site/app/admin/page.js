@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { LogOut, RefreshCw, Users, MessageSquare, Phone, Mail, Calendar, Plus, Trash2, Edit, ChevronLeft, FileText, CreditCard, Upload, Send, X, Eye, Car, Home, Heart, Briefcase, Building, Download, Save } from 'lucide-react'
+import { LogOut, RefreshCw, Users, MessageSquare, Phone, Mail, Calendar, Plus, Trash2, Edit, ChevronLeft, FileText, CreditCard, Upload, Send, X, Eye, Car, Home, Heart, Briefcase, Building, Download, Save, BarChart3, Globe, Monitor, Smartphone, MapPin } from 'lucide-react'
 
 const SESSION_KEY = 'iwr_admin_token'
 
@@ -263,6 +263,7 @@ function ClientDetail({ token, client, onBack }) {
     { key: 'id-cards', label: 'ID Cards', icon: CreditCard, count: idCards.length },
     { key: 'documents', label: 'Docs', icon: Upload, count: docs.length },
     { key: 'messages', label: 'Messages', icon: MessageSquare, count: messages.length },
+    { key: 'analytics', label: 'Analytics', icon: BarChart3 },
   ]
 
   return (
@@ -298,9 +299,183 @@ function ClientDetail({ token, client, onBack }) {
           {tab === 'policies' && <PoliciesTab token={token} clientId={client.id} policies={policies} onRefresh={fetchAll} />}
           {tab === 'id-cards' && <IDCardsTab token={token} clientId={client.id} idCards={idCards} policies={policies} onRefresh={fetchAll} />}
           {tab === 'documents' && <DocumentsTab token={token} clientId={client.id} docs={docs} onRefresh={fetchAll} />}
+          {tab === 'analytics' && <AnalyticsTab token={token} />}
           {tab === 'messages' && <MessagesTab token={token} clientId={client.id} messages={messages} onRefresh={fetchAll} />}
         </>
       )}
+    </div>
+  )
+}
+
+
+function AnalyticsTab({ token }) {
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [range, setRange] = useState('30')
+  const [error, setError] = useState(null)
+
+  const fetchAnalytics = useCallback(async (r) => {
+    try {
+      const res = await fetch(`/api/admin/analytics?range=${r || range}&_t=${Date.now()}`, {
+        headers: { Authorization: `Bearer ${token}` }, cache: 'no-store'
+      })
+      if (!res.ok) throw new Error('Failed to fetch analytics')
+      const d = await res.json()
+      if (d.error) throw new Error(d.error)
+      setData(d)
+      setError(null)
+    } catch (e) { setError(e.message) } finally { setLoading(false) }
+  }, [token, range])
+
+  useEffect(() => { fetchAnalytics() }, [fetchAnalytics])
+
+  const changeRange = (r) => { setRange(r); setLoading(true); fetchAnalytics(r) }
+
+  const StatCard = ({ icon: Icon, label, value, sub }) => (
+    <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+      <div className="flex items-center gap-2 text-gray-500 text-xs mb-1">{Icon && <Icon size={14} />}{label}</div>
+      <div className="text-2xl font-bold text-gray-900">{value}</div>
+      {sub && <div className="text-xs text-gray-400 mt-1">{sub}</div>}
+    </div>
+  )
+
+  const Bar = ({ value, max, color = 'bg-[#0954a5]' }) => (
+    <div className="w-full bg-gray-100 rounded-full h-2">
+      <div className={`${color} h-2 rounded-full transition-all`} style={{ width: `${max > 0 ? (value / max) * 100 : 0}%` }} />
+    </div>
+  )
+
+  if (loading) return <div className="text-center py-12 text-gray-400">Loading analytics...</div>
+  if (error) return <div className="text-center py-12 text-red-500">Error: {error}</div>
+  if (!data) return <div className="text-center py-12 text-gray-400">No data available</div>
+
+  const { overview, topPages, devices, sources, dailyTrend, locations } = data
+  const maxPageViews = Math.max(...topPages.map(p => p.views), 1)
+  const maxSourceSessions = Math.max(...sources.map(s => s.sessions), 1)
+  const maxLocationSessions = Math.max(...locations.map(l => l.sessions), 1)
+  const totalDeviceSessions = devices.reduce((a, d) => a + d.sessions, 0) || 1
+  const maxTrendSessions = Math.max(...dailyTrend.map(d => d.sessions), 1)
+
+  const deviceColors = { desktop: 'bg-[#0954a5]', mobile: 'bg-green-500', tablet: 'bg-yellow-500' }
+  const deviceIcons = { desktop: Monitor, mobile: Smartphone, tablet: Monitor }
+
+  return (
+    <div className="space-y-6">
+      {/* Range selector */}
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2"><BarChart3 size={20} /> Website Analytics</h3>
+        <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
+          {[['7','7 Days'],['30','30 Days'],['90','90 Days']].map(([v,l]) => (
+            <button key={v} onClick={() => changeRange(v)} className={`px-3 py-1 text-xs rounded-md transition-all ${range===v ? 'bg-white shadow text-[#0954a5] font-medium' : 'text-gray-500 hover:text-gray-700'}`}>{l}</button>
+          ))}
+        </div>
+      </div>
+
+      {/* Overview cards */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        <StatCard icon={Users} label="Visitors" value={overview.users} sub={`${overview.newUsers} new`} />
+        <StatCard icon={BarChart3} label="Sessions" value={overview.sessions} />
+        <StatCard icon={Eye} label="Page Views" value={overview.pageViews} />
+        <StatCard label="Bounce Rate" value={`${overview.bounceRate}%`} sub={parseFloat(overview.bounceRate) > 70 ? 'Could improve' : 'Healthy'} />
+        <StatCard label="Avg. Visit" value={`${overview.avgSessionDuration}s`} sub={parseInt(overview.avgSessionDuration) > 60 ? 'Good engagement' : 'Quick visits'} />
+        <StatCard label="New vs Return" value={`${overview.users > 0 ? Math.round(overview.newUsers/overview.users*100) : 0}% new`} />
+      </div>
+
+      {/* Daily trend */}
+      {dailyTrend.length > 0 && (
+        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+          <h4 className="text-sm font-medium text-gray-700 mb-3">Daily Traffic</h4>
+          <div className="flex items-end gap-1 h-32">
+            {dailyTrend.map((d, i) => (
+              <div key={i} className="flex-1 flex flex-col items-center gap-1 group relative">
+                <div className="absolute -top-6 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap z-10">{d.date}: {d.sessions} visits</div>
+                <div className="w-full bg-[#0954a5] rounded-t transition-all hover:bg-[#0b6ad4]" style={{ height: `${(d.sessions / maxTrendSessions) * 100}%`, minHeight: d.sessions > 0 ? '4px' : '1px' }} />
+              </div>
+            ))}
+          </div>
+          <div className="flex justify-between mt-1 text-xs text-gray-400">
+            <span>{dailyTrend[0]?.date}</span>
+            <span>{dailyTrend[dailyTrend.length-1]?.date}</span>
+          </div>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Top pages */}
+        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+          <h4 className="text-sm font-medium text-gray-700 mb-3">Top Pages</h4>
+          <div className="space-y-3">
+            {topPages.map((p, i) => (
+              <div key={i}>
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-gray-700 truncate max-w-[70%]">{p.page}</span>
+                  <span className="text-gray-500">{p.views} views</span>
+                </div>
+                <Bar value={p.views} max={maxPageViews} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Traffic sources */}
+        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+          <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2"><Globe size={14} /> Where Visitors Come From</h4>
+          <div className="space-y-3">
+            {sources.map((s, i) => (
+              <div key={i}>
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-gray-700">{s.source}</span>
+                  <span className="text-gray-500">{s.sessions} visits</span>
+                </div>
+                <Bar value={s.sessions} max={maxSourceSessions} color="bg-green-500" />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Devices */}
+        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+          <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2"><Monitor size={14} /> Devices</h4>
+          <div className="space-y-3">
+            {devices.map((d, i) => {
+              const pct = ((d.sessions / totalDeviceSessions) * 100).toFixed(0)
+              const DIcon = deviceIcons[d.device] || Monitor
+              return (
+                <div key={i} className="flex items-center gap-3">
+                  <DIcon size={16} className="text-gray-400" />
+                  <div className="flex-1">
+                    <div className="flex justify-between text-xs mb-1">
+                      <span className="text-gray-700 capitalize">{d.device}</span>
+                      <span className="text-gray-500">{pct}% ({d.sessions})</span>
+                    </div>
+                    <Bar value={d.sessions} max={totalDeviceSessions} color={deviceColors[d.device] || 'bg-gray-400'} />
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Locations */}
+        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+          <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2"><MapPin size={14} /> Visitor Locations</h4>
+          <div className="space-y-3">
+            {locations.map((l, i) => (
+              <div key={i}>
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-gray-700">{l.city}</span>
+                  <span className="text-gray-500">{l.sessions} visits</span>
+                </div>
+                <Bar value={l.sessions} max={maxLocationSessions} color="bg-purple-500" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="text-center text-xs text-gray-400">
+        Last updated: {new Date(data.generated).toLocaleString()} · Data from Google Analytics
+      </div>
     </div>
   )
 }
