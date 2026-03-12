@@ -19,8 +19,9 @@ const STATUS_COLORS = {
   closed: 'bg-green-100 text-green-700',
 }
 const POLICY_STATUS_COLORS = { active: 'bg-green-100 text-green-700', expired: 'bg-gray-100 text-gray-600', cancelled: 'bg-red-100 text-red-700' }
-const POLICY_TYPES = ['auto', 'home', 'life', 'business', 'renters', 'condo']
+const POLICY_TYPES = ['auto', 'homeowners', 'renters', 'life', 'business', 'umbrella', 'flood', 'health', 'condo']
 const TYPE_ICONS = { auto: Car, home: Home, life: Heart, business: Briefcase, renters: Building, condo: Building }
+const POLICY_TYPE_LABELS = { auto: 'Auto', homeowners: 'Homeowners', renters: 'Renters', life: 'Life', business: 'Business / Commercial', umbrella: 'Umbrella', flood: 'Flood', health: 'Health', condo: 'Condo / HOA' }
 const DOC_CATEGORIES = ['id', 'proof_of_residence', 'claim_photo', 'signature', 'other']
 
 // ================= ORIGINAL COMPONENTS =================
@@ -305,8 +306,19 @@ function ClientDetail({ token, client, onBack }) {
 }
 
 function PoliciesTab({ token, clientId, policies, onRefresh }) {
+  const defaultForm = { policy_number: '', policy_type: 'auto', status: 'active', carrier: 'Farmers Insurance', start_date: '', end_date: '', premium_amount: '', coverage_summary: '',
+    deductible: '', agent_name: '',
+    vehicles_covered: '', vin: '', drivers_listed: '', liability_bi_pd: '', collision_deductible: '', comp_deductible: '', uninsured_motorist: '',
+    property_address: '', dwelling_coverage: '', personal_property: '', liability_limit: '', loss_of_use: '', endorsements: '',
+    insured_person: '', beneficiary: '', death_benefit: '', life_policy_type: '', term_length: '',
+    business_name: '', business_type: '', gl_limit: '', property_coverage: '', workers_comp: '', professional_liability: '',
+    underlying_policies: '', umbrella_limit: '',
+    building_coverage: '', contents_coverage: '', nfip_number: '', flood_zone: '',
+    plan_name: '', member_id: '', group_number: '', network_type: '', health_deductible: '', oop_max: '', copay_amounts: '',
+    interior_coverage: '', ho6_endorsements: ''
+  }
   const [showForm, setShowForm] = useState(false)
-  const [form, setForm] = useState({ policy_number: '', policy_type: 'auto', status: 'active', carrier: 'Farmers Insurance', start_date: '', end_date: '', premium_amount: '', coverage_summary: '' })
+  const [form, setForm] = useState({...defaultForm})
   const [saving, setSaving] = useState(false)
   const [selected, setSelected] = useState(null)
   const [editing, setEditing] = useState(false)
@@ -315,61 +327,180 @@ function PoliciesTab({ token, clientId, policies, onRefresh }) {
   const [newCarrier, setNewCarrier] = useState('')
   const defaultCarriers = ['Farmers Insurance', 'Insurance Wheat Ridge']
   const [customCarriers, setCustomCarriers] = useState(() => {
-    if (typeof window !== 'undefined') {
-      try { return JSON.parse(localStorage.getItem('iw_custom_carriers') || '[]') } catch { return [] }
-    }
+    if (typeof window !== 'undefined') { try { return JSON.parse(localStorage.getItem('iw_custom_carriers') || '[]') } catch { return [] } }
     return []
   })
   const carrierOptions = [...defaultCarriers, ...customCarriers]
-  const addCarrier = () => {
-    if (!newCarrier.trim() || carrierOptions.includes(newCarrier.trim())) return
-    const updated = [...customCarriers, newCarrier.trim()]
-    setCustomCarriers(updated)
-    localStorage.setItem('iw_custom_carriers', JSON.stringify(updated))
-    setNewCarrier('')
+  const addCarrier = () => { if (!newCarrier.trim() || carrierOptions.includes(newCarrier.trim())) return; const u = [...customCarriers, newCarrier.trim()]; setCustomCarriers(u); localStorage.setItem('iw_custom_carriers', JSON.stringify(u)); setNewCarrier('') }
+  const removeCarrier = (c) => { const u = customCarriers.filter(x => x !== c); setCustomCarriers(u); localStorage.setItem('iw_custom_carriers', JSON.stringify(u)) }
+
+  const typeSpecificKeys = {
+    auto: ['vehicles_covered','vin','drivers_listed','liability_bi_pd','collision_deductible','comp_deductible','uninsured_motorist'],
+    homeowners: ['property_address','dwelling_coverage','personal_property','liability_limit','loss_of_use','endorsements'],
+    renters: ['property_address','personal_property','liability_limit'],
+    life: ['insured_person','beneficiary','death_benefit','life_policy_type','term_length'],
+    business: ['business_name','business_type','gl_limit','property_coverage','workers_comp','professional_liability'],
+    umbrella: ['underlying_policies','umbrella_limit'],
+    flood: ['property_address','building_coverage','contents_coverage','nfip_number','flood_zone'],
+    health: ['plan_name','member_id','group_number','network_type','health_deductible','oop_max','copay_amounts'],
+    condo: ['property_address','interior_coverage','personal_property','liability_limit','ho6_endorsements'],
   }
-  const removeCarrier = (c) => {
-    const updated = customCarriers.filter(x => x !== c)
-    setCustomCarriers(updated)
-    localStorage.setItem('iw_custom_carriers', JSON.stringify(updated))
+
+  const buildPayload = (f) => {
+    const keys = typeSpecificKeys[f.policy_type] || []
+    const details = {}
+    keys.forEach(k => { if (f[k]) details[k] = f[k] })
+    return {
+      policy_number: f.policy_number, policy_type: f.policy_type, status: f.status, carrier: f.carrier,
+      start_date: f.start_date || null, end_date: f.end_date || null,
+      premium_amount: f.premium_amount ? Number(f.premium_amount) : null,
+      coverage_summary: JSON.stringify({ text: f.coverage_summary || '', deductible: f.deductible || '', agent_name: f.agent_name || '', ...details }),
+    }
+  }
+
+  const parseDetails = (p) => {
+    let d = {}
+    try { d = JSON.parse(p.coverage_summary || '{}'); if (typeof d === 'string') d = {} } catch { d = {} }
+    return { ...p, coverage_summary_text: d.text || p.coverage_summary || '', deductible: d.deductible || '', agent_name: d.agent_name || '', ...d }
   }
 
   const save = async (e) => {
-    e.preventDefault()
-    setSaving(true)
-    await fetch('/api/admin/policies', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ ...form, client_id: clientId, premium_amount: form.premium_amount ? Number(form.premium_amount) : null }),
-    })
-    setShowForm(false)
-    setForm({ policy_number: '', policy_type: 'auto', status: 'active', carrier: 'Farmers Insurance', start_date: '', end_date: '', premium_amount: '', coverage_summary: '' })
-    setSaving(false)
-    onRefresh()
+    e.preventDefault(); setSaving(true)
+    await fetch('/api/admin/policies', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ ...buildPayload(form), client_id: clientId }) })
+    setShowForm(false); setForm({...defaultForm}); setSaving(false); onRefresh()
   }
 
   const updatePolicy = async () => {
     setSaving(true)
-    await fetch('/api/admin/policies', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ id: selected.id, ...editForm, premium_amount: editForm.premium_amount ? Number(editForm.premium_amount) : null }),
-    })
-    setSaving(false)
-    setEditing(false)
-    setSelected(null)
-    onRefresh()
+    await fetch('/api/admin/policies', { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ id: selected.id, ...buildPayload(editForm) }) })
+    setSaving(false); setEditing(false); setSelected(null); onRefresh()
   }
 
-  const del = async (id) => {
-    if (!confirm('Delete this policy?')) return
-    await fetch(`/api/admin/policies?id=${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } })
-    setSelected(null)
-    onRefresh()
-  }
+  const del = async (id) => { if (!confirm('Delete this policy?')) return; await fetch(`/api/admin/policies?id=${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } }); setSelected(null); onRefresh() }
 
   const inputCls = "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900"
   const labelCls = "block text-xs text-gray-500 mb-1"
+
+  const TypeFields = ({ f, setF, prefix = '' }) => {
+    const t = f.policy_type
+    const sectionCls = "text-xs font-semibold text-gray-600 border-b border-gray-200 pb-1"
+    return (<>
+      {/* Shared extra fields */}
+      <div className="grid grid-cols-2 gap-3">
+        <div><label className={labelCls}>Deductible</label><input value={f.deductible || ''} onChange={e => setF({...f, deductible: e.target.value})} placeholder="e.g. $500" className={inputCls} /></div>
+        <div><label className={labelCls}>Agent / Broker</label><input value={f.agent_name || ''} onChange={e => setF({...f, agent_name: e.target.value})} placeholder="Agent name" className={inputCls} /></div>
+      </div>
+
+      {t === 'auto' && (<><p className={sectionCls}>🚗 Auto Details</p>
+        <div className="grid grid-cols-2 gap-3">
+          <div><label className={labelCls}>Vehicles Covered</label><input value={f.vehicles_covered || ''} onChange={e => setF({...f, vehicles_covered: e.target.value})} placeholder="e.g. 2023 Toyota Camry" className={inputCls} /></div>
+          <div><label className={labelCls}>VIN(s)</label><input value={f.vin || ''} onChange={e => setF({...f, vin: e.target.value})} placeholder="Vehicle ID Number" className={inputCls} /></div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div><label className={labelCls}>Drivers Listed</label><input value={f.drivers_listed || ''} onChange={e => setF({...f, drivers_listed: e.target.value})} placeholder="e.g. John, Jane Smith" className={inputCls} /></div>
+          <div><label className={labelCls}>Liability (BI/PD)</label><input value={f.liability_bi_pd || ''} onChange={e => setF({...f, liability_bi_pd: e.target.value})} placeholder="e.g. 100/300/100" className={inputCls} /></div>
+        </div>
+        <div className="grid grid-cols-3 gap-3">
+          <div><label className={labelCls}>Collision Deductible</label><input value={f.collision_deductible || ''} onChange={e => setF({...f, collision_deductible: e.target.value})} placeholder="$500" className={inputCls} /></div>
+          <div><label className={labelCls}>Comp Deductible</label><input value={f.comp_deductible || ''} onChange={e => setF({...f, comp_deductible: e.target.value})} placeholder="$250" className={inputCls} /></div>
+          <div><label className={labelCls}>Uninsured Motorist</label><input value={f.uninsured_motorist || ''} onChange={e => setF({...f, uninsured_motorist: e.target.value})} placeholder="100/300" className={inputCls} /></div>
+        </div>
+      </>)}
+
+      {t === 'homeowners' && (<><p className={sectionCls}>🏠 Homeowners Details</p>
+        <div><label className={labelCls}>Property Address</label><input value={f.property_address || ''} onChange={e => setF({...f, property_address: e.target.value})} className={inputCls} /></div>
+        <div className="grid grid-cols-2 gap-3">
+          <div><label className={labelCls}>Dwelling Coverage</label><input value={f.dwelling_coverage || ''} onChange={e => setF({...f, dwelling_coverage: e.target.value})} placeholder="$350,000" className={inputCls} /></div>
+          <div><label className={labelCls}>Personal Property</label><input value={f.personal_property || ''} onChange={e => setF({...f, personal_property: e.target.value})} placeholder="$175,000" className={inputCls} /></div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div><label className={labelCls}>Liability Limit</label><input value={f.liability_limit || ''} onChange={e => setF({...f, liability_limit: e.target.value})} placeholder="$300,000" className={inputCls} /></div>
+          <div><label className={labelCls}>Loss of Use</label><input value={f.loss_of_use || ''} onChange={e => setF({...f, loss_of_use: e.target.value})} placeholder="$70,000" className={inputCls} /></div>
+        </div>
+        <div><label className={labelCls}>Special Endorsements</label><input value={f.endorsements || ''} onChange={e => setF({...f, endorsements: e.target.value})} placeholder="e.g. Earthquake, Sewer backup" className={inputCls} /></div>
+      </>)}
+
+      {t === 'renters' && (<><p className={sectionCls}>🏢 Renters Details</p>
+        <div><label className={labelCls}>Property Address</label><input value={f.property_address || ''} onChange={e => setF({...f, property_address: e.target.value})} className={inputCls} /></div>
+        <div className="grid grid-cols-2 gap-3">
+          <div><label className={labelCls}>Personal Property Coverage</label><input value={f.personal_property || ''} onChange={e => setF({...f, personal_property: e.target.value})} placeholder="$30,000" className={inputCls} /></div>
+          <div><label className={labelCls}>Liability Limit</label><input value={f.liability_limit || ''} onChange={e => setF({...f, liability_limit: e.target.value})} placeholder="$100,000" className={inputCls} /></div>
+        </div>
+      </>)}
+
+      {t === 'life' && (<><p className={sectionCls}>❤️ Life Insurance Details</p>
+        <div className="grid grid-cols-2 gap-3">
+          <div><label className={labelCls}>Insured Person</label><input value={f.insured_person || ''} onChange={e => setF({...f, insured_person: e.target.value})} className={inputCls} /></div>
+          <div><label className={labelCls}>Beneficiary</label><input value={f.beneficiary || ''} onChange={e => setF({...f, beneficiary: e.target.value})} className={inputCls} /></div>
+        </div>
+        <div className="grid grid-cols-3 gap-3">
+          <div><label className={labelCls}>Death Benefit</label><input value={f.death_benefit || ''} onChange={e => setF({...f, death_benefit: e.target.value})} placeholder="$500,000" className={inputCls} /></div>
+          <div><label className={labelCls}>Policy Type</label><select value={f.life_policy_type || ''} onChange={e => setF({...f, life_policy_type: e.target.value})} className={inputCls}><option value="">Select...</option><option value="term">Term</option><option value="whole">Whole Life</option><option value="universal">Universal</option></select></div>
+          <div><label className={labelCls}>Term Length</label><input value={f.term_length || ''} onChange={e => setF({...f, term_length: e.target.value})} placeholder="e.g. 20 years" className={inputCls} /></div>
+        </div>
+      </>)}
+
+      {t === 'business' && (<><p className={sectionCls}>💼 Business / Commercial Details</p>
+        <div className="grid grid-cols-2 gap-3">
+          <div><label className={labelCls}>Business Name</label><input value={f.business_name || ''} onChange={e => setF({...f, business_name: e.target.value})} className={inputCls} /></div>
+          <div><label className={labelCls}>Business Type</label><input value={f.business_type || ''} onChange={e => setF({...f, business_type: e.target.value})} placeholder="e.g. LLC, Restaurant" className={inputCls} /></div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div><label className={labelCls}>General Liability Limit</label><input value={f.gl_limit || ''} onChange={e => setF({...f, gl_limit: e.target.value})} placeholder="$1,000,000" className={inputCls} /></div>
+          <div><label className={labelCls}>Property Coverage</label><input value={f.property_coverage || ''} onChange={e => setF({...f, property_coverage: e.target.value})} placeholder="$500,000" className={inputCls} /></div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div><label className={labelCls}>Workers Comp</label><select value={f.workers_comp || ''} onChange={e => setF({...f, workers_comp: e.target.value})} className={inputCls}><option value="">N/A</option><option value="yes">Yes</option><option value="no">No</option></select></div>
+          <div><label className={labelCls}>Professional Liability</label><input value={f.professional_liability || ''} onChange={e => setF({...f, professional_liability: e.target.value})} placeholder="$1,000,000" className={inputCls} /></div>
+        </div>
+      </>)}
+
+      {t === 'umbrella' && (<><p className={sectionCls}>☂️ Umbrella Details</p>
+        <div><label className={labelCls}>Underlying Policies Covered</label><input value={f.underlying_policies || ''} onChange={e => setF({...f, underlying_policies: e.target.value})} placeholder="e.g. Auto + Homeowners" className={inputCls} /></div>
+        <div><label className={labelCls}>Umbrella Limit</label><input value={f.umbrella_limit || ''} onChange={e => setF({...f, umbrella_limit: e.target.value})} placeholder="$1,000,000" className={inputCls} /></div>
+      </>)}
+
+      {t === 'flood' && (<><p className={sectionCls}>🌊 Flood Insurance Details</p>
+        <div><label className={labelCls}>Property Address</label><input value={f.property_address || ''} onChange={e => setF({...f, property_address: e.target.value})} className={inputCls} /></div>
+        <div className="grid grid-cols-2 gap-3">
+          <div><label className={labelCls}>Building Coverage</label><input value={f.building_coverage || ''} onChange={e => setF({...f, building_coverage: e.target.value})} placeholder="$250,000" className={inputCls} /></div>
+          <div><label className={labelCls}>Contents Coverage</label><input value={f.contents_coverage || ''} onChange={e => setF({...f, contents_coverage: e.target.value})} placeholder="$100,000" className={inputCls} /></div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div><label className={labelCls}>NFIP Policy Number</label><input value={f.nfip_number || ''} onChange={e => setF({...f, nfip_number: e.target.value})} className={inputCls} /></div>
+          <div><label className={labelCls}>Flood Zone</label><input value={f.flood_zone || ''} onChange={e => setF({...f, flood_zone: e.target.value})} placeholder="e.g. Zone AE" className={inputCls} /></div>
+        </div>
+      </>)}
+
+      {t === 'health' && (<><p className={sectionCls}>🏥 Health Insurance Details</p>
+        <div className="grid grid-cols-2 gap-3">
+          <div><label className={labelCls}>Plan Name</label><input value={f.plan_name || ''} onChange={e => setF({...f, plan_name: e.target.value})} placeholder="e.g. Blue Cross PPO" className={inputCls} /></div>
+          <div><label className={labelCls}>Network Type</label><select value={f.network_type || ''} onChange={e => setF({...f, network_type: e.target.value})} className={inputCls}><option value="">Select...</option><option value="HMO">HMO</option><option value="PPO">PPO</option><option value="EPO">EPO</option><option value="POS">POS</option></select></div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div><label className={labelCls}>Member ID</label><input value={f.member_id || ''} onChange={e => setF({...f, member_id: e.target.value})} className={inputCls} /></div>
+          <div><label className={labelCls}>Group Number</label><input value={f.group_number || ''} onChange={e => setF({...f, group_number: e.target.value})} className={inputCls} /></div>
+        </div>
+        <div className="grid grid-cols-3 gap-3">
+          <div><label className={labelCls}>Deductible</label><input value={f.health_deductible || ''} onChange={e => setF({...f, health_deductible: e.target.value})} placeholder="$1,500" className={inputCls} /></div>
+          <div><label className={labelCls}>Out-of-Pocket Max</label><input value={f.oop_max || ''} onChange={e => setF({...f, oop_max: e.target.value})} placeholder="$6,000" className={inputCls} /></div>
+          <div><label className={labelCls}>Copay Amounts</label><input value={f.copay_amounts || ''} onChange={e => setF({...f, copay_amounts: e.target.value})} placeholder="$25/$50" className={inputCls} /></div>
+        </div>
+      </>)}
+
+      {t === 'condo' && (<><p className={sectionCls}>🏘️ Condo / HOA Details</p>
+        <div><label className={labelCls}>Property Address</label><input value={f.property_address || ''} onChange={e => setF({...f, property_address: e.target.value})} className={inputCls} /></div>
+        <div className="grid grid-cols-2 gap-3">
+          <div><label className={labelCls}>Interior/Dwelling Coverage</label><input value={f.interior_coverage || ''} onChange={e => setF({...f, interior_coverage: e.target.value})} placeholder="$100,000" className={inputCls} /></div>
+          <div><label className={labelCls}>Personal Property</label><input value={f.personal_property || ''} onChange={e => setF({...f, personal_property: e.target.value})} placeholder="$50,000" className={inputCls} /></div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div><label className={labelCls}>Liability Limit</label><input value={f.liability_limit || ''} onChange={e => setF({...f, liability_limit: e.target.value})} placeholder="$300,000" className={inputCls} /></div>
+          <div><label className={labelCls}>HO6 Endorsements</label><input value={f.ho6_endorsements || ''} onChange={e => setF({...f, ho6_endorsements: e.target.value})} placeholder="e.g. Loss assessment" className={inputCls} /></div>
+        </div>
+      </>)}
+    </>)
+  }
 
   return (
     <div>
@@ -379,35 +510,32 @@ function PoliciesTab({ token, clientId, policies, onRefresh }) {
       {showForm && (
         <form onSubmit={save} className="bg-gray-50 rounded-xl p-4 mb-4 space-y-3">
           <div className="grid grid-cols-2 gap-3">
-            <input placeholder="Policy Number *" required value={form.policy_number} onChange={e => setForm({...form, policy_number: e.target.value})} className={inputCls} />
-            <select value={form.policy_type} onChange={e => setForm({...form, policy_type: e.target.value})} className={inputCls}>
-              {POLICY_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-            </select>
+            <div><label className={labelCls}>Policy Number *</label><input required value={form.policy_number} onChange={e => setForm({...form, policy_number: e.target.value})} className={inputCls} /></div>
+            <div><label className={labelCls}>Policy Type</label><select value={form.policy_type} onChange={e => setForm({...form, policy_type: e.target.value})} className={inputCls}>
+              {POLICY_TYPES.map(t => <option key={t} value={t}>{POLICY_TYPE_LABELS[t] || t}</option>)}
+            </select></div>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <select value={form.status} onChange={e => setForm({...form, status: e.target.value})} className={inputCls}>
+            <div><label className={labelCls}>Status</label><select value={form.status} onChange={e => setForm({...form, status: e.target.value})} className={inputCls}>
               <option value="active">Active</option><option value="expired">Expired</option><option value="cancelled">Cancelled</option>
-            </select>
-            <div>
+            </select></div>
+            <div><label className={labelCls}>Carrier</label>
               <select value={carrierOptions.includes(form.carrier) ? form.carrier : 'Other'} onChange={e => { const v = e.target.value; setForm({...form, carrier: v === 'Other' ? '' : v}) }} className={inputCls}>
                 {carrierOptions.map(c => <option key={c} value={c}>{c}</option>)}
                 <option value="Other">Other</option>
               </select>
-              {!carrierOptions.includes(form.carrier) && (
-                <input placeholder="Enter carrier name" value={form.carrier} onChange={e => setForm({...form, carrier: e.target.value})} className={inputCls + " mt-2"} />
-              )}
+              {!carrierOptions.includes(form.carrier) && <input placeholder="Enter carrier name" value={form.carrier} onChange={e => setForm({...form, carrier: e.target.value})} className={inputCls + " mt-2"} />}
             </div>
           </div>
           <div className="grid grid-cols-3 gap-3">
             <div><label className={labelCls}>Effective Date</label><input type="date" value={form.start_date} onChange={e => setForm({...form, start_date: e.target.value})} className={inputCls} /></div>
             <div><label className={labelCls}>Expiration Date</label><input type="date" value={form.end_date} onChange={e => setForm({...form, end_date: e.target.value})} className={inputCls} /></div>
-            <div><label className={labelCls}>&nbsp;</label><input type="number" placeholder="Premium $" value={form.premium_amount} onChange={e => setForm({...form, premium_amount: e.target.value})} className={inputCls} /></div>
+            <div><label className={labelCls}>Premium $</label><input type="number" value={form.premium_amount} onChange={e => setForm({...form, premium_amount: e.target.value})} className={inputCls} /></div>
           </div>
-          <textarea placeholder="Coverage Summary" value={form.coverage_summary} onChange={e => setForm({...form, coverage_summary: e.target.value})} rows={3} className={inputCls} />
+          <TypeFields f={form} setF={setForm} />
+          <div><label className={labelCls}>Notes / Coverage Summary</label><textarea value={form.coverage_summary} onChange={e => setForm({...form, coverage_summary: e.target.value})} rows={2} className={inputCls} placeholder="Any additional notes..." /></div>
           <div className="flex items-center gap-3">
-            <button type="submit" disabled={saving} className="bg-[#0954a5] text-white px-4 py-2 rounded-lg text-sm disabled:opacity-60">
-              {saving ? 'Saving...' : 'Save Policy'}
-            </button>
+            <button type="submit" disabled={saving} className="bg-[#0954a5] text-white px-4 py-2 rounded-lg text-sm disabled:opacity-60">{saving ? 'Saving...' : 'Save Policy'}</button>
             <button type="button" onClick={() => setShowCarrierMgmt(!showCarrierMgmt)} className="text-xs text-gray-400 hover:text-gray-600">⚙️ Manage Carriers</button>
           </div>
           {showCarrierMgmt && (
@@ -417,11 +545,9 @@ function PoliciesTab({ token, clientId, policies, onRefresh }) {
                 <input placeholder="New carrier name" value={newCarrier} onChange={e => setNewCarrier(e.target.value)} className={inputCls + " flex-1"} onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addCarrier())} />
                 <button type="button" onClick={addCarrier} className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-xs hover:bg-gray-200">Add</button>
               </div>
-              {customCarriers.length > 0 && (
-                <div className="flex flex-wrap gap-1">{customCarriers.map(c => (
-                  <span key={c} className="inline-flex items-center gap-1 bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full">{c} <button type="button" onClick={() => removeCarrier(c)} className="text-red-400 hover:text-red-600">×</button></span>
-                ))}</div>
-              )}
+              {customCarriers.length > 0 && <div className="flex flex-wrap gap-1">{customCarriers.map(c => (
+                <span key={c} className="inline-flex items-center gap-1 bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full">{c} <button type="button" onClick={() => removeCarrier(c)} className="text-red-400 hover:text-red-600">×</button></span>
+              ))}</div>}
             </div>
           )}
         </form>
@@ -431,11 +557,11 @@ function PoliciesTab({ token, clientId, policies, onRefresh }) {
           {policies.map(p => {
             const Icon = TYPE_ICONS[p.policy_type] || Briefcase
             return (
-              <div key={p.id} onClick={() => { setSelected(p); setEditForm({ policy_number: p.policy_number, policy_type: p.policy_type, status: p.status, carrier: p.carrier || '', start_date: p.start_date || '', end_date: p.end_date || '', premium_amount: p.premium_amount || '', coverage_summary: p.coverage_summary || '' }); setEditing(false) }} className="bg-white rounded-xl border border-gray-100 p-4 flex items-center gap-3 cursor-pointer hover:border-blue-200 hover:bg-blue-50/30 transition">
+              <div key={p.id} onClick={() => { const pd = parseDetails(p); setSelected(pd); setEditForm({...defaultForm, ...pd, coverage_summary: pd.coverage_summary_text || ''}); setEditing(false) }} className="bg-white rounded-xl border border-gray-100 p-4 flex items-center gap-3 cursor-pointer hover:border-blue-200 hover:bg-blue-50/30 transition">
                 <div className="w-8 h-8 rounded bg-blue-50 text-[#0954a5] flex items-center justify-center"><Icon size={16} /></div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-gray-900 capitalize text-sm">{p.policy_type}</span>
+                    <span className="font-medium text-gray-900 text-sm">{POLICY_TYPE_LABELS[p.policy_type] || p.policy_type}</span>
                     <span className={`text-xs px-2 py-0.5 rounded-full capitalize ${POLICY_STATUS_COLORS[p.status] || 'bg-gray-100'}`}>{p.status}</span>
                   </div>
                   <p className="text-xs text-gray-500">#{p.policy_number} | {p.carrier} | ${p.premium_amount || '—'}/yr</p>
@@ -447,29 +573,41 @@ function PoliciesTab({ token, clientId, policies, onRefresh }) {
       )}
 
       <Modal open={!!selected} onClose={() => { setSelected(null); setEditing(false) }} title={editing ? 'Edit Policy' : 'Policy Details'}>
-        {selected && !editing && (
-          <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-3 text-sm">
-              <div><span className="text-xs text-gray-500">Policy Number</span><p className="font-medium">#{selected.policy_number}</p></div>
-              <div><span className="text-xs text-gray-500">Type</span><p className="font-medium capitalize">{selected.policy_type}</p></div>
-              <div><span className="text-xs text-gray-500">Status</span><p><span className={`text-xs px-2 py-0.5 rounded-full capitalize ${POLICY_STATUS_COLORS[selected.status] || 'bg-gray-100'}`}>{selected.status}</span></p></div>
-              <div><span className="text-xs text-gray-500">Carrier</span><p className="font-medium">{selected.carrier || '—'}</p></div>
-              <div><span className="text-xs text-gray-500">Effective Date</span><p className="font-medium">{formatDate(selected.start_date)}</p></div>
-              <div><span className="text-xs text-gray-500">Expiration Date</span><p className="font-medium">{formatDate(selected.end_date)}</p></div>
-              <div><span className="text-xs text-gray-500">Premium</span><p className="font-medium">${selected.premium_amount || '—'}/yr</p></div>
+        {selected && !editing && (() => {
+          const d = selected
+          const keys = typeSpecificKeys[d.policy_type] || []
+          const fieldLabels = { vehicles_covered:'Vehicles',vin:'VIN',drivers_listed:'Drivers',liability_bi_pd:'Liability (BI/PD)',collision_deductible:'Collision Ded.',comp_deductible:'Comp Ded.',uninsured_motorist:'Uninsured Motorist',property_address:'Property Address',dwelling_coverage:'Dwelling',personal_property:'Personal Property',liability_limit:'Liability Limit',loss_of_use:'Loss of Use',endorsements:'Endorsements',insured_person:'Insured Person',beneficiary:'Beneficiary',death_benefit:'Death Benefit',life_policy_type:'Type',term_length:'Term',business_name:'Business',business_type:'Business Type',gl_limit:'GL Limit',property_coverage:'Property Coverage',workers_comp:'Workers Comp',professional_liability:'Prof. Liability',underlying_policies:'Underlying Policies',umbrella_limit:'Umbrella Limit',building_coverage:'Building',contents_coverage:'Contents',nfip_number:'NFIP #',flood_zone:'Flood Zone',plan_name:'Plan',member_id:'Member ID',group_number:'Group #',network_type:'Network',health_deductible:'Deductible',oop_max:'OOP Max',copay_amounts:'Copay',interior_coverage:'Interior Coverage',ho6_endorsements:'HO6 Endorsements' }
+          return (
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div><span className="text-xs text-gray-500">Policy Number</span><p className="font-medium">#{d.policy_number}</p></div>
+                <div><span className="text-xs text-gray-500">Type</span><p className="font-medium">{POLICY_TYPE_LABELS[d.policy_type] || d.policy_type}</p></div>
+                <div><span className="text-xs text-gray-500">Status</span><p><span className={`text-xs px-2 py-0.5 rounded-full capitalize ${POLICY_STATUS_COLORS[d.status] || 'bg-gray-100'}`}>{d.status}</span></p></div>
+                <div><span className="text-xs text-gray-500">Carrier</span><p className="font-medium">{d.carrier || '—'}</p></div>
+                <div><span className="text-xs text-gray-500">Effective Date</span><p className="font-medium">{formatDate(d.start_date)}</p></div>
+                <div><span className="text-xs text-gray-500">Expiration Date</span><p className="font-medium">{formatDate(d.end_date)}</p></div>
+                <div><span className="text-xs text-gray-500">Premium</span><p className="font-medium">${d.premium_amount || '—'}/yr</p></div>
+                {d.deductible && <div><span className="text-xs text-gray-500">Deductible</span><p className="font-medium">{d.deductible}</p></div>}
+                {d.agent_name && <div><span className="text-xs text-gray-500">Agent</span><p className="font-medium">{d.agent_name}</p></div>}
+              </div>
+              {keys.some(k => d[k]) && (
+                <div className="grid grid-cols-2 gap-3 text-sm border-t border-gray-100 pt-3">
+                  {keys.map(k => d[k] ? <div key={k}><span className="text-xs text-gray-500">{fieldLabels[k] || k}</span><p className="font-medium">{d[k]}</p></div> : null)}
+                </div>
+              )}
+              {d.coverage_summary_text && <div className="border-t border-gray-100 pt-3"><span className="text-xs text-gray-500">Notes</span><p className="text-sm mt-1">{d.coverage_summary_text}</p></div>}
+              <div className="flex gap-2 pt-2 border-t border-gray-100">
+                <button onClick={() => setEditing(true)} className="bg-[#0954a5] text-white px-4 py-2 rounded-lg text-sm flex items-center gap-1"><Edit size={14} /> Edit</button>
+                <button onClick={() => del(d.id)} className="bg-red-50 text-red-600 px-4 py-2 rounded-lg text-sm flex items-center gap-1"><Trash2 size={14} /> Delete</button>
+              </div>
             </div>
-            {selected.coverage_summary && <div><span className="text-xs text-gray-500">Coverage Summary</span><p className="text-sm mt-1">{selected.coverage_summary}</p></div>}
-            <div className="flex gap-2 pt-2 border-t border-gray-100">
-              <button onClick={() => setEditing(true)} className="bg-[#0954a5] text-white px-4 py-2 rounded-lg text-sm flex items-center gap-1"><Edit size={14} /> Edit</button>
-              <button onClick={() => del(selected.id)} className="bg-red-50 text-red-600 px-4 py-2 rounded-lg text-sm flex items-center gap-1"><Trash2 size={14} /> Delete</button>
-            </div>
-          </div>
-        )}
+          )
+        })()}
         {selected && editing && (
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <div><label className="block text-xs text-gray-500 mb-1">Policy Number</label><input value={editForm.policy_number} onChange={e => setEditForm({...editForm, policy_number: e.target.value})} className={inputCls} /></div>
-              <div><label className="block text-xs text-gray-500 mb-1">Type</label><select value={editForm.policy_type} onChange={e => setEditForm({...editForm, policy_type: e.target.value})} className={inputCls}>{POLICY_TYPES.map(t => <option key={t} value={t}>{t}</option>)}</select></div>
+              <div><label className="block text-xs text-gray-500 mb-1">Type</label><select value={editForm.policy_type} onChange={e => setEditForm({...editForm, policy_type: e.target.value})} className={inputCls}>{POLICY_TYPES.map(t => <option key={t} value={t}>{POLICY_TYPE_LABELS[t] || t}</option>)}</select></div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div><label className="block text-xs text-gray-500 mb-1">Status</label><select value={editForm.status} onChange={e => setEditForm({...editForm, status: e.target.value})} className={inputCls}><option value="active">Active</option><option value="expired">Expired</option><option value="cancelled">Cancelled</option></select></div>
@@ -480,7 +618,8 @@ function PoliciesTab({ token, clientId, policies, onRefresh }) {
               <div><label className="block text-xs text-gray-500 mb-1">Expiration Date</label><input type="date" value={editForm.end_date} onChange={e => setEditForm({...editForm, end_date: e.target.value})} className={inputCls} /></div>
               <div><label className="block text-xs text-gray-500 mb-1">Premium $</label><input type="number" value={editForm.premium_amount} onChange={e => setEditForm({...editForm, premium_amount: e.target.value})} className={inputCls} /></div>
             </div>
-            <div><label className="block text-xs text-gray-500 mb-1">Coverage Summary</label><textarea value={editForm.coverage_summary} onChange={e => setEditForm({...editForm, coverage_summary: e.target.value})} rows={3} className={inputCls} /></div>
+            <TypeFields f={editForm} setF={setEditForm} />
+            <div><label className="block text-xs text-gray-500 mb-1">Notes</label><textarea value={editForm.coverage_summary} onChange={e => setEditForm({...editForm, coverage_summary: e.target.value})} rows={2} className={inputCls} /></div>
             <div className="flex gap-2 pt-2">
               <button onClick={updatePolicy} disabled={saving} className="bg-[#0954a5] text-white px-4 py-2 rounded-lg text-sm flex items-center gap-1 disabled:opacity-60"><Save size={14} /> {saving ? 'Saving...' : 'Save Changes'}</button>
               <button onClick={() => setEditing(false)} className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm">Cancel</button>
@@ -491,6 +630,7 @@ function PoliciesTab({ token, clientId, policies, onRefresh }) {
     </div>
   )
 }
+
 
 function IDCardsTab({ token, clientId, idCards, policies, onRefresh }) {
   const ID_CARD_TYPES = ['auto', 'health', 'home']
