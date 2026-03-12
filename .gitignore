@@ -84,3 +84,4 @@ nextjs-site/node_modules/@next/swc-linux-arm64-musl/next-swc.linux-arm64-musl.no
 # Environment files
 *.env
 *.env.*
+.env*.local
