@@ -42,6 +42,7 @@ export default function Navigation() {
                 <Link href="/services/condo-insurance" className="block px-4 py-3 hover:bg-gray-50">Condo Insurance</Link>
               </div>
             </div>
+            <Link href="/blog" className="text-gray-700 hover:text-primary font-medium transition">Blog</Link>
             <Link href="/contact" className="text-gray-700 hover:text-primary font-medium transition">Contact</Link>
             <a href="tel:3034641911" className="bg-primary text-white px-6 py-2.5 rounded-lg hover:bg-primary/90 font-medium transition flex items-center space-x-2">
               <Phone size={18} />
@@ -71,6 +72,7 @@ export default function Navigation() {
                 <Link href="/services/condo-insurance" onClick={() => setMobileMenuOpen(false)} className="block py-1 text-gray-700 hover:text-primary">Condo Insurance</Link>
               </div>
             </div>
+            <Link href="/blog" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-gray-700 hover:text-primary">Blog</Link>
             <Link href="/contact" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-gray-700 hover:text-primary">Contact</Link>
             <a href="tel:3034641911" className="block bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 font-medium text-center mt-4">
               Call (303) 464-1911
