@@ -387,7 +387,7 @@ function AnalyticsTab({ token }) {
             {dailyTrend.map((d, i) => (
               <div key={i} className="flex-1 flex flex-col items-center gap-1 group relative">
                 <div className="absolute -top-6 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap z-10">{d.date}: {d.sessions} visits</div>
-                <div className="w-full bg-[#0954a5] rounded-t transition-all hover:bg-[#0b6ad4]" style={{ height: `${(d.sessions / maxTrendSessions) * 100}%`, minHeight: d.sessions > 0 ? '4px' : '1px' }} />
+                <div className="w-full bg-[#0954a5] rounded-t transition-all hover:bg-[#0b6ad4]" style={{ height: `${Math.max(d.sessions > 0 ? 15 : 2, (d.sessions / maxTrendSessions) * 100)}%` }} />
               </div>
             ))}
           </div>
