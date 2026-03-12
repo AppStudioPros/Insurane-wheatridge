@@ -418,20 +418,28 @@ function PoliciesTab({ token, clientId, policies, onRefresh }) {
 }
 
 function IDCardsTab({ token, clientId, idCards, policies, onRefresh }) {
+  const ID_CARD_TYPES = ['auto', 'health', 'home']
   const [showForm, setShowForm] = useState(false)
-  const [form, setForm] = useState({ card_type: 'auto', insured_name: '', policy_number: '', effective_date: '', expiration_date: '', vehicle_info: '', policy_id: '' })
+  const [form, setForm] = useState({ card_type: 'auto', insured_name: '', policy_number: '', effective_date: '', expiration_date: '', vehicle_info: '', policy_id: '', vin: '', insured_drivers: '', liability_limits: '', member_id: '', group_number: '', plan_name: '', pcp_name: '', copay_info: '', rx_bin: '', property_address: '', dwelling_coverage: '', liability_limit: '' })
   const [saving, setSaving] = useState(false)
+
+  const resetForm = () => setForm({ card_type: 'auto', insured_name: '', policy_number: '', effective_date: '', expiration_date: '', vehicle_info: '', policy_id: '', vin: '', insured_drivers: '', liability_limits: '', member_id: '', group_number: '', plan_name: '', pcp_name: '', copay_info: '', rx_bin: '', property_address: '', dwelling_coverage: '', liability_limit: '' })
 
   const save = async (e) => {
     e.preventDefault()
     setSaving(true)
+    const { vin, insured_drivers, liability_limits, member_id, group_number, plan_name, pcp_name, copay_info, rx_bin, property_address, dwelling_coverage, liability_limit, ...base } = form
+    let coverage_details = null
+    if (form.card_type === 'auto') coverage_details = JSON.stringify({ vin, insured_drivers, liability_limits })
+    else if (form.card_type === 'health') coverage_details = JSON.stringify({ member_id, group_number, plan_name, pcp_name, copay_info, rx_bin })
+    else if (form.card_type === 'home') coverage_details = JSON.stringify({ property_address, dwelling_coverage, liability_limit })
     await fetch('/api/admin/id-cards', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ ...form, client_id: clientId, policy_id: form.policy_id || null }),
+      body: JSON.stringify({ ...base, coverage_details, client_id: clientId, policy_id: form.policy_id || null }),
     })
     setShowForm(false)
-    setForm({ card_type: 'auto', insured_name: '', policy_number: '', effective_date: '', expiration_date: '', vehicle_info: '', policy_id: '' })
+    resetForm()
     setSaving(false)
     onRefresh()
   }
@@ -443,6 +451,7 @@ function IDCardsTab({ token, clientId, idCards, policies, onRefresh }) {
   }
 
   const inputCls = "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900"
+  const labelCls = "block text-xs text-gray-500 mb-1"
 
   return (
     <div>
@@ -452,23 +461,69 @@ function IDCardsTab({ token, clientId, idCards, policies, onRefresh }) {
       {showForm && (
         <form onSubmit={save} className="bg-gray-50 rounded-xl p-4 mb-4 space-y-3">
           <div className="grid grid-cols-2 gap-3">
-            <select value={form.card_type} onChange={e => setForm({...form, card_type: e.target.value})} className={inputCls}>
-              {POLICY_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-            </select>
-            <input placeholder="Insured Name *" required value={form.insured_name} onChange={e => setForm({...form, insured_name: e.target.value})} className={inputCls} />
+            <div>
+              <label className={labelCls}>Card Type</label>
+              <select value={form.card_type} onChange={e => setForm({...form, card_type: e.target.value})} className={inputCls}>
+                {ID_CARD_TYPES.map(t => <option key={t} value={t}>{t === 'auto' ? 'Auto' : t === 'health' ? 'Health' : 'Homeowners'}</option>)}
+              </select>
+            </div>
+            <div><label className={labelCls}>Insured Name *</label><input required value={form.insured_name} onChange={e => setForm({...form, insured_name: e.target.value})} className={inputCls} /></div>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <input placeholder="Policy Number *" required value={form.policy_number} onChange={e => setForm({...form, policy_number: e.target.value})} className={inputCls} />
-            <select value={form.policy_id} onChange={e => setForm({...form, policy_id: e.target.value})} className={inputCls}>
-              <option value="">Link to policy (optional)</option>
-              {policies.map(p => <option key={p.id} value={p.id}>#{p.policy_number} ({p.policy_type})</option>)}
-            </select>
+            <div><label className={labelCls}>Policy Number *</label><input required value={form.policy_number} onChange={e => setForm({...form, policy_number: e.target.value})} className={inputCls} /></div>
+            <div>
+              <label className={labelCls}>Link Existing Policy</label>
+              <select value={form.policy_id} onChange={e => setForm({...form, policy_id: e.target.value})} className={inputCls}>
+                <option value="">(none)</option>
+                {policies.map(p => <option key={p.id} value={p.id}>#{p.policy_number} ({p.policy_type})</option>)}
+              </select>
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <div><label className="text-xs text-gray-500">Effective</label><input type="date" value={form.effective_date} onChange={e => setForm({...form, effective_date: e.target.value})} className={inputCls} /></div>
-            <div><label className="text-xs text-gray-500">Expiration</label><input type="date" value={form.expiration_date} onChange={e => setForm({...form, expiration_date: e.target.value})} className={inputCls} /></div>
+            <div><label className={labelCls}>Effective Date</label><input type="date" value={form.effective_date} onChange={e => setForm({...form, effective_date: e.target.value})} className={inputCls} /></div>
+            <div><label className={labelCls}>Expiration Date</label><input type="date" value={form.expiration_date} onChange={e => setForm({...form, expiration_date: e.target.value})} className={inputCls} /></div>
           </div>
-          <input placeholder="Vehicle Info (e.g. 2023 Toyota Camry)" value={form.vehicle_info} onChange={e => setForm({...form, vehicle_info: e.target.value})} className={inputCls} />
+
+          {/* AUTO-specific fields */}
+          {form.card_type === 'auto' && (<>
+            <p className="text-xs font-semibold text-gray-600 border-b border-gray-200 pb-1">Auto Insurance Details</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div><label className={labelCls}>Vehicle Info</label><input placeholder="e.g. 2023 Toyota Camry" value={form.vehicle_info} onChange={e => setForm({...form, vehicle_info: e.target.value})} className={inputCls} /></div>
+              <div><label className={labelCls}>VIN</label><input placeholder="Vehicle ID Number" value={form.vin} onChange={e => setForm({...form, vin: e.target.value})} className={inputCls} /></div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div><label className={labelCls}>Insured Drivers</label><input placeholder="e.g. John Smith, Jane Smith" value={form.insured_drivers} onChange={e => setForm({...form, insured_drivers: e.target.value})} className={inputCls} /></div>
+              <div><label className={labelCls}>Liability Limits</label><input placeholder="e.g. 100/300/100" value={form.liability_limits} onChange={e => setForm({...form, liability_limits: e.target.value})} className={inputCls} /></div>
+            </div>
+          </>)}
+
+          {/* HEALTH-specific fields */}
+          {form.card_type === 'health' && (<>
+            <p className="text-xs font-semibold text-gray-600 border-b border-gray-200 pb-1">Health Insurance Details</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div><label className={labelCls}>Member ID *</label><input placeholder="Member ID" value={form.member_id} onChange={e => setForm({...form, member_id: e.target.value})} className={inputCls} /></div>
+              <div><label className={labelCls}>Group Number</label><input placeholder="Group #" value={form.group_number} onChange={e => setForm({...form, group_number: e.target.value})} className={inputCls} /></div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div><label className={labelCls}>Plan Name</label><input placeholder="e.g. Blue Cross PPO" value={form.plan_name} onChange={e => setForm({...form, plan_name: e.target.value})} className={inputCls} /></div>
+              <div><label className={labelCls}>Primary Care Physician</label><input placeholder="PCP Name" value={form.pcp_name} onChange={e => setForm({...form, pcp_name: e.target.value})} className={inputCls} /></div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div><label className={labelCls}>Copay Info</label><input placeholder="e.g. $25 office / $50 specialist" value={form.copay_info} onChange={e => setForm({...form, copay_info: e.target.value})} className={inputCls} /></div>
+              <div><label className={labelCls}>RX Bin / PCN / Group</label><input placeholder="e.g. 012345 / AB1234 / GRP001" value={form.rx_bin} onChange={e => setForm({...form, rx_bin: e.target.value})} className={inputCls} /></div>
+            </div>
+          </>)}
+
+          {/* HOMEOWNERS-specific fields */}
+          {form.card_type === 'home' && (<>
+            <p className="text-xs font-semibold text-gray-600 border-b border-gray-200 pb-1">Homeowners Insurance Details</p>
+            <div><label className={labelCls}>Property Address</label><input placeholder="Full property address" value={form.property_address} onChange={e => setForm({...form, property_address: e.target.value})} className={inputCls} /></div>
+            <div className="grid grid-cols-2 gap-3">
+              <div><label className={labelCls}>Dwelling Coverage</label><input placeholder="e.g. $350,000" value={form.dwelling_coverage} onChange={e => setForm({...form, dwelling_coverage: e.target.value})} className={inputCls} /></div>
+              <div><label className={labelCls}>Liability Limit</label><input placeholder="e.g. $300,000" value={form.liability_limit} onChange={e => setForm({...form, liability_limit: e.target.value})} className={inputCls} /></div>
+            </div>
+          </>)}
+
           <button type="submit" disabled={saving} className="bg-[#0954a5] text-white px-4 py-2 rounded-lg text-sm disabled:opacity-60">
             {saving ? 'Saving...' : 'Save ID Card'}
           </button>
@@ -476,17 +531,22 @@ function IDCardsTab({ token, clientId, idCards, policies, onRefresh }) {
       )}
       {idCards.length === 0 ? <p className="text-gray-400 text-center py-6">No ID cards.</p> : (
         <div className="space-y-2">
-          {idCards.map(c => (
-            <div key={c.id} className="bg-white rounded-xl border border-gray-100 p-4 flex items-center gap-3">
-              <div className="w-8 h-8 rounded bg-green-50 text-green-700 flex items-center justify-center"><CreditCard size={16} /></div>
-              <div className="flex-1 min-w-0">
-                <div className="font-medium text-gray-900 text-sm">{c.insured_name} - <span className="capitalize">{c.card_type}</span></div>
-                <p className="text-xs text-gray-500">#{c.policy_number} | {formatShortDate(c.effective_date)} - {formatShortDate(c.expiration_date)}</p>
-                {c.vehicle_info && <p className="text-xs text-gray-400">{c.vehicle_info}</p>}
+          {idCards.map(c => {
+            const cd = c.coverage_details ? (typeof c.coverage_details === 'string' ? JSON.parse(c.coverage_details) : c.coverage_details) : {}
+            return (
+              <div key={c.id} className="bg-white rounded-xl border border-gray-100 p-4 flex items-center gap-3">
+                <div className="w-8 h-8 rounded bg-green-50 text-green-700 flex items-center justify-center"><CreditCard size={16} /></div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-gray-900 text-sm">{c.insured_name} - <span className="capitalize">{c.card_type === 'home' ? 'Homeowners' : c.card_type}</span></div>
+                  <p className="text-xs text-gray-500">#{c.policy_number} | {formatShortDate(c.effective_date)} - {formatShortDate(c.expiration_date)}</p>
+                  {c.card_type === 'auto' && c.vehicle_info && <p className="text-xs text-gray-400">{c.vehicle_info}{cd.vin ? ` | VIN: ${cd.vin}` : ''}</p>}
+                  {c.card_type === 'health' && cd.member_id && <p className="text-xs text-gray-400">Member: {cd.member_id}{cd.group_number ? ` | Group: ${cd.group_number}` : ''}{cd.plan_name ? ` | ${cd.plan_name}` : ''}</p>}
+                  {c.card_type === 'home' && cd.property_address && <p className="text-xs text-gray-400">{cd.property_address}{cd.dwelling_coverage ? ` | ${cd.dwelling_coverage}` : ''}</p>}
+                </div>
+                <button onClick={() => del(c.id)} className="text-red-400 hover:text-red-600"><Trash2 size={14} /></button>
               </div>
-              <button onClick={() => del(c.id)} className="text-red-400 hover:text-red-600"><Trash2 size={14} /></button>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>
