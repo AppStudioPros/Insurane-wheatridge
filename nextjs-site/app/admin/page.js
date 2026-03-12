@@ -263,7 +263,6 @@ function ClientDetail({ token, client, onBack }) {
     { key: 'id-cards', label: 'ID Cards', icon: CreditCard, count: idCards.length },
     { key: 'documents', label: 'Docs', icon: Upload, count: docs.length },
     { key: 'messages', label: 'Messages', icon: MessageSquare, count: messages.length },
-    { key: 'analytics', label: 'Analytics', icon: BarChart3 },
   ]
 
   return (
@@ -299,7 +298,6 @@ function ClientDetail({ token, client, onBack }) {
           {tab === 'policies' && <PoliciesTab token={token} clientId={client.id} policies={policies} onRefresh={fetchAll} />}
           {tab === 'id-cards' && <IDCardsTab token={token} clientId={client.id} idCards={idCards} policies={policies} onRefresh={fetchAll} />}
           {tab === 'documents' && <DocumentsTab token={token} clientId={client.id} docs={docs} onRefresh={fetchAll} />}
-          {tab === 'analytics' && <AnalyticsTab token={token} />}
           {tab === 'messages' && <MessagesTab token={token} clientId={client.id} messages={messages} onRefresh={fetchAll} />}
         </>
       )}
@@ -1419,6 +1417,7 @@ export default function AdminPage() {
             { key: 'inquiries', label: 'Inquiries', icon: MessageSquare, count: inquiries.length },
             { key: 'leads', label: 'Leads', icon: Users, count: leads.length },
             { key: 'clients', label: 'Clients', icon: Users, count: null },
+            { key: 'analytics', label: 'Analytics', icon: BarChart3, count: null },
           ].map(t => {
             const Icon = t.icon
             return (
@@ -1445,6 +1444,8 @@ export default function AdminPage() {
           leads.length === 0 ? <div className="text-center py-16 text-gray-400">No leads yet.</div> : (
             <div className="space-y-3">{leads.map(item => <LeadRow key={item.id} item={item} token={token} onUpdate={() => fetchData(token)} />)}</div>
           )
+        ) : tab === 'analytics' ? (
+          <AnalyticsTab token={token} />
         ) : tab === 'clients' ? (
           selectedClient ? (
             <ClientDetail token={token} client={selectedClient} onBack={() => setSelectedClient(null)} />
