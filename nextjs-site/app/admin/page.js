@@ -492,11 +492,6 @@ function PoliciesTab({ token, clientId, policies, onRefresh }) {
   )
 }
 
-      )}
-    </div>
-  )
-}
-
 function IDCardsTab({ token, clientId, idCards, policies, onRefresh }) {
   const ID_CARD_TYPES = ['auto', 'health', 'home']
   const [showForm, setShowForm] = useState(false)
