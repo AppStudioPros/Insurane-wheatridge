@@ -1336,6 +1336,31 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false)
   const [tab, setTab] = useState('inquiries')
   const [selectedClient, setSelectedClient] = useState(null)
+  const [showNotifs, setShowNotifs] = useState(false)
+  const [unreadMessages, setUnreadMessages] = useState([])
+  const notifRef = useRef(null)
+
+  // Fetch unread messages across all clients
+  useEffect(() => {
+    if (!token) return
+    const checkMessages = async () => {
+      try {
+        const res = await fetch(`/api/admin/notifications?_t=${Date.now()}`, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store' })
+        if (res.ok) { const d = await res.json(); setUnreadMessages(d.unreadMessages || []) }
+      } catch(e) {}
+    }
+    checkMessages()
+    const id = setInterval(checkMessages, 10000)
+    return () => clearInterval(id)
+  }, [token])
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e) => { if (notifRef.current && !notifRef.current.contains(e.target)) setShowNotifs(false) }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
 
   useEffect(() => {
     const saved = sessionStorage.getItem(SESSION_KEY)
@@ -1393,31 +1418,6 @@ export default function AdminPage() {
   const leads = data.leads ?? []
   const newInquiries = inquiries.filter(i => i.status === 'new')
   const newLeads = leads.filter(l => l.status === 'new')
-  const [showNotifs, setShowNotifs] = useState(false)
-  const [unreadMessages, setUnreadMessages] = useState([])
-  const notifRef = useRef(null)
-
-  // Fetch unread messages across all clients
-  useEffect(() => {
-    if (!token) return
-    const checkMessages = async () => {
-      try {
-        const res = await fetch(`/api/admin/notifications?_t=${Date.now()}`, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store' })
-        if (res.ok) { const d = await res.json(); setUnreadMessages(d.unreadMessages || []) }
-      } catch(e) {}
-    }
-    checkMessages()
-    const id = setInterval(checkMessages, 10000)
-    return () => clearInterval(id)
-  }, [token])
-
-  // Close dropdown on outside click
-  useEffect(() => {
-    const handler = (e) => { if (notifRef.current && !notifRef.current.contains(e.target)) setShowNotifs(false) }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [])
-
   const notifications = [
     ...newInquiries.map(i => ({ type: 'inquiry', label: `New inquiry from ${i.name || i.email || 'Unknown'}`, time: i.created_at, action: () => { setTab('inquiries'); setShowNotifs(false) } })),
     ...newLeads.map(l => ({ type: 'lead', label: `New lead: ${l.name || l.email || 'Unknown'}`, time: l.created_at, action: () => { setTab('leads'); setShowNotifs(false) } })),
