@@ -293,6 +293,28 @@ function PoliciesTab({ token, clientId, policies, onRefresh }) {
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState({ policy_number: '', policy_type: 'auto', status: 'active', carrier: 'Farmers Insurance', start_date: '', end_date: '', premium_amount: '', coverage_summary: '' })
   const [saving, setSaving] = useState(false)
+  const [showCarrierMgmt, setShowCarrierMgmt] = useState(false)
+  const [newCarrier, setNewCarrier] = useState('')
+  const defaultCarriers = ['Farmers Insurance', 'Insurance Wheat Ridge']
+  const [customCarriers, setCustomCarriers] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try { return JSON.parse(localStorage.getItem('iw_custom_carriers') || '[]') } catch { return [] }
+    }
+    return []
+  })
+  const carrierOptions = [...defaultCarriers, ...customCarriers]
+  const addCarrier = () => {
+    if (!newCarrier.trim() || carrierOptions.includes(newCarrier.trim())) return
+    const updated = [...customCarriers, newCarrier.trim()]
+    setCustomCarriers(updated)
+    localStorage.setItem('iw_custom_carriers', JSON.stringify(updated))
+    setNewCarrier('')
+  }
+  const removeCarrier = (c) => {
+    const updated = customCarriers.filter(x => x !== c)
+    setCustomCarriers(updated)
+    localStorage.setItem('iw_custom_carriers', JSON.stringify(updated))
+  }
 
   const save = async (e) => {
     e.preventDefault()
@@ -333,17 +355,42 @@ function PoliciesTab({ token, clientId, policies, onRefresh }) {
             <select value={form.status} onChange={e => setForm({...form, status: e.target.value})} className={inputCls}>
               <option value="active">Active</option><option value="expired">Expired</option><option value="cancelled">Cancelled</option>
             </select>
-            <input placeholder="Carrier" value={form.carrier} onChange={e => setForm({...form, carrier: e.target.value})} className={inputCls} />
+            <div>
+              <select value={carrierOptions.includes(form.carrier) ? form.carrier : 'Other'} onChange={e => { const v = e.target.value; setForm({...form, carrier: v === 'Other' ? '' : v}) }} className={inputCls}>
+                {carrierOptions.map(c => <option key={c} value={c}>{c}</option>)}
+                <option value="Other">Other</option>
+              </select>
+              {!carrierOptions.includes(form.carrier) && (
+                <input placeholder="Enter carrier name" value={form.carrier} onChange={e => setForm({...form, carrier: e.target.value})} className={inputCls + " mt-2"} />
+              )}
+            </div>
           </div>
           <div className="grid grid-cols-3 gap-3">
-            <input type="date" placeholder="Start Date" value={form.start_date} onChange={e => setForm({...form, start_date: e.target.value})} className={inputCls} />
-            <input type="date" placeholder="End Date" value={form.end_date} onChange={e => setForm({...form, end_date: e.target.value})} className={inputCls} />
-            <input type="number" placeholder="Premium $" value={form.premium_amount} onChange={e => setForm({...form, premium_amount: e.target.value})} className={inputCls} />
+            <div><label className="block text-xs text-gray-500 mb-1">Effective Date</label><input type="date" value={form.start_date} onChange={e => setForm({...form, start_date: e.target.value})} className={inputCls} /></div>
+            <div><label className="block text-xs text-gray-500 mb-1">Expiration Date</label><input type="date" value={form.end_date} onChange={e => setForm({...form, end_date: e.target.value})} className={inputCls} /></div>
+            <div><label className="block text-xs text-gray-500 mb-1">&nbsp;</label><input type="number" placeholder="Premium $" value={form.premium_amount} onChange={e => setForm({...form, premium_amount: e.target.value})} className={inputCls} /></div>
           </div>
           <textarea placeholder="Coverage Summary" value={form.coverage_summary} onChange={e => setForm({...form, coverage_summary: e.target.value})} rows={3} className={inputCls} />
-          <button type="submit" disabled={saving} className="bg-[#0954a5] text-white px-4 py-2 rounded-lg text-sm disabled:opacity-60">
-            {saving ? 'Saving...' : 'Save Policy'}
-          </button>
+          <div className="flex items-center gap-3">
+            <button type="submit" disabled={saving} className="bg-[#0954a5] text-white px-4 py-2 rounded-lg text-sm disabled:opacity-60">
+              {saving ? 'Saving...' : 'Save Policy'}
+            </button>
+            <button type="button" onClick={() => setShowCarrierMgmt(!showCarrierMgmt)} className="text-xs text-gray-400 hover:text-gray-600">⚙️ Manage Carriers</button>
+          </div>
+          {showCarrierMgmt && (
+            <div className="bg-white rounded-lg border border-gray-200 p-3 mt-2 space-y-2">
+              <p className="text-xs font-medium text-gray-600">Custom Carriers</p>
+              <div className="flex gap-2">
+                <input placeholder="New carrier name" value={newCarrier} onChange={e => setNewCarrier(e.target.value)} className={inputCls + " flex-1"} onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addCarrier())} />
+                <button type="button" onClick={addCarrier} className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-xs hover:bg-gray-200">Add</button>
+              </div>
+              {customCarriers.length > 0 && (
+                <div className="flex flex-wrap gap-1">{customCarriers.map(c => (
+                  <span key={c} className="inline-flex items-center gap-1 bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full">{c} <button type="button" onClick={() => removeCarrier(c)} className="text-red-400 hover:text-red-600">×</button></span>
+                ))}</div>
+              )}
+            </div>
+          )}
         </form>
       )}
       {policies.length === 0 ? <p className="text-gray-400 text-center py-6">No policies.</p> : (
