@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { LogOut, RefreshCw, Users, MessageSquare, Phone, Mail, Calendar, Plus, Trash2, Edit, ChevronLeft, FileText, CreditCard, Upload, Send, X, Eye, Car, Home, Heart, Briefcase, Building } from 'lucide-react'
+import { LogOut, RefreshCw, Users, MessageSquare, Phone, Mail, Calendar, Plus, Trash2, Edit, ChevronLeft, FileText, CreditCard, Upload, Send, X, Eye, Car, Home, Heart, Briefcase, Building, Download, Save } from 'lucide-react'
 
 const SESSION_KEY = 'iwr_admin_token'
 
@@ -24,6 +24,21 @@ const TYPE_ICONS = { auto: Car, home: Home, life: Heart, business: Briefcase, re
 const DOC_CATEGORIES = ['id', 'proof_of_residence', 'claim_photo', 'signature', 'other']
 
 // ================= ORIGINAL COMPONENTS =================
+
+function Modal({ open, onClose, title, children }) {
+  if (!open) return null
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose}>
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[85vh] overflow-y-auto m-4" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between p-4 border-b border-gray-100">
+          <h3 className="font-semibold text-gray-900">{title}</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600"><X size={18} /></button>
+        </div>
+        <div className="p-4">{children}</div>
+      </div>
+    </div>
+  )
+}
 function StatusBadge({ status, table, id, token, onUpdate }) {
   const [loading, setLoading] = useState(false)
   const next = { new: 'contacted', contacted: 'closed', closed: 'new' }
@@ -293,6 +308,9 @@ function PoliciesTab({ token, clientId, policies, onRefresh }) {
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState({ policy_number: '', policy_type: 'auto', status: 'active', carrier: 'Farmers Insurance', start_date: '', end_date: '', premium_amount: '', coverage_summary: '' })
   const [saving, setSaving] = useState(false)
+  const [selected, setSelected] = useState(null)
+  const [editing, setEditing] = useState(false)
+  const [editForm, setEditForm] = useState({})
   const [showCarrierMgmt, setShowCarrierMgmt] = useState(false)
   const [newCarrier, setNewCarrier] = useState('')
   const defaultCarriers = ['Farmers Insurance', 'Insurance Wheat Ridge']
@@ -330,13 +348,28 @@ function PoliciesTab({ token, clientId, policies, onRefresh }) {
     onRefresh()
   }
 
+  const updatePolicy = async () => {
+    setSaving(true)
+    await fetch('/api/admin/policies', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ id: selected.id, ...editForm, premium_amount: editForm.premium_amount ? Number(editForm.premium_amount) : null }),
+    })
+    setSaving(false)
+    setEditing(false)
+    setSelected(null)
+    onRefresh()
+  }
+
   const del = async (id) => {
     if (!confirm('Delete this policy?')) return
     await fetch(`/api/admin/policies?id=${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } })
+    setSelected(null)
     onRefresh()
   }
 
   const inputCls = "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900"
+  const labelCls = "block text-xs text-gray-500 mb-1"
 
   return (
     <div>
@@ -366,9 +399,9 @@ function PoliciesTab({ token, clientId, policies, onRefresh }) {
             </div>
           </div>
           <div className="grid grid-cols-3 gap-3">
-            <div><label className="block text-xs text-gray-500 mb-1">Effective Date</label><input type="date" value={form.start_date} onChange={e => setForm({...form, start_date: e.target.value})} className={inputCls} /></div>
-            <div><label className="block text-xs text-gray-500 mb-1">Expiration Date</label><input type="date" value={form.end_date} onChange={e => setForm({...form, end_date: e.target.value})} className={inputCls} /></div>
-            <div><label className="block text-xs text-gray-500 mb-1">&nbsp;</label><input type="number" placeholder="Premium $" value={form.premium_amount} onChange={e => setForm({...form, premium_amount: e.target.value})} className={inputCls} /></div>
+            <div><label className={labelCls}>Effective Date</label><input type="date" value={form.start_date} onChange={e => setForm({...form, start_date: e.target.value})} className={inputCls} /></div>
+            <div><label className={labelCls}>Expiration Date</label><input type="date" value={form.end_date} onChange={e => setForm({...form, end_date: e.target.value})} className={inputCls} /></div>
+            <div><label className={labelCls}>&nbsp;</label><input type="number" placeholder="Premium $" value={form.premium_amount} onChange={e => setForm({...form, premium_amount: e.target.value})} className={inputCls} /></div>
           </div>
           <textarea placeholder="Coverage Summary" value={form.coverage_summary} onChange={e => setForm({...form, coverage_summary: e.target.value})} rows={3} className={inputCls} />
           <div className="flex items-center gap-3">
@@ -398,7 +431,7 @@ function PoliciesTab({ token, clientId, policies, onRefresh }) {
           {policies.map(p => {
             const Icon = TYPE_ICONS[p.policy_type] || Briefcase
             return (
-              <div key={p.id} className="bg-white rounded-xl border border-gray-100 p-4 flex items-center gap-3">
+              <div key={p.id} onClick={() => { setSelected(p); setEditForm({ policy_number: p.policy_number, policy_type: p.policy_type, status: p.status, carrier: p.carrier || '', start_date: p.start_date || '', end_date: p.end_date || '', premium_amount: p.premium_amount || '', coverage_summary: p.coverage_summary || '' }); setEditing(false) }} className="bg-white rounded-xl border border-gray-100 p-4 flex items-center gap-3 cursor-pointer hover:border-blue-200 hover:bg-blue-50/30 transition">
                 <div className="w-8 h-8 rounded bg-blue-50 text-[#0954a5] flex items-center justify-center"><Icon size={16} /></div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
@@ -407,11 +440,58 @@ function PoliciesTab({ token, clientId, policies, onRefresh }) {
                   </div>
                   <p className="text-xs text-gray-500">#{p.policy_number} | {p.carrier} | ${p.premium_amount || '—'}/yr</p>
                 </div>
-                <button onClick={() => del(p.id)} className="text-red-400 hover:text-red-600"><Trash2 size={14} /></button>
               </div>
             )
           })}
         </div>
+      )}
+
+      <Modal open={!!selected} onClose={() => { setSelected(null); setEditing(false) }} title={editing ? 'Edit Policy' : 'Policy Details'}>
+        {selected && !editing && (
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div><span className="text-xs text-gray-500">Policy Number</span><p className="font-medium">#{selected.policy_number}</p></div>
+              <div><span className="text-xs text-gray-500">Type</span><p className="font-medium capitalize">{selected.policy_type}</p></div>
+              <div><span className="text-xs text-gray-500">Status</span><p><span className={`text-xs px-2 py-0.5 rounded-full capitalize ${POLICY_STATUS_COLORS[selected.status] || 'bg-gray-100'}`}>{selected.status}</span></p></div>
+              <div><span className="text-xs text-gray-500">Carrier</span><p className="font-medium">{selected.carrier || '—'}</p></div>
+              <div><span className="text-xs text-gray-500">Effective Date</span><p className="font-medium">{formatDate(selected.start_date)}</p></div>
+              <div><span className="text-xs text-gray-500">Expiration Date</span><p className="font-medium">{formatDate(selected.end_date)}</p></div>
+              <div><span className="text-xs text-gray-500">Premium</span><p className="font-medium">${selected.premium_amount || '—'}/yr</p></div>
+            </div>
+            {selected.coverage_summary && <div><span className="text-xs text-gray-500">Coverage Summary</span><p className="text-sm mt-1">{selected.coverage_summary}</p></div>}
+            <div className="flex gap-2 pt-2 border-t border-gray-100">
+              <button onClick={() => setEditing(true)} className="bg-[#0954a5] text-white px-4 py-2 rounded-lg text-sm flex items-center gap-1"><Edit size={14} /> Edit</button>
+              <button onClick={() => del(selected.id)} className="bg-red-50 text-red-600 px-4 py-2 rounded-lg text-sm flex items-center gap-1"><Trash2 size={14} /> Delete</button>
+            </div>
+          </div>
+        )}
+        {selected && editing && (
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div><label className="block text-xs text-gray-500 mb-1">Policy Number</label><input value={editForm.policy_number} onChange={e => setEditForm({...editForm, policy_number: e.target.value})} className={inputCls} /></div>
+              <div><label className="block text-xs text-gray-500 mb-1">Type</label><select value={editForm.policy_type} onChange={e => setEditForm({...editForm, policy_type: e.target.value})} className={inputCls}>{POLICY_TYPES.map(t => <option key={t} value={t}>{t}</option>)}</select></div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div><label className="block text-xs text-gray-500 mb-1">Status</label><select value={editForm.status} onChange={e => setEditForm({...editForm, status: e.target.value})} className={inputCls}><option value="active">Active</option><option value="expired">Expired</option><option value="cancelled">Cancelled</option></select></div>
+              <div><label className="block text-xs text-gray-500 mb-1">Carrier</label><input value={editForm.carrier} onChange={e => setEditForm({...editForm, carrier: e.target.value})} className={inputCls} /></div>
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              <div><label className="block text-xs text-gray-500 mb-1">Effective Date</label><input type="date" value={editForm.start_date} onChange={e => setEditForm({...editForm, start_date: e.target.value})} className={inputCls} /></div>
+              <div><label className="block text-xs text-gray-500 mb-1">Expiration Date</label><input type="date" value={editForm.end_date} onChange={e => setEditForm({...editForm, end_date: e.target.value})} className={inputCls} /></div>
+              <div><label className="block text-xs text-gray-500 mb-1">Premium $</label><input type="number" value={editForm.premium_amount} onChange={e => setEditForm({...editForm, premium_amount: e.target.value})} className={inputCls} /></div>
+            </div>
+            <div><label className="block text-xs text-gray-500 mb-1">Coverage Summary</label><textarea value={editForm.coverage_summary} onChange={e => setEditForm({...editForm, coverage_summary: e.target.value})} rows={3} className={inputCls} /></div>
+            <div className="flex gap-2 pt-2">
+              <button onClick={updatePolicy} disabled={saving} className="bg-[#0954a5] text-white px-4 py-2 rounded-lg text-sm flex items-center gap-1 disabled:opacity-60"><Save size={14} /> {saving ? 'Saving...' : 'Save Changes'}</button>
+              <button onClick={() => setEditing(false)} className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm">Cancel</button>
+            </div>
+          </div>
+        )}
+      </Modal>
+    </div>
+  )
+}
+
       )}
     </div>
   )
@@ -422,6 +502,27 @@ function IDCardsTab({ token, clientId, idCards, policies, onRefresh }) {
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState({ card_type: 'auto', insured_name: '', policy_number: '', effective_date: '', expiration_date: '', vehicle_info: '', policy_id: '', vin: '', insured_drivers: '', liability_limits: '', member_id: '', group_number: '', plan_name: '', pcp_name: '', copay_info: '', rx_bin: '', property_address: '', dwelling_coverage: '', liability_limit: '' })
   const [saving, setSaving] = useState(false)
+  const [selectedCard, setSelectedCard] = useState(null)
+  const [editingCard, setEditingCard] = useState(false)
+  const [editCardForm, setEditCardForm] = useState({})
+
+  const updateCard = async () => {
+    setSaving(true)
+    const { vin, insured_drivers, liability_limits, member_id, group_number, plan_name, pcp_name, copay_info, rx_bin, property_address, dwelling_coverage, liability_limit, id, client_id, created_at, coverage_details: _cd, ...base } = editCardForm
+    let coverage_details = null
+    if (editCardForm.card_type === 'auto') coverage_details = JSON.stringify({ vin, insured_drivers, liability_limits })
+    else if (editCardForm.card_type === 'health') coverage_details = JSON.stringify({ member_id, group_number, plan_name, pcp_name, copay_info, rx_bin })
+    else if (editCardForm.card_type === 'home') coverage_details = JSON.stringify({ property_address, dwelling_coverage, liability_limit })
+    await fetch('/api/admin/id-cards', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ id: selectedCard.id, ...base, coverage_details }),
+    })
+    setSaving(false)
+    setEditingCard(false)
+    setSelectedCard(null)
+    onRefresh()
+  }
 
   const resetForm = () => setForm({ card_type: 'auto', insured_name: '', policy_number: '', effective_date: '', expiration_date: '', vehicle_info: '', policy_id: '', vin: '', insured_drivers: '', liability_limits: '', member_id: '', group_number: '', plan_name: '', pcp_name: '', copay_info: '', rx_bin: '', property_address: '', dwelling_coverage: '', liability_limit: '' })
 
@@ -534,7 +635,7 @@ function IDCardsTab({ token, clientId, idCards, policies, onRefresh }) {
           {idCards.map(c => {
             const cd = c.coverage_details ? (typeof c.coverage_details === 'string' ? JSON.parse(c.coverage_details) : c.coverage_details) : {}
             return (
-              <div key={c.id} className="bg-white rounded-xl border border-gray-100 p-4 flex items-center gap-3">
+              <div key={c.id} onClick={() => { setSelectedCard(c); setEditingCard(false) }} className="bg-white rounded-xl border border-gray-100 p-4 flex items-center gap-3 cursor-pointer hover:border-green-200 hover:bg-green-50/30 transition">
                 <div className="w-8 h-8 rounded bg-green-50 text-green-700 flex items-center justify-center"><CreditCard size={16} /></div>
                 <div className="flex-1 min-w-0">
                   <div className="font-medium text-gray-900 text-sm">{c.insured_name} - <span className="capitalize">{c.card_type === 'home' ? 'Homeowners' : c.card_type}</span></div>
@@ -543,12 +644,112 @@ function IDCardsTab({ token, clientId, idCards, policies, onRefresh }) {
                   {c.card_type === 'health' && cd.member_id && <p className="text-xs text-gray-400">Member: {cd.member_id}{cd.group_number ? ` | Group: ${cd.group_number}` : ''}{cd.plan_name ? ` | ${cd.plan_name}` : ''}</p>}
                   {c.card_type === 'home' && cd.property_address && <p className="text-xs text-gray-400">{cd.property_address}{cd.dwelling_coverage ? ` | ${cd.dwelling_coverage}` : ''}</p>}
                 </div>
-                <button onClick={() => del(c.id)} className="text-red-400 hover:text-red-600"><Trash2 size={14} /></button>
               </div>
             )
           })}
         </div>
       )}
+
+      <Modal open={!!selectedCard} onClose={() => { setSelectedCard(null); setEditingCard(false) }} title={editingCard ? 'Edit ID Card' : 'ID Card Details'}>
+        {selectedCard && (() => {
+          const cd = selectedCard.coverage_details ? (typeof selectedCard.coverage_details === 'string' ? JSON.parse(selectedCard.coverage_details) : selectedCard.coverage_details) : {}
+          return !editingCard ? (
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div><span className="text-xs text-gray-500">Card Type</span><p className="font-medium capitalize">{selectedCard.card_type === 'home' ? 'Homeowners' : selectedCard.card_type}</p></div>
+                <div><span className="text-xs text-gray-500">Insured Name</span><p className="font-medium">{selectedCard.insured_name}</p></div>
+                <div><span className="text-xs text-gray-500">Policy Number</span><p className="font-medium">#{selectedCard.policy_number}</p></div>
+                <div><span className="text-xs text-gray-500">Effective Date</span><p className="font-medium">{formatDate(selectedCard.effective_date)}</p></div>
+                <div><span className="text-xs text-gray-500">Expiration Date</span><p className="font-medium">{formatDate(selectedCard.expiration_date)}</p></div>
+              </div>
+              {selectedCard.card_type === 'auto' && (
+                <div className="grid grid-cols-2 gap-3 text-sm border-t border-gray-100 pt-3">
+                  <div><span className="text-xs text-gray-500">Vehicle</span><p className="font-medium">{selectedCard.vehicle_info || '—'}</p></div>
+                  <div><span className="text-xs text-gray-500">VIN</span><p className="font-medium">{cd.vin || '—'}</p></div>
+                  <div><span className="text-xs text-gray-500">Insured Drivers</span><p className="font-medium">{cd.insured_drivers || '—'}</p></div>
+                  <div><span className="text-xs text-gray-500">Liability Limits</span><p className="font-medium">{cd.liability_limits || '—'}</p></div>
+                </div>
+              )}
+              {selectedCard.card_type === 'health' && (
+                <div className="grid grid-cols-2 gap-3 text-sm border-t border-gray-100 pt-3">
+                  <div><span className="text-xs text-gray-500">Member ID</span><p className="font-medium">{cd.member_id || '—'}</p></div>
+                  <div><span className="text-xs text-gray-500">Group Number</span><p className="font-medium">{cd.group_number || '—'}</p></div>
+                  <div><span className="text-xs text-gray-500">Plan Name</span><p className="font-medium">{cd.plan_name || '—'}</p></div>
+                  <div><span className="text-xs text-gray-500">PCP</span><p className="font-medium">{cd.pcp_name || '—'}</p></div>
+                  <div><span className="text-xs text-gray-500">Copay Info</span><p className="font-medium">{cd.copay_info || '—'}</p></div>
+                  <div><span className="text-xs text-gray-500">RX Bin/PCN/Group</span><p className="font-medium">{cd.rx_bin || '—'}</p></div>
+                </div>
+              )}
+              {selectedCard.card_type === 'home' && (
+                <div className="text-sm border-t border-gray-100 pt-3 space-y-2">
+                  <div><span className="text-xs text-gray-500">Property Address</span><p className="font-medium">{cd.property_address || '—'}</p></div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div><span className="text-xs text-gray-500">Dwelling Coverage</span><p className="font-medium">{cd.dwelling_coverage || '—'}</p></div>
+                    <div><span className="text-xs text-gray-500">Liability Limit</span><p className="font-medium">{cd.liability_limit || '—'}</p></div>
+                  </div>
+                </div>
+              )}
+              <div className="flex gap-2 pt-2 border-t border-gray-100">
+                <button onClick={() => { setEditingCard(true); setEditCardForm({ ...selectedCard, ...cd }) }} className="bg-[#0954a5] text-white px-4 py-2 rounded-lg text-sm flex items-center gap-1"><Edit size={14} /> Edit</button>
+                <button onClick={() => { del(selectedCard.id); setSelectedCard(null) }} className="bg-red-50 text-red-600 px-4 py-2 rounded-lg text-sm flex items-center gap-1"><Trash2 size={14} /> Delete</button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div><label className="block text-xs text-gray-500 mb-1">Card Type</label><select value={editCardForm.card_type} onChange={e => setEditCardForm({...editCardForm, card_type: e.target.value})} className={inputCls}>{ID_CARD_TYPES.map(t => <option key={t} value={t}>{t === 'auto' ? 'Auto' : t === 'health' ? 'Health' : 'Homeowners'}</option>)}</select></div>
+                <div><label className="block text-xs text-gray-500 mb-1">Insured Name</label><input value={editCardForm.insured_name || ''} onChange={e => setEditCardForm({...editCardForm, insured_name: e.target.value})} className={inputCls} /></div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div><label className="block text-xs text-gray-500 mb-1">Policy Number</label><input value={editCardForm.policy_number || ''} onChange={e => setEditCardForm({...editCardForm, policy_number: e.target.value})} className={inputCls} /></div>
+                <div><label className="block text-xs text-gray-500 mb-1">Link Existing Policy</label><select value={editCardForm.policy_id || ''} onChange={e => setEditCardForm({...editCardForm, policy_id: e.target.value})} className={inputCls}><option value="">(none)</option>{policies.map(p => <option key={p.id} value={p.id}>#{p.policy_number} ({p.policy_type})</option>)}</select></div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div><label className="block text-xs text-gray-500 mb-1">Effective Date</label><input type="date" value={editCardForm.effective_date || ''} onChange={e => setEditCardForm({...editCardForm, effective_date: e.target.value})} className={inputCls} /></div>
+                <div><label className="block text-xs text-gray-500 mb-1">Expiration Date</label><input type="date" value={editCardForm.expiration_date || ''} onChange={e => setEditCardForm({...editCardForm, expiration_date: e.target.value})} className={inputCls} /></div>
+              </div>
+              {editCardForm.card_type === 'auto' && (<>
+                <p className="text-xs font-semibold text-gray-600 border-b border-gray-200 pb-1">Auto Details</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div><label className="block text-xs text-gray-500 mb-1">Vehicle Info</label><input value={editCardForm.vehicle_info || ''} onChange={e => setEditCardForm({...editCardForm, vehicle_info: e.target.value})} className={inputCls} /></div>
+                  <div><label className="block text-xs text-gray-500 mb-1">VIN</label><input value={editCardForm.vin || ''} onChange={e => setEditCardForm({...editCardForm, vin: e.target.value})} className={inputCls} /></div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div><label className="block text-xs text-gray-500 mb-1">Insured Drivers</label><input value={editCardForm.insured_drivers || ''} onChange={e => setEditCardForm({...editCardForm, insured_drivers: e.target.value})} className={inputCls} /></div>
+                  <div><label className="block text-xs text-gray-500 mb-1">Liability Limits</label><input value={editCardForm.liability_limits || ''} onChange={e => setEditCardForm({...editCardForm, liability_limits: e.target.value})} className={inputCls} /></div>
+                </div>
+              </>)}
+              {editCardForm.card_type === 'health' && (<>
+                <p className="text-xs font-semibold text-gray-600 border-b border-gray-200 pb-1">Health Details</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div><label className="block text-xs text-gray-500 mb-1">Member ID</label><input value={editCardForm.member_id || ''} onChange={e => setEditCardForm({...editCardForm, member_id: e.target.value})} className={inputCls} /></div>
+                  <div><label className="block text-xs text-gray-500 mb-1">Group Number</label><input value={editCardForm.group_number || ''} onChange={e => setEditCardForm({...editCardForm, group_number: e.target.value})} className={inputCls} /></div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div><label className="block text-xs text-gray-500 mb-1">Plan Name</label><input value={editCardForm.plan_name || ''} onChange={e => setEditCardForm({...editCardForm, plan_name: e.target.value})} className={inputCls} /></div>
+                  <div><label className="block text-xs text-gray-500 mb-1">PCP</label><input value={editCardForm.pcp_name || ''} onChange={e => setEditCardForm({...editCardForm, pcp_name: e.target.value})} className={inputCls} /></div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div><label className="block text-xs text-gray-500 mb-1">Copay Info</label><input value={editCardForm.copay_info || ''} onChange={e => setEditCardForm({...editCardForm, copay_info: e.target.value})} className={inputCls} /></div>
+                  <div><label className="block text-xs text-gray-500 mb-1">RX Bin/PCN/Group</label><input value={editCardForm.rx_bin || ''} onChange={e => setEditCardForm({...editCardForm, rx_bin: e.target.value})} className={inputCls} /></div>
+                </div>
+              </>)}
+              {editCardForm.card_type === 'home' && (<>
+                <p className="text-xs font-semibold text-gray-600 border-b border-gray-200 pb-1">Homeowners Details</p>
+                <div><label className="block text-xs text-gray-500 mb-1">Property Address</label><input value={editCardForm.property_address || ''} onChange={e => setEditCardForm({...editCardForm, property_address: e.target.value})} className={inputCls} /></div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div><label className="block text-xs text-gray-500 mb-1">Dwelling Coverage</label><input value={editCardForm.dwelling_coverage || ''} onChange={e => setEditCardForm({...editCardForm, dwelling_coverage: e.target.value})} className={inputCls} /></div>
+                  <div><label className="block text-xs text-gray-500 mb-1">Liability Limit</label><input value={editCardForm.liability_limit || ''} onChange={e => setEditCardForm({...editCardForm, liability_limit: e.target.value})} className={inputCls} /></div>
+                </div>
+              </>)}
+              <div className="flex gap-2 pt-2">
+                <button onClick={updateCard} disabled={saving} className="bg-[#0954a5] text-white px-4 py-2 rounded-lg text-sm flex items-center gap-1 disabled:opacity-60"><Save size={14} /> {saving ? 'Saving...' : 'Save Changes'}</button>
+                <button onClick={() => setEditingCard(false)} className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm">Cancel</button>
+              </div>
+            </div>
+          )
+        })()}
+      </Modal>
     </div>
   )
 }
@@ -559,6 +760,10 @@ function DocumentsTab({ token, clientId, docs, onRefresh }) {
   const [category, setCategory] = useState('other')
   const [notes, setNotes] = useState('')
   const [uploading, setUploading] = useState(false)
+  const [selectedDoc, setSelectedDoc] = useState(null)
+  const [editingDoc, setEditingDoc] = useState(false)
+  const [editDocForm, setEditDocForm] = useState({})
+  const [savingDoc, setSavingDoc] = useState(false)
 
   const upload = async (e) => {
     e.preventDefault()
@@ -577,6 +782,38 @@ function DocumentsTab({ token, clientId, docs, onRefresh }) {
     onRefresh()
   }
 
+  const updateDoc = async () => {
+    setSavingDoc(true)
+    await fetch('/api/admin/documents', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ id: selectedDoc.id, category: editDocForm.category, notes: editDocForm.notes }),
+    })
+    setSavingDoc(false)
+    setEditingDoc(false)
+    setSelectedDoc(null)
+    onRefresh()
+  }
+
+  const delDoc = async (id) => {
+    if (!confirm('Delete this document?')) return
+    await fetch(`/api/admin/documents?id=${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } })
+    setSelectedDoc(null)
+    onRefresh()
+  }
+
+  const downloadDoc = (doc) => {
+    if (!doc.file_url) return
+    const a = document.createElement('a')
+    a.href = doc.file_url
+    a.download = doc.file_name || 'download'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+  }
+
+  const inputCls = "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900"
+
   return (
     <div>
       <button onClick={() => setShowUpload(!showUpload)} className="bg-[#0954a5] text-white px-3 py-1.5 rounded-lg text-sm font-medium mb-3 flex items-center gap-1">
@@ -586,10 +823,10 @@ function DocumentsTab({ token, clientId, docs, onRefresh }) {
         <form onSubmit={upload} className="bg-gray-50 rounded-xl p-4 mb-4 space-y-3">
           <input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={e => setFile(e.target.files[0])}
             className="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-50 file:text-[#0954a5] file:font-medium" />
-          <select value={category} onChange={e => setCategory(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900">
+          <select value={category} onChange={e => setCategory(e.target.value)} className={inputCls}>
             {DOC_CATEGORIES.map(c => <option key={c} value={c}>{c.replace(/_/g, ' ')}</option>)}
           </select>
-          <input placeholder="Notes" value={notes} onChange={e => setNotes(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900" />
+          <input placeholder="Notes" value={notes} onChange={e => setNotes(e.target.value)} className={inputCls} />
           <button type="submit" disabled={!file || uploading} className="bg-[#0954a5] text-white px-4 py-2 rounded-lg text-sm disabled:opacity-60">
             {uploading ? 'Uploading...' : 'Upload'}
           </button>
@@ -598,7 +835,7 @@ function DocumentsTab({ token, clientId, docs, onRefresh }) {
       {docs.length === 0 ? <p className="text-gray-400 text-center py-6">No documents.</p> : (
         <div className="space-y-2">
           {docs.map(d => (
-            <div key={d.id} className="bg-white rounded-xl border border-gray-100 p-3 flex items-center gap-3">
+            <div key={d.id} onClick={() => { setSelectedDoc(d); setEditDocForm({ category: d.category || 'other', notes: d.notes || '' }); setEditingDoc(false) }} className="bg-white rounded-xl border border-gray-100 p-3 flex items-center gap-3 cursor-pointer hover:border-purple-200 hover:bg-purple-50/30 transition">
               <div className={`w-8 h-8 rounded flex items-center justify-center shrink-0 ${d.file_type === 'pdf' ? 'bg-red-50 text-red-600' : 'bg-purple-50 text-purple-600'}`}>
                 {d.file_type === 'pdf' ? <FileText size={14} /> : <Upload size={14} />}
               </div>
@@ -606,11 +843,49 @@ function DocumentsTab({ token, clientId, docs, onRefresh }) {
                 <p className="text-sm font-medium text-gray-900 truncate">{d.file_name}</p>
                 <p className="text-xs text-gray-500">{d.category?.replace(/_/g, ' ')} | {formatShortDate(d.created_at)} | by {d.uploaded_by}</p>
               </div>
-              {d.file_url && <a href={d.file_url} target="_blank" rel="noopener noreferrer" className="text-[#0954a5]"><Eye size={16} /></a>}
             </div>
           ))}
         </div>
       )}
+
+      <Modal open={!!selectedDoc} onClose={() => { setSelectedDoc(null); setEditingDoc(false) }} title={editingDoc ? 'Edit Document' : 'Document Details'}>
+        {selectedDoc && !editingDoc && (
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div><span className="text-xs text-gray-500">File Name</span><p className="font-medium truncate">{selectedDoc.file_name}</p></div>
+              <div><span className="text-xs text-gray-500">File Type</span><p className="font-medium uppercase">{selectedDoc.file_type}</p></div>
+              <div><span className="text-xs text-gray-500">Category</span><p className="font-medium capitalize">{selectedDoc.category?.replace(/_/g, ' ')}</p></div>
+              <div><span className="text-xs text-gray-500">Uploaded</span><p className="font-medium">{formatDate(selectedDoc.created_at)} by {selectedDoc.uploaded_by}</p></div>
+            </div>
+            {selectedDoc.notes && <div><span className="text-xs text-gray-500">Notes</span><p className="text-sm mt-1">{selectedDoc.notes}</p></div>}
+            {selectedDoc.file_url && selectedDoc.file_type === 'image' && (
+              <div className="border border-gray-100 rounded-lg overflow-hidden"><img src={selectedDoc.file_url} alt={selectedDoc.file_name} className="w-full max-h-64 object-contain bg-gray-50" /></div>
+            )}
+            {selectedDoc.file_url && selectedDoc.file_type === 'pdf' && (
+              <div className="bg-gray-50 rounded-lg p-4 text-center text-sm text-gray-500">
+                <FileText size={24} className="mx-auto mb-2 text-red-400" />
+                PDF Document — use Download or View to open
+              </div>
+            )}
+            <div className="flex gap-2 pt-2 border-t border-gray-100">
+              <button onClick={() => downloadDoc(selectedDoc)} className="bg-[#0954a5] text-white px-4 py-2 rounded-lg text-sm flex items-center gap-1"><Download size={14} /> Download</button>
+              {selectedDoc.file_url && <a href={selectedDoc.file_url} target="_blank" rel="noopener noreferrer" className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm flex items-center gap-1"><Eye size={14} /> View</a>}
+              <button onClick={() => setEditingDoc(true)} className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm flex items-center gap-1"><Edit size={14} /> Edit</button>
+              <button onClick={() => delDoc(selectedDoc.id)} className="bg-red-50 text-red-600 px-4 py-2 rounded-lg text-sm flex items-center gap-1"><Trash2 size={14} /> Delete</button>
+            </div>
+          </div>
+        )}
+        {selectedDoc && editingDoc && (
+          <div className="space-y-3">
+            <div><label className="block text-xs text-gray-500 mb-1">Category</label><select value={editDocForm.category} onChange={e => setEditDocForm({...editDocForm, category: e.target.value})} className={inputCls}>{DOC_CATEGORIES.map(c => <option key={c} value={c}>{c.replace(/_/g, ' ')}</option>)}</select></div>
+            <div><label className="block text-xs text-gray-500 mb-1">Notes</label><textarea value={editDocForm.notes} onChange={e => setEditDocForm({...editDocForm, notes: e.target.value})} rows={3} className={inputCls} /></div>
+            <div className="flex gap-2 pt-2">
+              <button onClick={updateDoc} disabled={savingDoc} className="bg-[#0954a5] text-white px-4 py-2 rounded-lg text-sm flex items-center gap-1 disabled:opacity-60"><Save size={14} /> {savingDoc ? 'Saving...' : 'Save Changes'}</button>
+              <button onClick={() => setEditingDoc(false)} className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm">Cancel</button>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   )
 }

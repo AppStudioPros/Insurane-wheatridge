@@ -48,3 +48,23 @@ export async function POST(request) {
   if (error) return Response.json({ error: error.message }, { status: 500 })
   return Response.json(data)
 }
+
+export async function PATCH(request) {
+  if (!authorized(request)) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+  const body = await request.json()
+  const { id, ...updates } = body
+  if (!id) return Response.json({ error: 'id required' }, { status: 400 })
+  const { data, error } = await supabase.from('documents').update(updates).eq('id', id).select().single()
+  if (error) return Response.json({ error: error.message }, { status: 500 })
+  return Response.json(data)
+}
+
+export async function DELETE(request) {
+  if (!authorized(request)) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+  const { searchParams } = new URL(request.url)
+  const id = searchParams.get('id')
+  if (!id) return Response.json({ error: 'id required' }, { status: 400 })
+  const { error } = await supabase.from('documents').delete().eq('id', id)
+  if (error) return Response.json({ error: error.message }, { status: 500 })
+  return Response.json({ success: true })
+}
