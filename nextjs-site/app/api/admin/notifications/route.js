@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
+const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Jubal2026'
 
@@ -20,7 +20,7 @@ export async function GET(request) {
 
   try {
     // Get recent unread messages from clients (sender = client, not admin)
-    const messages = await sbFetch('messages?sender_type=eq.client&read=eq.false&order=created_at.desc&limit=20')
+    const messages = await sbFetch('messages?sender=eq.client&read=eq.false&order=created_at.desc&limit=20')
 
     // For each message, get client info
     const clientIds = [...new Set((messages || []).map(m => m.client_id).filter(Boolean))]

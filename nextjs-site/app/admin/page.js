@@ -1270,11 +1270,7 @@ function MessagesTab({ token, clientId, messages: initialMessages, onRefresh }) 
 
   return (
     <div className="flex flex-col" style={{ height: '500px' }}>
-      {unreadCount > 0 && (
-        <div className="bg-orange-50 border border-orange-200 rounded-lg px-3 py-2 mb-3 text-sm text-orange-700">
-          {unreadCount} unread message{unreadCount > 1 ? 's' : ''} from client
-        </div>
-      )}
+
       <div className="flex-1 overflow-y-auto rounded-xl bg-gray-50 border border-gray-100 p-4 space-y-1 mb-3">
         {messages.length === 0 ? (
           <p className="text-gray-400 text-center py-12">No messages yet. Send the first message below.</p>
