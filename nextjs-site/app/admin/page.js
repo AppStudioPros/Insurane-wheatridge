@@ -296,7 +296,7 @@ function ClientDetail({ token, client, onBack, initialTab }) {
       {loading ? <p className="text-gray-400 py-8 text-center">Loading...</p> : (
         <>
           {tab === 'policies' && <PoliciesTab token={token} clientId={client.id} policies={policies} onRefresh={fetchAll} />}
-          {tab === 'id-cards' && <IDCardsTab token={token} clientId={client.id} idCards={idCards} policies={policies} onRefresh={fetchAll} />}
+          {tab === 'id-cards' && <IDCardsTab token={token} clientId={client.id} client={client} idCards={idCards} policies={policies} onRefresh={fetchAll} />}
           {tab === 'documents' && <DocumentsTab token={token} clientId={client.id} docs={docs} onRefresh={fetchAll} />}
           {tab === 'messages' && <MessagesTab token={token} clientId={client.id} messages={messages} onRefresh={fetchAll} />}
         </>
@@ -811,7 +811,7 @@ function PoliciesTab({ token, clientId, policies, onRefresh }) {
 }
 
 
-function IDCardsTab({ token, clientId, idCards, policies, onRefresh }) {
+function IDCardsTab({ token, clientId, client, idCards, policies, onRefresh }) {
   const ID_CARD_TYPES = ['auto', 'health', 'home']
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState({ card_type: 'auto', insured_name: '', policy_number: '', effective_date: '', expiration_date: '', vehicle_info: '', policy_id: '', vin: '', insured_drivers: '', liability_limits: '', member_id: '', group_number: '', plan_name: '', pcp_name: '', copay_info: '', rx_bin: '', property_address: '', dwelling_coverage: '', liability_limit: '' })
@@ -875,6 +875,47 @@ function IDCardsTab({ token, clientId, idCards, policies, onRefresh }) {
       </button>
       {showForm && (
         <form onSubmit={save} className="bg-gray-50 rounded-xl p-4 mb-4 space-y-3">
+          <div className="mb-2">
+            <label className={labelCls}>Link to Policy (auto-fills fields below)</label>
+            <select value={form.policy_id} onChange={e => {
+              const pid = e.target.value
+              if (!pid) { setForm({...form, policy_id: ''}); return }
+              const p = policies.find(x => x.id === pid)
+              if (!p) return
+              const typeMap = { auto: 'auto', home: 'home', homeowners: 'home', health: 'health', life: 'health', renters: 'home', condo: 'home' }
+              const cardType = typeMap[(p.policy_type || '').toLowerCase()] || form.card_type
+              const cs = p.coverage_summary ? (typeof p.coverage_summary === 'string' ? JSON.parse(p.coverage_summary) : p.coverage_summary) : {}
+              const updates = {
+                policy_id: pid,
+                card_type: cardType,
+                insured_name: (client.first_name || '') + ' ' + (client.last_name || ''),
+                policy_number: p.policy_number || '',
+                effective_date: p.start_date || '',
+                expiration_date: p.end_date || '',
+              }
+              if (cardType === 'auto') {
+                updates.vehicle_info = cs.vehicle_info || cs.vehicle || ''
+                updates.vin = cs.vin || ''
+                updates.insured_drivers = cs.insured_drivers || ''
+                updates.liability_limits = cs.liability_limits || ''
+              } else if (cardType === 'health') {
+                updates.member_id = cs.member_id || ''
+                updates.group_number = cs.group_number || ''
+                updates.plan_name = cs.plan_name || ''
+                updates.pcp_name = cs.pcp_name || ''
+                updates.copay_info = cs.copay_info || ''
+                updates.rx_bin = cs.rx_bin || ''
+              } else if (cardType === 'home') {
+                updates.property_address = cs.property_address || cs.address || ''
+                updates.dwelling_coverage = cs.dwelling_coverage || ''
+                updates.liability_limit = cs.liability_limit || ''
+              }
+              setForm(prev => ({...prev, ...updates}))
+            }} className={inputCls}>
+              <option value="">(none - manual entry)</option>
+              {policies.map(p => <option key={p.id} value={p.id}>#{p.policy_number} — {p.carrier || 'Farmers Insurance'} ({p.policy_type})</option>)}
+            </select>
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={labelCls}>Card Type</label>
@@ -886,17 +927,11 @@ function IDCardsTab({ token, clientId, idCards, policies, onRefresh }) {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div><label className={labelCls}>Policy Number *</label><input required value={form.policy_number} onChange={e => setForm({...form, policy_number: e.target.value})} className={inputCls} /></div>
-            <div>
-              <label className={labelCls}>Link Existing Policy</label>
-              <select value={form.policy_id} onChange={e => setForm({...form, policy_id: e.target.value})} className={inputCls}>
-                <option value="">(none)</option>
-                {policies.map(p => <option key={p.id} value={p.id}>#{p.policy_number} ({p.policy_type})</option>)}
-              </select>
-            </div>
+            <div><label className={labelCls}>Effective Date</label><input type="date" value={form.effective_date} onChange={e => setForm({...form, effective_date: e.target.value})} className={inputCls} /></div>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <div><label className={labelCls}>Effective Date</label><input type="date" value={form.effective_date} onChange={e => setForm({...form, effective_date: e.target.value})} className={inputCls} /></div>
             <div><label className={labelCls}>Expiration Date</label><input type="date" value={form.expiration_date} onChange={e => setForm({...form, expiration_date: e.target.value})} className={inputCls} /></div>
+            <div></div>
           </div>
 
           {/* AUTO-specific fields */}
