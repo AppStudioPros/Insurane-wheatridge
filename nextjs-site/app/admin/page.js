@@ -297,7 +297,7 @@ function ClientDetail({ token, client, onBack, initialTab }) {
         <>
           {tab === 'policies' && <PoliciesTab token={token} clientId={client.id} policies={policies} onRefresh={fetchAll} />}
           {tab === 'id-cards' && <IDCardsTab token={token} clientId={client.id} client={client} idCards={idCards} policies={policies} onRefresh={fetchAll} />}
-          {tab === 'documents' && <DocumentsTab token={token} clientId={client.id} docs={docs} onRefresh={fetchAll} />}
+          {tab === 'documents' && <DocumentsTab token={token} clientId={client.id} docs={docs} policies={policies} onRefresh={fetchAll} />}
           {tab === 'messages' && <MessagesTab token={token} clientId={client.id} messages={messages} onRefresh={fetchAll} />}
         </>
       )}
@@ -1103,11 +1103,12 @@ function IDCardsTab({ token, clientId, client, idCards, policies, onRefresh }) {
   )
 }
 
-function DocumentsTab({ token, clientId, docs, onRefresh }) {
+function DocumentsTab({ token, clientId, docs, policies, onRefresh }) {
   const [showUpload, setShowUpload] = useState(false)
   const [file, setFile] = useState(null)
   const [category, setCategory] = useState('other')
   const [notes, setNotes] = useState('')
+  const [policyId, setPolicyId] = useState('')
   const [uploading, setUploading] = useState(false)
   const [selectedDoc, setSelectedDoc] = useState(null)
   const [editingDoc, setEditingDoc] = useState(false)
@@ -1123,10 +1124,12 @@ function DocumentsTab({ token, clientId, docs, onRefresh }) {
     form.append('client_id', clientId)
     form.append('category', category)
     form.append('notes', notes)
+    if (policyId) form.append('policy_id', policyId)
     await fetch('/api/admin/documents', { method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: form })
     setShowUpload(false)
     setFile(null)
     setNotes('')
+    setPolicyId('')
     setUploading(false)
     onRefresh()
   }
@@ -1174,6 +1177,10 @@ function DocumentsTab({ token, clientId, docs, onRefresh }) {
             className="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-50 file:text-[#0954a5] file:font-medium" />
           <select value={category} onChange={e => setCategory(e.target.value)} className={inputCls}>
             {DOC_CATEGORIES.map(c => <option key={c} value={c}>{c.replace(/_/g, ' ')}</option>)}
+          </select>
+          <select value={policyId} onChange={e => setPolicyId(e.target.value)} className={inputCls}>
+            <option value="">Link to Policy (optional)</option>
+            {policies.map(p => <option key={p.id} value={p.id}>#{p.policy_number} — {p.carrier || 'Farmers Insurance'} ({p.policy_type})</option>)}
           </select>
           <input placeholder="Notes" value={notes} onChange={e => setNotes(e.target.value)} className={inputCls} />
           <button type="submit" disabled={!file || uploading} className="bg-[#0954a5] text-white px-4 py-2 rounded-lg text-sm disabled:opacity-60">

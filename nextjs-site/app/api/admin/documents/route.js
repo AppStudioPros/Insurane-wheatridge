@@ -28,6 +28,7 @@ export async function POST(request) {
   const clientId = formData.get('client_id')
   const category = formData.get('category') || 'other'
   const notes = formData.get('notes') || ''
+  const policyId = formData.get('policy_id') || null
 
   if (!file || !clientId) return Response.json({ error: 'File and client_id required' }, { status: 400 })
 
@@ -43,6 +44,7 @@ export async function POST(request) {
     category,
     uploaded_by: 'admin',
     notes,
+    policy_id: policyId || null,
   }).select().single()
 
   if (error) return Response.json({ error: error.message }, { status: 500 })
