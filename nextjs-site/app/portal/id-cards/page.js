@@ -17,7 +17,7 @@ function IDCard({ card }) {
         {/* Card Header */}
         <div className="px-6 pt-5 pb-3 flex items-center justify-between">
           <div>
-            <h3 className="text-white font-bold text-lg tracking-wide">FARMERS INSURANCE</h3>
+            <h3 className="text-white font-bold text-lg tracking-wide">{(card.carrier || 'Farmers Insurance').toUpperCase()}</h3>
             <p className="text-blue-200 text-xs uppercase tracking-widest mt-0.5">Insurance Identification Card</p>
           </div>
           <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
