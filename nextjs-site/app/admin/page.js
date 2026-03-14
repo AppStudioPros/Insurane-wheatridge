@@ -22,7 +22,7 @@ const POLICY_STATUS_COLORS = { active: 'bg-green-100 text-green-700', expired: '
 const POLICY_TYPES = ['auto', 'homeowners', 'renters', 'life', 'business', 'umbrella', 'flood', 'health', 'condo']
 const TYPE_ICONS = { auto: Car, home: Home, life: Heart, business: Briefcase, renters: Building, condo: Building }
 const POLICY_TYPE_LABELS = { auto: 'Auto', homeowners: 'Homeowners', renters: 'Renters', life: 'Life', business: 'Business / Commercial', umbrella: 'Umbrella', flood: 'Flood', health: 'Health', condo: 'Condo / HOA' }
-const DOC_CATEGORIES = ['id', 'proof_of_residence', 'claim_photo', 'signature', 'other']
+const DOC_CATEGORIES = ['policy_declaration', 'full_policy_document', 'certificate_of_insurance', 'endorsement_rider', 'billing_statement', 'claims_documentation', 'quote_proposal', 'cancellation_notice', 'renewal_notice', 'proof_of_prior_coverage', 'binder_letter', 'other']
 
 // ================= ORIGINAL COMPONENTS =================
 
@@ -295,7 +295,7 @@ function ClientDetail({ token, client, onBack, initialTab }) {
 
       {loading ? <p className="text-gray-400 py-8 text-center">Loading...</p> : (
         <>
-          {tab === 'policies' && <PoliciesTab token={token} clientId={client.id} policies={policies} onRefresh={fetchAll} />}
+          {tab === 'policies' && <PoliciesTab token={token} clientId={client.id} policies={policies} docs={docs} onRefresh={fetchAll} />}
           {tab === 'id-cards' && <IDCardsTab token={token} clientId={client.id} client={client} idCards={idCards} policies={policies} onRefresh={fetchAll} />}
           {tab === 'documents' && <DocumentsTab token={token} clientId={client.id} docs={docs} policies={policies} onRefresh={fetchAll} />}
           {tab === 'messages' && <MessagesTab token={token} clientId={client.id} messages={messages} onRefresh={fetchAll} />}
@@ -603,7 +603,7 @@ function TypeFields({ f, setF }) {
 }
 
 
-function PoliciesTab({ token, clientId, policies, onRefresh }) {
+function PoliciesTab({ token, clientId, policies, docs, onRefresh }) {
   const defaultForm = { policy_number: '', policy_type: 'auto', status: 'active', carrier: 'Farmers Insurance', start_date: '', end_date: '', premium_amount: '', coverage_summary: '',
     deductible: '', agent_name: '',
     vehicles_covered: '', vin: '', drivers_listed: '', liability_bi_pd: '', collision_deductible: '', comp_deductible: '', uninsured_motorist: '',
@@ -622,6 +622,8 @@ function PoliciesTab({ token, clientId, policies, onRefresh }) {
   const [editing, setEditing] = useState(false)
   const [editForm, setEditForm] = useState({})
   const [showCarrierMgmt, setShowCarrierMgmt] = useState(false)
+  const [policyFile, setPolicyFile] = useState(null)
+  const [attachExisting, setAttachExisting] = useState('')
   const [newCarrier, setNewCarrier] = useState('')
   const defaultCarriers = ['Farmers Insurance', 'Insurance Wheat Ridge']
   const [customCarriers, setCustomCarriers] = useState(() => {
@@ -664,8 +666,21 @@ function PoliciesTab({ token, clientId, policies, onRefresh }) {
 
   const save = async (e) => {
     e.preventDefault(); setSaving(true)
-    await fetch('/api/admin/policies', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ ...buildPayload(form), client_id: clientId }) })
-    setShowForm(false); setForm({...defaultForm}); setSaving(false); onRefresh()
+    const res = await fetch('/api/admin/policies', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ ...buildPayload(form), client_id: clientId }) })
+    const newPolicy = await res.json()
+    // Upload new doc or link existing doc to this policy
+    if (policyFile && newPolicy?.id) {
+      const fd = new FormData()
+      fd.append('file', policyFile)
+      fd.append('client_id', clientId)
+      fd.append('category', 'full_policy_document')
+      fd.append('policy_id', newPolicy.id)
+      fd.append('notes', `Policy #${form.policy_number}`)
+      await fetch('/api/admin/documents', { method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: fd })
+    } else if (attachExisting && newPolicy?.id) {
+      await fetch('/api/admin/documents', { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ id: attachExisting, policy_id: newPolicy.id }) })
+    }
+    setShowForm(false); setForm({...defaultForm}); setPolicyFile(null); setAttachExisting(''); setSaving(false); onRefresh()
   }
 
   const updatePolicy = async () => {
@@ -713,9 +728,25 @@ function PoliciesTab({ token, clientId, policies, onRefresh }) {
           </div>
           <TypeFields f={form} setF={setForm} />
           <div><label className={labelCls}>Notes / Coverage Summary</label><textarea value={form.coverage_summary} onChange={e => setForm({...form, coverage_summary: e.target.value})} rows={2} className={inputCls} placeholder="Any additional notes..." /></div>
+          <div className="bg-gray-50 rounded-lg p-3 space-y-2">
+            <label className={labelCls}>Attach Policy Document</label>
+            <div className="flex gap-2 items-center">
+              <label className="flex-1 cursor-pointer">
+                <div className="border border-dashed border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-500 hover:border-blue-300 hover:bg-blue-50/30 transition text-center">
+                  {policyFile ? policyFile.name : 'Upload from computer'}
+                </div>
+                <input type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden" onChange={e => { setPolicyFile(e.target.files[0]); setAttachExisting('') }} />
+              </label>
+              <span className="text-xs text-gray-400">or</span>
+              <select value={attachExisting} onChange={e => { setAttachExisting(e.target.value); setPolicyFile(null) }} className="flex-1 text-sm border border-gray-200 rounded-lg px-2 py-2">
+                <option value="">Attach existing doc</option>
+                {(docs || []).map(d => <option key={d.id} value={d.id}>{d.file_name}</option>)}
+              </select>
+            </div>
+          </div>
           <div className="flex items-center gap-3">
             <button type="submit" disabled={saving} className="bg-[#0954a5] text-white px-4 py-2 rounded-lg text-sm disabled:opacity-60">{saving ? 'Saving...' : 'Save Policy'}</button>
-            <button type="button" onClick={() => setShowCarrierMgmt(!showCarrierMgmt)} className="text-xs text-gray-400 hover:text-gray-600">⚙️ Manage Carriers</button>
+            <button type="button" onClick={() => setShowCarrierMgmt(!showCarrierMgmt)} className="text-xs text-gray-400 hover:text-gray-600">Manage Carriers</button>
           </div>
           {showCarrierMgmt && (
             <div className="bg-white rounded-lg border border-gray-200 p-3 mt-2 space-y-2">
