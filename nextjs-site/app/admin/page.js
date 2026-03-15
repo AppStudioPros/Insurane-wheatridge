@@ -1476,9 +1476,22 @@ export default function AdminPage() {
     e.preventDefault()
     if (!pw.trim()) return
     setPwErr(''); setLoading(true)
-    const ok = await fetchData(pw)
-    if (ok) { sessionStorage.setItem(SESSION_KEY, pw); setToken(pw) }
-    else { setPwErr('Incorrect password.'); setLoading(false) }
+    try {
+      const res = await fetch('/api/admin/data', { headers: { Authorization: `Bearer ${pw}` } })
+      if (res.ok) {
+        const d = await res.json()
+        sessionStorage.setItem(SESSION_KEY, pw)
+        setToken(pw)
+        setData(d)
+        setLoading(false)
+      } else {
+        setPwErr('Incorrect password.')
+        setLoading(false)
+      }
+    } catch {
+      setPwErr('Connection error. Please try again.')
+      setLoading(false)
+    }
   }
 
   const logout = () => { sessionStorage.removeItem(SESSION_KEY); setToken(null); setData(null) }
