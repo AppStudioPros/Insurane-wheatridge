@@ -1460,17 +1460,23 @@ export default function AdminPage() {
 
   useEffect(() => {
     const saved = sessionStorage.getItem(SESSION_KEY)
-    if (saved) setToken(saved)
+    if (saved && !token) setToken(saved)
   }, [])
 
   const fetchData = useCallback(async (t) => {
     setLoading(true)
-    const res = await fetch('/api/admin/data', { headers: { Authorization: `Bearer ${t}` } })
-    if (res.ok) { setData(await res.json()); setLoading(false); return true }
-    sessionStorage.removeItem(SESSION_KEY); setToken(null); setLoading(false); return false
+    try {
+      const res = await fetch('/api/admin/data', { headers: { Authorization: `Bearer ${t}` } })
+      if (res.ok) { setData(await res.json()); setLoading(false); return true }
+      setLoading(false)
+      return false
+    } catch {
+      setLoading(false)
+      return false
+    }
   }, [])
 
-  useEffect(() => { if (token) fetchData(token) }, [token, fetchData])
+  useEffect(() => { if (token && !data) fetchData(token) }, [token, data, fetchData])
 
   const login = async (e) => {
     e.preventDefault()
@@ -1481,10 +1487,12 @@ export default function AdminPage() {
       if (res.ok) {
         const d = await res.json()
         sessionStorage.setItem(SESSION_KEY, pw)
-        setToken(pw)
+        // Set data first, then token — avoids useEffect re-fetch race
         setData(d)
+        setToken(pw)
         setLoading(false)
       } else {
+        sessionStorage.removeItem(SESSION_KEY)
         setPwErr('Incorrect password.')
         setLoading(false)
       }
