@@ -221,7 +221,7 @@ export default function HomePage() {
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 max-w-6xl mx-auto">
             {[
-              { number: 2, suffix: '+', label: 'Years of Service', icon: Award },
+              { number: 5, suffix: '+', label: 'Years of Service', icon: Award },
               { number: 500, suffix: '+', label: 'Clients Protected', icon: Users },
               { number: 98, suffix: '%', label: 'Customer Satisfaction', icon: TrendingUp },
               { number: 24, suffix: '/7', label: 'Claim Support', icon: Zap }
