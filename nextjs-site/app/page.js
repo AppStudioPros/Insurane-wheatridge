@@ -112,7 +112,7 @@ export default function HomePage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
               >
-                🏆 Trusted by Wheat Ridge Families Since 2022
+                🏆 Trusted by Wheat Ridge Families Since 2019
               </motion.div>
               
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-8 leading-tight">
@@ -505,7 +505,7 @@ export default function HomePage() {
               <AccordionItem value="item-1" className="bg-white px-6 rounded-lg">
                 <AccordionTrigger className="text-lg font-semibold">What products do you offer?</AccordionTrigger>
                 <AccordionContent className="text-gray-600">
-                  I offer the following products: Auto insurance, Home insurance, Business insurance, Motorcycle insurance, Recreational insurance, Renters insurance, Umbrella insurance, Term Life insurance, and Whole Life insurance.
+                  I offer the following products: Auto, Home, Renters, Motorcycle, Recreational, and Umbrella insurance. Business Insurance including BOP, Commercial General Liability, Commercial Auto, and Workers Compensation. Life Insurance including Term Life, Universal Life, and Juvenile Life.
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="item-2" className="bg-white px-6 rounded-lg">
@@ -517,7 +517,7 @@ export default function HomePage() {
               <AccordionItem value="item-3" className="bg-white px-6 rounded-lg">
                 <AccordionTrigger className="text-lg font-semibold">What neighborhoods do you serve?</AccordionTrigger>
                 <AccordionContent className="text-gray-600">
-                  I serve the following neighborhoods: Jefferson County, Denver County, Larimer County, Gilbert County, and Broomfield County.
+                  I serve the following areas: Jefferson County, Denver County, Larimer County, Gilpin County, Broomfield County, Boulder County, Clear Creek County, Weld County, and Douglas County.
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="item-4" className="bg-white px-6 rounded-lg">

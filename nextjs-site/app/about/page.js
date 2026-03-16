@@ -8,7 +8,7 @@ import { GraduationCap, Award, MapPin, Phone } from 'lucide-react'
 
 export const metadata = {
   title: 'About Jubal Terry | Farmers Insurance Agent in Wheat Ridge, CO',
-  description: 'Meet Jubal Terry, your trusted Farmers Insurance agent in Wheat Ridge, CO. Over 2 years of experience providing personalized insurance solutions.',
+  description: 'Meet Jubal Terry, your trusted Farmers Insurance agent in Wheat Ridge, CO. Over 5 years of experience providing personalized insurance solutions.',
 }
 
 export default function AboutPage() {
@@ -48,7 +48,7 @@ export default function AboutPage() {
                 As your local Farmers® insurance agent in Wheat Ridge CO, at 4251 Kipling St #165, I help customers like you identify the insurance coverage that best fits your needs. This process is straightforward and personalized to help make you smarter about insurance.
               </p>
               <p className="text-lg text-gray-700 mb-6 leading-relaxed">
-                I have over two years of knowledge and experience to help you better understand your coverage options—whether that's auto, home, renters, business insurance, and more. We are just south of Winchell's Donut Shop on Kipling Street.
+                I have over five years of knowledge and experience to help you better understand your coverage options—whether that's auto, home, renters, business insurance, and more. We are just south of Winchell's Donut Shop on Kipling Street.
               </p>
               <p className="text-lg text-gray-700 mb-8 leading-relaxed">
                 Give me a call at (303) 464-1911 and I'll be happy to answer any questions you might have.
@@ -80,12 +80,12 @@ export default function AboutPage() {
               <div className="bg-white p-4 md:p-8 rounded-lg shadow-md">
                 <Award className="text-primary mb-4" size={40} />
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Years with Farmers</h3>
-                <p className="text-gray-700">Over 2 years</p>
+                <p className="text-gray-700">5+ years</p>
               </div>
               <div className="bg-white p-4 md:p-8 rounded-lg shadow-md">
                 <GraduationCap className="text-primary mb-4" size={40} />
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Education</h3>
-                <p className="text-gray-700">Geology, Wheat Ridge High School</p>
+                <p className="text-gray-700">Geology — Western Colorado University, Insurance University of Farmers, Wheat Ridge High School</p>
               </div>
               <div className="bg-white p-4 md:p-8 rounded-lg shadow-md">
                 <MapPin className="text-primary mb-4" size={40} />
