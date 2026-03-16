@@ -11,7 +11,7 @@ export default function Footer() {
             <p className="text-gray-400 mb-2">Jubal Terry</p>
             <p className="text-gray-400 mb-2">Farmers Insurance Agent</p>
             <p className="text-gray-400 text-sm">License #653703</p>
-            <p className="text-gray-400 text-sm mt-4">Over 2 years with Farmers Insurance</p>
+            <p className="text-gray-400 text-sm mt-4">5+ years with Farmers Insurance</p>
           </div>
           
           <div>
@@ -60,7 +60,7 @@ export default function Footer() {
             </div>
             <div className="mt-4">
               <h4 className="font-semibold mb-2">Service Areas</h4>
-              <p className="text-sm text-gray-400">Jefferson County, Denver County, Larimer County, Gilbert County, Broomfield County</p>
+              <p className="text-sm text-gray-400">Jefferson County, Denver County, Larimer County, Gilpin County, Broomfield County, Boulder County, Clear Creek County, Weld County, Douglas County</p>
             </div>
           </div>
         </div>

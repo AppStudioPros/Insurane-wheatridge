@@ -123,8 +123,12 @@ export default function AboutPage() {
                   'Jefferson County',
                   'Denver County',
                   'Larimer County',
-                  'Gilbert County',
-                  'Broomfield County'
+                  'Gilpin County',
+                  'Broomfield County',
+                  'Boulder County',
+                  'Clear Creek County',
+                  'Weld County',
+                  'Douglas County'
                 ].map((area) => (
                   <div key={area} className="flex items-center space-x-3">
                     <MapPin className="text-primary flex-shrink-0" size={24} />
