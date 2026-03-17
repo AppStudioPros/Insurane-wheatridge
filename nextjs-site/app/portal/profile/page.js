@@ -1,7 +1,19 @@
 'use client'
 import { useState, useEffect } from 'react'
 import PortalLayout, { usePortalAuth } from '@/components/portal-layout'
-import { Save, Lock } from 'lucide-react'
+import { Save, Lock, Eye, EyeOff } from 'lucide-react'
+
+function PasswordInput({ value, onChange, className, ...props }) {
+  const [show, setShow] = useState(false)
+  return (
+    <div className="relative">
+      <input type={show ? 'text' : 'password'} value={value} onChange={onChange} className={className} {...props} />
+      <button type="button" onClick={() => setShow(!show)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+        {show ? <EyeOff size={16} /> : <Eye size={16} />}
+      </button>
+    </div>
+  )
+}
 
 export default function ProfilePage() {
   const { client, ready, logout, authFetch } = usePortalAuth()
@@ -33,7 +45,6 @@ export default function ProfilePage() {
     if (res?.ok) {
       const d = await res.json()
       setProfile(d)
-      // Update sessionStorage
       const c = JSON.parse(sessionStorage.getItem('portal_client') || '{}')
       sessionStorage.setItem('portal_client', JSON.stringify({ ...c, first_name: d.first_name, last_name: d.last_name }))
       setMsg('Profile updated successfully.')
@@ -117,15 +128,15 @@ export default function ProfilePage() {
             <h3 className="font-semibold text-gray-900 flex items-center gap-2"><Lock size={16} /> Change Password</h3>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
-              <input type="password" value={pwForm.current_password} onChange={e => setPwForm({...pwForm, current_password: e.target.value})} className={inputCls} required />
+              <PasswordInput value={pwForm.current_password} onChange={e => setPwForm({...pwForm, current_password: e.target.value})} className={inputCls + ' pr-10'} required />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
-              <input type="password" value={pwForm.new_password} onChange={e => setPwForm({...pwForm, new_password: e.target.value})} className={inputCls} required />
+              <PasswordInput value={pwForm.new_password} onChange={e => setPwForm({...pwForm, new_password: e.target.value})} className={inputCls + ' pr-10'} required />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
-              <input type="password" value={pwForm.confirm} onChange={e => setPwForm({...pwForm, confirm: e.target.value})} className={inputCls} required />
+              <PasswordInput value={pwForm.confirm} onChange={e => setPwForm({...pwForm, confirm: e.target.value})} className={inputCls + ' pr-10'} required />
             </div>
             <button type="submit" disabled={saving} className="bg-[#0954a5] text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-[#073d7a] transition disabled:opacity-60 flex items-center gap-2">
               <Lock size={14} /> {saving ? 'Changing...' : 'Change Password'}
