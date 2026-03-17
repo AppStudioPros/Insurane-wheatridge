@@ -22,4 +22,4 @@
 </td></tr>
 </table>
 </td></tr></table>
-</body></html>`}}},76995:(e,t,r)=>{r.d(t,{O:()=>s});var n=r(37857);let a=null,s=new Proxy({},{get:(e,t)=>(...e)=>(a||(a=(0,n.eI)(process.env.SUPABASE_URL,process.env.SUPABASE_SERVICE_ROLE_KEY)),a)[t](...e)})}};var t=require("../../../../webpack-runtime.js");t.C(e);var r=e=>t(t.s=e),n=t.X(0,[8948,7572,2591],()=>r(88551));module.exports=n})();
+</body></html>`}}},76995:(e,t,r)=>{r.d(t,{O:()=>i,S:()=>s});var n=r(37857);let a=null;function s(){return a||(a=(0,n.eI)(process.env.SUPABASE_URL,process.env.SUPABASE_SERVICE_ROLE_KEY)),a}let i=new Proxy({},{get:(e,t)=>(...e)=>s()[t](...e)})}};var t=require("../../../../webpack-runtime.js");t.C(e);var r=e=>t(t.s=e),n=t.X(0,[8948,7572,2591],()=>r(88551));module.exports=n})();
