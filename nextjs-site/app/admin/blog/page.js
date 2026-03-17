@@ -34,6 +34,26 @@ function formatDate(d) {
   return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
+
+// Compress image before upload (Vercel has 4.5MB limit)
+async function compressImage(file, maxWidth = 1600, quality = 0.8) {
+  if (file.size < 1024 * 1024) return file // Skip if under 1MB
+  return new Promise((resolve) => {
+    const img = new window.Image()
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      let w = img.width, h = img.height
+      if (w > maxWidth) { h = (h * maxWidth) / w; w = maxWidth }
+      canvas.width = w; canvas.height = h
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h)
+      canvas.toBlob((blob) => {
+        resolve(new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' }))
+      }, 'image/jpeg', quality)
+    }
+    img.src = URL.createObjectURL(file)
+  })
+}
+
 export default function AdminBlog() {
   const [token, setToken] = useState('')
   const [authed, setAuthed] = useState(false)
@@ -72,8 +92,9 @@ export default function AdminBlog() {
   // Image upload
   const handleImageUpload = async (file) => {
     const t = sessionStorage.getItem('admin_token')
+    const compressed = await compressImage(file)
     const form = new FormData()
-    form.append('file', file)
+    form.append('file', compressed)
     try {
       const r = await fetch('/api/admin/blog-upload', {
         method: 'POST',
