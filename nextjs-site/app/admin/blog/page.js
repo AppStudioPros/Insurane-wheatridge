@@ -135,6 +135,7 @@ export default function AdminBlog() {
       ...current,
       status: status || current.status || 'draft',
       slug: current.slug || slugify(current.title || 'untitled'),
+      published_at: current.published_at || (status === 'published' ? new Date().toISOString() : null),
     }
     
     try {
@@ -149,6 +150,9 @@ export default function AdminBlog() {
         setCurrent(d)
         setMsg(status === 'published' ? 'Published!' : 'Saved as draft.')
         fetchPosts()
+        if (status === 'published') {
+          setTimeout(() => { setView('list'); setCurrent(null); setMsg('') }, 1000)
+        }
       } else {
         const err = await r.json()
         setMsg('Error: ' + (err.error || 'Failed to save'))
@@ -349,6 +353,11 @@ export default function AdminBlog() {
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">Author</label>
                   <input type="text" value={current.author} onChange={e => setCurrent({ ...current, author: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Publish Date</label>
+                  <input type="datetime-local" value={current.published_at ? new Date(current.published_at).toISOString().slice(0, 16) : ''} onChange={e => setCurrent({ ...current, published_at: e.target.value ? new Date(e.target.value).toISOString() : null })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                  <p className="text-[10px] text-gray-400 mt-0.5">Leave blank for current time on publish</p>
                 </div>
               </div>
 

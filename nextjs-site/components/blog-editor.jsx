@@ -69,7 +69,7 @@ function Toolbar({ editor, onImageUpload }) {
   const s = 15
 
   return (
-    <div className="border-b border-gray-200 p-2 flex flex-wrap gap-0.5 items-center bg-gray-50 rounded-t-lg sticky top-0 z-10">
+    <div className="border-b border-gray-200 p-2 flex flex-wrap gap-0.5 items-center bg-gray-50 rounded-t-lg sticky top-0 z-10 overflow-visible">
       <ToolbarButton onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive('bold')} title="Bold">
         <Bold size={s} />
       </ToolbarButton>
@@ -144,7 +144,7 @@ function Toolbar({ editor, onImageUpload }) {
         <button type="button" className="p-1.5 rounded hover:bg-gray-200 transition text-gray-600 flex items-center gap-1 text-xs font-medium" title="Insert Block">
           <Plus size={s} /> <span className="hidden sm:inline">Insert</span>
         </button>
-        <div className="absolute left-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-100 py-1 w-48 hidden group-hover:block z-20">
+        <div className="absolute right-0 bottom-full mb-1 bg-white rounded-lg shadow-lg border border-gray-100 py-1 w-52 hidden group-hover:block z-50">
           {BLOCK_TEMPLATES.map((block, i) => (
             <button
               key={i}
@@ -195,7 +195,7 @@ export default function BlogEditor({ content, onChange, onImageUpload }) {
   })
 
   return (
-    <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
+    <div className="border border-gray-200 rounded-lg bg-white overflow-visible relative">
       <Toolbar editor={editor} onImageUpload={onImageUpload} />
       <EditorContent editor={editor} />
     </div>
