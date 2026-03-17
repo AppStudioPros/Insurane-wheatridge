@@ -11,14 +11,21 @@ export default function Dashboard() {
   useEffect(() => {
     if (!ready) return
     Promise.all([
-      authFetch('/api/portal/policies').then(r => r?.json()),
-      authFetch('/api/portal/documents').then(r => r?.json()),
-      authFetch('/api/portal/messages').then(r => r?.json()),
-    ]).then(([policies, documents, messages]) => {
+      authFetch('/api/portal/policies').then(r => r?.json()).catch(() => []),
+      authFetch('/api/portal/documents').then(r => r?.json()).catch(() => []),
+      authFetch('/api/portal/messages').then(r => r?.json()).catch(() => []),
+      authFetch('/api/portal/id-cards').then(r => r?.json()).catch(() => []),
+    ]).then(([policies, documents, messages, idCards]) => {
+      const policyList = Array.isArray(policies) ? policies : []
+      const docList = Array.isArray(documents) ? documents : []
+      const msgList = Array.isArray(messages) ? messages : []
+      const cardList = Array.isArray(idCards) ? idCards : []
       setStats({
-        activePolicies: (policies ?? []).filter(p => p.status === 'active').length,
-        documents: (documents ?? []).length,
-        unreadMessages: (messages ?? []).filter(m => m.sender === 'agent' && !m.read).length,
+        activePolicies: policyList.filter(p => p.status === 'active').length,
+        totalPolicies: policyList.length,
+        documents: docList.length,
+        unreadMessages: msgList.filter(m => m.sender === 'agent' && !m.read).length,
+        idCards: cardList.length,
       })
       setLoading(false)
     })
@@ -27,10 +34,10 @@ export default function Dashboard() {
   if (!ready) return null
 
   const cards = [
-    { href: '/portal/policies', label: 'My Policies', icon: FileText, color: 'bg-blue-50 text-[#0954a5]', stat: stats?.activePolicies, statLabel: 'active' },
-    { href: '/portal/id-cards', label: 'ID Cards', icon: CreditCard, color: 'bg-green-50 text-green-700', stat: null, statLabel: '' },
-    { href: '/portal/documents', label: 'Documents', icon: Upload, color: 'bg-purple-50 text-purple-700', stat: stats?.documents, statLabel: 'uploaded' },
-    { href: '/portal/messages', label: 'Messages', icon: MessageSquare, color: 'bg-orange-50 text-orange-700', stat: stats?.unreadMessages, statLabel: 'unread' },
+    { href: '/portal/policies', label: 'My Policies', icon: FileText, color: 'bg-blue-50 text-[#0954a5]', stat: stats ? (stats.activePolicies || stats.totalPolicies) : null, statLabel: stats?.activePolicies ? 'active' : 'total' },
+    { href: '/portal/id-cards', label: 'ID Cards', icon: CreditCard, color: 'bg-green-50 text-green-700', stat: stats?.idCards ?? null, statLabel: 'on file' },
+    { href: '/portal/documents', label: 'Documents', icon: Upload, color: 'bg-purple-50 text-purple-700', stat: stats?.documents ?? null, statLabel: 'uploaded' },
+    { href: '/portal/messages', label: 'Messages', icon: MessageSquare, color: 'bg-orange-50 text-orange-700', stat: stats?.unreadMessages ?? null, statLabel: 'unread' },
     { href: '/portal/profile', label: 'My Profile', icon: User, color: 'bg-gray-50 text-gray-700', stat: null, statLabel: '' },
   ]
 
@@ -62,7 +69,7 @@ export default function Dashboard() {
                   <h3 className="font-semibold text-gray-900 group-hover:text-[#0954a5] transition">
                     {card.label}
                   </h3>
-                  {card.stat !== null && (
+                  {card.stat !== null && card.stat !== undefined && (
                     <p className="text-sm text-gray-500 mt-1">
                       {card.stat} {card.statLabel}
                     </p>
@@ -78,7 +85,7 @@ export default function Dashboard() {
           <div>
             <h3 className="font-semibold text-gray-900">Need help?</h3>
             <p className="text-sm text-gray-600 mt-1">
-              Send us a message through the Messages section or call us at (303) 422-3535.
+              Send us a message through the Messages section or call us at (303) 464-1911.
             </p>
           </div>
         </div>
