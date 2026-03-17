@@ -80,20 +80,27 @@ export default function AdminBlog() {
         headers: { Authorization: `Bearer ${t}` },
         body: form,
       })
-      if (r.ok) {
-        const d = await r.json()
+      const d = await r.json()
+      if (r.ok && d.url) {
         return d.url
+      } else {
+        setMsg('Image upload failed: ' + (d.error || 'Unknown error'))
       }
-    } catch (e) {}
+    } catch (e) {
+      setMsg('Image upload failed: ' + e.message)
+    }
     return null
   }
 
   // Featured image upload
+  const [uploadingFeatured, setUploadingFeatured] = useState(false)
   const handleFeaturedImage = async (e) => {
     const file = e.target.files?.[0]
     if (!file) return
+    setUploadingFeatured(true)
     const url = await handleImageUpload(file)
     if (url) setCurrent(c => ({ ...c, featured_image: url }))
+    setUploadingFeatured(false)
     e.target.value = ''
   }
 
@@ -295,8 +302,8 @@ export default function AdminBlog() {
                 ) : (
                   <label className="block border-2 border-dashed border-gray-200 rounded-lg p-6 text-center cursor-pointer hover:border-[#0954a5] transition">
                     <ImageIcon size={24} className="mx-auto text-gray-400 mb-2" />
-                    <span className="text-sm text-gray-500">Click to upload</span>
-                    <input type="file" accept="image/*" className="hidden" onChange={handleFeaturedImage} />
+                    <span className="text-sm text-gray-500">{uploadingFeatured ? 'Uploading...' : 'Click to upload'}</span>
+                    <input type="file" accept="image/*" className="hidden" onChange={handleFeaturedImage} disabled={uploadingFeatured} />
                   </label>
                 )}
               </div>
