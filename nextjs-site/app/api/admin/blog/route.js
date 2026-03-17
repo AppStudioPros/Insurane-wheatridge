@@ -17,7 +17,7 @@ export async function GET(request) {
   
   const { data, error } = await supabaseGet('blog_posts', {
     order: 'created_at.desc',
-    select: 'id,title,slug,excerpt,featured_image,category,tags,status,author,template,created_at,updated_at,published_at',
+    select: '*',
   })
   
   if (error) return Response.json({ error: error.message }, { status: 500 })

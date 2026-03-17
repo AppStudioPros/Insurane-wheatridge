@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST='{"app/admin/blog/page.js -> @/components/blog-editor":{"id":8964,"files":["static/chunks/70e0d97a.0728d543054cf242.js","static/chunks/54a60aa6.8be833ee5e67ba69.js","static/chunks/273.734d4fddf17cd737.js","static/chunks/964.2cedb649444eed3d.js"]}}';
+self.__REACT_LOADABLE_MANIFEST='{"app/admin/blog/page.js -> @/components/blog-editor":{"id":8964,"files":["static/chunks/70e0d97a.0728d543054cf242.js","static/chunks/54a60aa6.8be833ee5e67ba69.js","static/chunks/273.734d4fddf17cd737.js","static/chunks/964.58fcdc8667fa56de.js"]}}';

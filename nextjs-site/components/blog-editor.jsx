@@ -7,7 +7,7 @@ import TextAlign from '@tiptap/extension-text-align'
 import Underline from '@tiptap/extension-underline'
 import Placeholder from '@tiptap/extension-placeholder'
 import Youtube from '@tiptap/extension-youtube'
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
 import {
   Bold, Italic, Underline as UnderlineIcon, Strikethrough,
   Heading1, Heading2, Heading3, List, ListOrdered,
@@ -193,6 +193,13 @@ export default function BlogEditor({ content, onChange, onImageUpload }) {
       },
     },
   })
+
+  // Sync content when editing an existing post
+  useEffect(() => {
+    if (editor && content && editor.getHTML() !== content && !editor.isFocused) {
+      editor.commands.setContent(content)
+    }
+  }, [content, editor])
 
   return (
     <div className="border border-gray-200 rounded-lg bg-white overflow-visible relative">
