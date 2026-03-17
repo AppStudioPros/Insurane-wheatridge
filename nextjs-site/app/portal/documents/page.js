@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import PortalLayout, { usePortalAuth } from '@/components/portal-layout'
-import { Upload, FileText, Image, Eye, Plus, X } from 'lucide-react'
+import { Upload, FileText, Image, Eye, Plus, X, Download } from 'lucide-react'
 
 const CATEGORIES = [
   { value: 'id', label: 'ID' },
@@ -12,7 +12,57 @@ const CATEGORIES = [
 ]
 
 function formatDate(d) {
+  return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+}
+function formatShortDate(d) {
   return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
+
+function DocModal({ doc, onClose }) {
+  if (!doc) return null
+  const isImage = doc.file_type === 'image' || /\.(jpg|jpeg|png|gif|webp)$/i.test(doc.file_name || '')
+  return (
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="bg-white rounded-xl max-w-lg w-full max-h-[85vh] overflow-auto" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between p-4 border-b border-gray-100">
+          <h3 className="font-semibold text-gray-900">Document Details</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600"><X size={18} /></button>
+        </div>
+        <div className="p-4 space-y-3">
+          <div className="grid grid-cols-2 gap-3 text-sm">
+            <div><span className="text-xs text-gray-500">File Name</span><p className="font-medium truncate">{doc.file_name}</p></div>
+            <div><span className="text-xs text-gray-500">File Type</span><p className="font-medium uppercase">{doc.file_type || '—'}</p></div>
+            <div><span className="text-xs text-gray-500">Category</span><p className="font-medium capitalize">{(doc.category || 'other').replace(/_/g, ' ')}</p></div>
+            <div><span className="text-xs text-gray-500">Uploaded</span><p className="font-medium">{formatDate(doc.created_at)} by {doc.uploaded_by}</p></div>
+          </div>
+          {doc.notes && <div><span className="text-xs text-gray-500">Notes</span><p className="text-sm mt-1">{doc.notes}</p></div>}
+          {doc.file_url && isImage && (
+            <div className="border border-gray-100 rounded-lg overflow-hidden">
+              <img src={doc.file_url} alt={doc.file_name} className="w-full max-h-64 object-contain bg-gray-50" />
+            </div>
+          )}
+          {doc.file_url && !isImage && (
+            <div className="bg-gray-50 rounded-lg p-4 text-center text-sm text-gray-500">
+              <FileText size={24} className="mx-auto mb-2 text-red-400" />
+              PDF Document — use Download or View to open
+            </div>
+          )}
+          <div className="flex gap-2 pt-2 border-t border-gray-100">
+            {doc.file_url && (
+              <>
+                <a href={doc.file_url} download={doc.file_name} className="bg-[#0954a5] text-white px-4 py-2 rounded-lg text-sm flex items-center gap-1 hover:bg-[#073d7a] transition">
+                  <Download size={14} /> Download
+                </a>
+                <a href={doc.file_url} target="_blank" rel="noopener noreferrer" className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm flex items-center gap-1 hover:bg-gray-200 transition">
+                  <Eye size={14} /> View
+                </a>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export default function DocumentsPage() {
@@ -24,7 +74,7 @@ export default function DocumentsPage() {
   const [category, setCategory] = useState('other')
   const [notes, setNotes] = useState('')
   const [file, setFile] = useState(null)
-  const [preview, setPreview] = useState(null)
+  const [selectedDoc, setSelectedDoc] = useState(null)
 
   const fetchDocs = async () => {
     const t = sessionStorage.getItem('portal_token')
@@ -131,7 +181,11 @@ export default function DocumentsPage() {
       ) : (
         <div className="space-y-3">
           {docs.map(doc => (
-            <div key={doc.id} className="bg-white rounded-xl border border-gray-100 p-4 flex items-center gap-4">
+            <button
+              key={doc.id}
+              onClick={() => setSelectedDoc(doc)}
+              className="w-full bg-white rounded-xl border border-gray-100 p-4 flex items-center gap-4 text-left hover:shadow-md transition"
+            >
               <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
                 doc.file_type === 'pdf' ? 'bg-red-50 text-red-600' : 'bg-purple-50 text-purple-600'
               }`}>
@@ -140,27 +194,17 @@ export default function DocumentsPage() {
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-gray-900 text-sm truncate">{doc.file_name}</p>
                 <p className="text-xs text-gray-500">
-                  {CATEGORIES.find(c => c.value === doc.category)?.label || doc.category} | {formatDate(doc.created_at)} | by {doc.uploaded_by}
+                  {CATEGORIES.find(c => c.value === doc.category)?.label || doc.category} | {formatShortDate(doc.created_at)} | by {doc.uploaded_by}
                 </p>
                 {doc.notes && <p className="text-xs text-gray-400 mt-0.5">{doc.notes}</p>}
               </div>
-              {doc.file_url && (
-                <a href={doc.file_url} target="_blank" rel="noopener noreferrer" className="text-[#0954a5] hover:text-[#073d7a]">
-                  <Eye size={18} />
-                </a>
-              )}
-            </div>
+              <Eye size={18} className="text-[#0954a5] shrink-0" />
+            </button>
           ))}
         </div>
       )}
 
-      {preview && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setPreview(null)}>
-          <div className="bg-white rounded-xl max-w-2xl max-h-[80vh] overflow-auto p-4">
-            <img src={preview} alt="Document preview" className="max-w-full" />
-          </div>
-        </div>
-      )}
+      <DocModal doc={selectedDoc} onClose={() => setSelectedDoc(null)} />
     </PortalLayout>
   )
 }

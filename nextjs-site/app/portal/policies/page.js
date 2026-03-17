@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import PortalLayout, { usePortalAuth } from '@/components/portal-layout'
-import { Car, Home, Heart, Briefcase, Building, ChevronDown, ChevronUp } from 'lucide-react'
+import { Car, Home, Heart, Briefcase, Building, ChevronDown, ChevronUp, FileText, Image, Eye, Download, X } from 'lucide-react'
 
 const TYPE_ICONS = { auto: Car, home: Home, life: Heart, business: Briefcase, renters: Building, condo: Building }
 const STATUS_COLORS = { active: 'bg-green-100 text-green-700', expired: 'bg-gray-100 text-gray-600', cancelled: 'bg-red-100 text-red-700' }
@@ -10,12 +10,66 @@ function formatDate(d) {
   if (!d) return '—'
   return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
+function formatFullDate(d) {
+  if (!d) return '—'
+  return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+}
+
+function DocModal({ doc, onClose }) {
+  if (!doc) return null
+  const isImage = doc.file_type === 'image' || /\.(jpg|jpeg|png|gif|webp)$/i.test(doc.file_name || doc.name || '')
+  const fileName = doc.file_name || doc.name || 'Document'
+  const fileUrl = doc.file_url || doc.url
+  return (
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="bg-white rounded-xl max-w-lg w-full max-h-[85vh] overflow-auto" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between p-4 border-b border-gray-100">
+          <h3 className="font-semibold text-gray-900">Document Details</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600"><X size={18} /></button>
+        </div>
+        <div className="p-4 space-y-3">
+          <div className="grid grid-cols-2 gap-3 text-sm">
+            <div><span className="text-xs text-gray-500">File Name</span><p className="font-medium truncate">{fileName}</p></div>
+            <div><span className="text-xs text-gray-500">File Type</span><p className="font-medium uppercase">{doc.file_type || doc.type || '—'}</p></div>
+            {doc.category && <div><span className="text-xs text-gray-500">Category</span><p className="font-medium capitalize">{doc.category.replace(/_/g, ' ')}</p></div>}
+            {doc.created_at && <div><span className="text-xs text-gray-500">Uploaded</span><p className="font-medium">{formatFullDate(doc.created_at)}{doc.uploaded_by ? ` by ${doc.uploaded_by}` : ''}</p></div>}
+          </div>
+          {doc.notes && <div><span className="text-xs text-gray-500">Notes</span><p className="text-sm mt-1">{doc.notes}</p></div>}
+          {fileUrl && isImage && (
+            <div className="border border-gray-100 rounded-lg overflow-hidden">
+              <img src={fileUrl} alt={fileName} className="w-full max-h-64 object-contain bg-gray-50" />
+            </div>
+          )}
+          {fileUrl && !isImage && (
+            <div className="bg-gray-50 rounded-lg p-4 text-center text-sm text-gray-500">
+              <FileText size={24} className="mx-auto mb-2 text-red-400" />
+              PDF Document — use Download or View to open
+            </div>
+          )}
+          <div className="flex gap-2 pt-2 border-t border-gray-100">
+            {fileUrl && (
+              <>
+                <a href={fileUrl} download={fileName} className="bg-[#0954a5] text-white px-4 py-2 rounded-lg text-sm flex items-center gap-1 hover:bg-[#073d7a] transition">
+                  <Download size={14} /> Download
+                </a>
+                <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm flex items-center gap-1 hover:bg-gray-200 transition">
+                  <Eye size={14} /> View
+                </a>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function PoliciesPage() {
   const { client, ready, logout, authFetch } = usePortalAuth()
   const [policies, setPolicies] = useState([])
   const [loading, setLoading] = useState(true)
   const [expanded, setExpanded] = useState(null)
+  const [selectedDoc, setSelectedDoc] = useState(null)
 
   const fetchPolicies = async () => {
     const t = sessionStorage.getItem('portal_token')
@@ -78,13 +132,11 @@ export default function PoliciesPage() {
                 </button>
                 {isOpen && (
                   <div className="px-4 pb-4 border-t border-gray-100">
-                    {/* Mobile-only date/premium */}
                     <div className="sm:hidden mb-3 pt-3">
                       {p.premium_amount && <p className="font-semibold text-gray-900">${Number(p.premium_amount).toLocaleString()}/yr</p>}
                       <p className="text-xs text-gray-400">{formatDate(p.start_date)} - {formatDate(p.end_date)}</p>
                     </div>
 
-                    {/* Policy Details Grid */}
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4 mb-4">
                       <div>
                         <p className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mb-0.5">Policy Number</p>
@@ -114,7 +166,6 @@ export default function PoliciesPage() {
                       )}
                     </div>
 
-                    {/* Coverage Summary */}
                     {(() => {
                       const cs = p.coverage_summary
                         ? (typeof p.coverage_summary === 'string'
@@ -152,18 +203,24 @@ export default function PoliciesPage() {
                       )
                     })()}
 
-                    {/* Policy Documents */}
                     {p.documents && p.documents.length > 0 && (
                       <div className="mt-4">
                         <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Policy Documents</h4>
                         <div className="space-y-2">
-                          {p.documents.map(doc => (
-                            <a key={doc.id} href={doc.url} target="_blank" rel="noopener noreferrer"
-                              className="flex items-center gap-2 text-sm text-[#0954a5] hover:text-blue-700 bg-blue-50 rounded-lg px-3 py-2 transition hover:bg-blue-100">
-                              <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                              {doc.name || 'Policy Document'}
-                            </a>
-                          ))}
+                          {p.documents.map(doc => {
+                            const isImage = doc.type === 'image' || /\.(jpg|jpeg|png|gif|webp)$/i.test(doc.name || '')
+                            return (
+                              <button
+                                key={doc.id}
+                                onClick={() => setSelectedDoc(doc)}
+                                className="w-full flex items-center gap-2 text-sm text-[#0954a5] hover:text-blue-700 bg-blue-50 rounded-lg px-3 py-2 transition hover:bg-blue-100 text-left"
+                              >
+                                {isImage ? <Image size={16} className="shrink-0" /> : <FileText size={16} className="shrink-0" />}
+                                <span className="truncate">{doc.name || 'Policy Document'}</span>
+                                <Eye size={14} className="shrink-0 ml-auto opacity-60" />
+                              </button>
+                            )
+                          })}
                         </div>
                       </div>
                     )}
@@ -178,6 +235,8 @@ export default function PoliciesPage() {
           })}
         </div>
       )}
+
+      <DocModal doc={selectedDoc} onClose={() => setSelectedDoc(null)} />
     </PortalLayout>
   )
 }
