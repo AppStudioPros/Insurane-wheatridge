@@ -21,7 +21,7 @@ export async function POST(request) {
     }
 
     await getResend().emails.send({
-      from: 'Insurance Wheatridge <noreply@mail.insurancewheatridge.com>',
+      from: 'Insurance Wheat Ridge <noreply@mail.insurancewheatridge.com>',
       to: ['jubal.terry@insurancewheatridge.com'],
       subject: `🎯 New Lead: ${firstName} is interested in a quote`,
       html: `

@@ -70,14 +70,14 @@ export default function InstallPrompt() {
         <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 16 }}>
           <img
             src="/icons/icon-192x192.png"
-            alt="Insurance Wheatridge"
+            alt="Insurance Wheat Ridge"
             width={56}
             height={56}
             style={{ borderRadius: 12, flexShrink: 0 }}
           />
           <div>
             <div style={{ fontSize: 17, fontWeight: 700, color: "#1a1a2e", marginBottom: 2 }}>
-              Insurance Wheatridge
+              Insurance Wheat Ridge
             </div>
             <div style={{ fontSize: 13, color: "#666" }}>
               Add to your home screen for quick access

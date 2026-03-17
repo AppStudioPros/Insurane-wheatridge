@@ -31,7 +31,7 @@ export async function POST(req) {
     }
 
     const { error } = await getResend().emails.send({
-      from: 'Insurance Wheatridge <noreply@mail.insurancewheatridge.com>',
+      from: 'Insurance Wheat Ridge <noreply@mail.insurancewheatridge.com>',
       to: ['jterry1@farmersagent.com'],
       replyTo: email,
       subject: `New Farmers Quote Request — ${name}`,
@@ -67,7 +67,7 @@ export async function POST(req) {
             </tr>` : ''}
           </table>
           <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
-          <p style="color: #9ca3af; font-size: 12px; margin: 0;">Jubal Terry — Insurance Wheatridge · (303) 464-1911</p>
+          <p style="color: #9ca3af; font-size: 12px; margin: 0;">Jubal Terry — Insurance Wheat Ridge · (303) 464-1911</p>
         </div>
       `,
     });

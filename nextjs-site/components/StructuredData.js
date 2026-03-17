@@ -3,7 +3,7 @@ export default function StructuredData() {
     "@context": "https://schema.org",
     "@type": "InsuranceAgency",
     "name": "Insurance Wheat Ridge - Jubal Terry, Farmers Insurance Agent",
-    "alternateName": "Insurance Wheatridge",
+    "alternateName": "Insurance Wheat Ridge",
     "image": "https://www.insurancewheatridge.com/images/Jubal%20Terry%202025%20NMP-7.jpg",
     "logo": "https://www.insurancewheatridge.com/images/Jubal%20Terry%202025%20NMP-2.jpg",
     "@id": "https://www.insurancewheatridge.com",
