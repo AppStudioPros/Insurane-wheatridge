@@ -1596,8 +1596,15 @@ export default function AdminPage() {
             { key: 'leads', label: 'Leads', icon: Users, count: leads.length },
             { key: 'clients', label: 'Clients', icon: Users, count: null },
             { key: 'analytics', label: 'Analytics', icon: BarChart3, count: null },
+            { key: 'blog', label: 'Blog', icon: FileText, count: null, href: '/admin/blog' },
           ].map(t => {
             const Icon = t.icon
+            if (t.href) return (
+              <a key={t.key} href={t.href}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition bg-white text-gray-600 border border-gray-200 hover:border-blue-300">
+                <Icon size={15} /> {t.label}
+              </a>
+            )
             return (
               <button key={t.key} onClick={() => { setTab(t.key); setSelectedClient(null) }}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition ${

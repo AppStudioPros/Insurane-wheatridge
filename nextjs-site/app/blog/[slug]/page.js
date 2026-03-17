@@ -4,28 +4,61 @@ import Link from 'next/link'
 import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
 import { blogPosts } from '@/lib/blog-posts'
+import { supabaseGet } from '@/lib/supabase-rest'
 import { Calendar, Clock, User, ArrowLeft, Phone, Mail } from 'lucide-react'
+
+export const dynamic = "force-dynamic"
 
 export async function generateStaticParams() {
   return blogPosts.map(post => ({ slug: post.slug }))
 }
 
-export async function generateMetadata({ params }) {
-  const post = blogPosts.find(p => p.slug === params.slug)
-  if (!post) return {}
-  return {
-    title: post.title,
-    description: post.excerpt,
-    authors: [{ name: post.author }],
-    openGraph: {
-      title: post.title,
-      description: post.excerpt,
-      type: 'article',
-      publishedTime: post.date,
-      authors: [post.author],
-      images: [{ url: post.image }],
-    },
+async function getCmsPost(slug) {
+  try {
+    const { data } = await supabaseGet('blog_posts', {
+      slug: `eq.${slug}`,
+      status: 'eq.published',
+      limit: '1',
+    })
+    return data?.[0] || null
+  } catch {
+    return null
   }
+}
+
+async function getCmsPosts() {
+  try {
+    const { data } = await supabaseGet('blog_posts', {
+      status: 'eq.published',
+      order: 'published_at.desc',
+      select: 'id,title,slug,excerpt,featured_image,category,author,published_at',
+    })
+    return data ?? []
+  } catch {
+    return []
+  }
+}
+
+export async function generateMetadata({ params }) {
+  const staticPost = blogPosts.find(p => p.slug === params.slug)
+  if (staticPost) {
+    return {
+      title: staticPost.title,
+      description: staticPost.excerpt,
+      authors: [{ name: staticPost.author }],
+      openGraph: { title: staticPost.title, description: staticPost.excerpt, type: 'article', publishedTime: staticPost.date, authors: [staticPost.author], images: [{ url: staticPost.image }] },
+    }
+  }
+  const cmsPost = await getCmsPost(params.slug)
+  if (cmsPost) {
+    return {
+      title: cmsPost.meta_title || cmsPost.title,
+      description: cmsPost.meta_description || cmsPost.excerpt,
+      authors: [{ name: cmsPost.author }],
+      openGraph: { title: cmsPost.meta_title || cmsPost.title, description: cmsPost.meta_description || cmsPost.excerpt, type: 'article', publishedTime: cmsPost.published_at, images: cmsPost.featured_image ? [{ url: cmsPost.featured_image }] : [] },
+    }
+  }
+  return {}
 }
 
 function renderContent(content) {
@@ -68,25 +101,17 @@ function renderContent(content) {
         <div key={i} className="bg-blue-50 border border-blue-200 rounded-xl p-6 mt-8 mb-6">
           <p className="text-lg font-semibold text-gray-900 mb-3">Ready to talk?</p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <a href="tel:3034641911" className="flex items-center gap-2 bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-800 transition">
-              <Phone size={18} />(303) 464-1911
-            </a>
-            <a href="mailto:info@insurancewheatridge.com" className="flex items-center gap-2 bg-white text-blue-700 border border-blue-300 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition">
-              <Mail size={18} />info@insurancewheatridge.com
-            </a>
+            <a href="tel:3034641911" className="flex items-center gap-2 bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-800 transition"><Phone size={18} />(303) 464-1911</a>
+            <a href="mailto:info@insurancewheatridge.com" className="flex items-center gap-2 bg-white text-blue-700 border border-blue-300 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition"><Mail size={18} />info@insurancewheatridge.com</a>
           </div>
         </div>
       )
     } else if (line.trim() === '') {
-      // skip empty lines
+      // skip
     } else {
       const parts = line.split(/\*\*/g)
       if (parts.length > 1) {
-        elements.push(
-          <p key={i} className="text-gray-700 leading-relaxed mb-4">
-            {parts.map((part, j) => j % 2 === 1 ? <strong key={j}>{part}</strong> : part)}
-          </p>
-        )
+        elements.push(<p key={i} className="text-gray-700 leading-relaxed mb-4">{parts.map((part, j) => j % 2 === 1 ? <strong key={j}>{part}</strong> : part)}</p>)
       } else {
         elements.push(<p key={i} className="text-gray-700 leading-relaxed mb-4">{line}</p>)
       }
@@ -96,23 +121,34 @@ function renderContent(content) {
   return elements
 }
 
-export default function BlogPost({ params }) {
-  const post = blogPosts.find(p => p.slug === params.slug)
-  if (!post) notFound()
+export default async function BlogPost({ params }) {
+  // Try static first, then CMS
+  const staticPost = blogPosts.find(p => p.slug === params.slug)
+  const cmsPost = staticPost ? null : await getCmsPost(params.slug)
+  
+  if (!staticPost && !cmsPost) notFound()
 
-  const postIndex = blogPosts.indexOf(post)
-  const relatedPosts = blogPosts.filter((_, i) => i !== postIndex).slice(0, 2)
+  const isStatic = !!staticPost
+  const post = staticPost || cmsPost
+
+  // Related posts: mix of static + CMS
+  const allCms = isStatic ? [] : await getCmsPosts()
+  const staticRelated = blogPosts.filter(p => p.slug !== params.slug).slice(0, 2)
+  const cmsRelated = allCms.filter(p => p.slug !== params.slug).slice(0, 2)
+  const relatedPosts = isStatic ? staticRelated : (cmsRelated.length > 0 ? cmsRelated : staticRelated)
 
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "Article",
     "headline": post.title,
-    "description": post.excerpt,
-    "image": `https://www.insurancewheatridge.com${post.image}`,
-    "datePublished": post.date,
+    "description": post.excerpt || post.meta_description || '',
+    "image": isStatic ? `https://www.insurancewheatridge.com${post.image}` : (post.featured_image || ''),
+    "datePublished": isStatic ? post.date : post.published_at,
     "author": { "@type": "Person", "name": post.author, "jobTitle": "Farmers Insurance Agent" },
     "publisher": { "@type": "Organization", "name": "Insurance Wheat Ridge" },
   }
+
+  const postDate = isStatic ? post.date : post.published_at
 
   return (
     <div className="min-h-screen">
@@ -125,9 +161,9 @@ export default function BlogPost({ params }) {
             <Link href="/blog" className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm font-medium mb-6"><ArrowLeft size={16} />Back to Blog</Link>
 
             <div className="flex items-center gap-3 text-sm text-gray-500 mb-4">
-              <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-medium text-xs">{post.category}</span>
-              <span className="flex items-center gap-1"><Calendar size={14} />{new Date(post.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
-              <span className="flex items-center gap-1"><Clock size={14} />{post.readTime}</span>
+              <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-medium text-xs capitalize">{post.category}</span>
+              <span className="flex items-center gap-1"><Calendar size={14} />{new Date(postDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+              {isStatic && post.readTime && <span className="flex items-center gap-1"><Clock size={14} />{post.readTime}</span>}
             </div>
 
             <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-6 leading-tight">{post.title}</h1>
@@ -142,13 +178,23 @@ export default function BlogPost({ params }) {
               </div>
             </div>
 
-            <div className="relative rounded-2xl overflow-hidden mb-10 aspect-[16/9]">
-              <Image src={post.image} alt={post.imageAlt} fill className="object-cover" priority />
-            </div>
+            {/* Featured image */}
+            {isStatic ? (
+              <div className="relative rounded-2xl overflow-hidden mb-10 aspect-[16/9]">
+                <Image src={post.image} alt={post.imageAlt || post.title} fill className="object-cover" priority />
+              </div>
+            ) : post.featured_image ? (
+              <div className="rounded-2xl overflow-hidden mb-10">
+                <img src={post.featured_image} alt={post.title} className="w-full aspect-[16/9] object-cover" />
+              </div>
+            ) : null}
 
-            <div className="prose-custom">
-              {renderContent(post.content)}
-            </div>
+            {/* Content */}
+            {isStatic ? (
+              <div className="prose-custom">{renderContent(post.content)}</div>
+            ) : (
+              <div className="prose prose-sm sm:prose max-w-none" dangerouslySetInnerHTML={{ __html: post.content }} />
+            )}
           </div>
         </div>
       </article>
@@ -163,11 +209,17 @@ export default function BlogPost({ params }) {
                 {relatedPosts.map(rp => (
                   <Link key={rp.slug} href={`/blog/${rp.slug}`} className="group block bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition">
                     <div className="relative aspect-[16/10]">
-                      <Image src={rp.image} alt={rp.imageAlt} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                      {rp.image ? (
+                        <Image src={rp.image} alt={rp.imageAlt || rp.title} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                      ) : rp.featured_image ? (
+                        <img src={rp.featured_image} alt={rp.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                      ) : (
+                        <div className="w-full h-full bg-blue-100 flex items-center justify-center"><span className="text-blue-400 text-4xl">📝</span></div>
+                      )}
                     </div>
                     <div className="p-4">
                       <p className="font-bold text-gray-900 group-hover:text-blue-700 transition-colors">{rp.title}</p>
-                      <p className="text-sm text-gray-500 mt-1">{rp.readTime}</p>
+                      <p className="text-sm text-gray-500 mt-1">{rp.readTime || rp.category}</p>
                     </div>
                   </Link>
                 ))}

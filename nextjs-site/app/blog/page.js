@@ -3,22 +3,58 @@ import Image from 'next/image'
 import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
 import { blogPosts } from '@/lib/blog-posts'
+import { supabaseGet } from '@/lib/supabase-rest'
 import { Calendar, Clock, User, ArrowRight } from 'lucide-react'
+
+export const dynamic = "force-dynamic"
 
 export const metadata = {
   title: 'Insurance Blog | Tips & Guides for Wheat Ridge Residents',
   description: 'Read helpful insurance tips, guides, and local insights from Jubal Terry, your Farmers Insurance agent in Wheat Ridge, Colorado. Auto, home, life, business, and renters insurance advice.',
 }
 
-export default function BlogPage() {
-  const featured = blogPosts[0]
-  const rest = blogPosts.slice(1)
+async function getCmsPosts() {
+  try {
+    const { data } = await supabaseGet('blog_posts', {
+      status: 'eq.published',
+      order: 'published_at.desc',
+      select: 'id,title,slug,excerpt,featured_image,category,author,published_at',
+    })
+    return (data ?? []).map(p => ({
+      ...p,
+      date: p.published_at,
+      image: p.featured_image,
+      imageAlt: p.title,
+      readTime: null,
+      isCms: true,
+    }))
+  } catch {
+    return []
+  }
+}
+
+function PostImage({ post, className, fill, priority }) {
+  if (post.isCms) {
+    return post.image ? (
+      <img src={post.image} alt={post.imageAlt || post.title} className={`w-full h-full object-cover ${className || ''}`} />
+    ) : (
+      <div className="w-full h-full bg-blue-100 flex items-center justify-center"><span className="text-blue-400 text-5xl">📝</span></div>
+    )
+  }
+  return <Image src={post.image} alt={post.imageAlt} fill={fill} className={className} priority={priority} />
+}
+
+export default async function BlogPage() {
+  const cmsPosts = await getCmsPosts()
+  // CMS posts first (newest), then static posts
+  const allPosts = [...cmsPosts, ...blogPosts]
+  const featured = allPosts[0]
+  const rest = allPosts.slice(1)
 
   return (
     <div className="min-h-screen">
       <Navigation />
 
-      {/* Hero */}
       <section className="bg-gradient-to-br from-blue-900 to-blue-800 text-white py-16">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl lg:text-5xl font-bold mb-4">Insurance Insights</h1>
@@ -26,22 +62,21 @@ export default function BlogPage() {
         </div>
       </section>
 
-      {/* Featured Post */}
       <section className="py-12 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-5xl mx-auto">
             <Link href={`/blog/${featured.slug}`} className="group block">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
                 <div className="relative rounded-2xl overflow-hidden shadow-lg aspect-[16/10]">
-                  <Image src={featured.image} alt={featured.imageAlt} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <PostImage post={featured} fill className="object-cover group-hover:scale-105 transition-transform duration-500" priority />
                   <div className="absolute top-4 left-4">
-                    <span className="bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-full">{featured.category}</span>
+                    <span className="bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-full capitalize">{featured.category}</span>
                   </div>
                 </div>
                 <div>
                   <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
                     <span className="flex items-center gap-1"><Calendar size={14} />{new Date(featured.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
-                    <span className="flex items-center gap-1"><Clock size={14} />{featured.readTime}</span>
+                    {featured.readTime && <span className="flex items-center gap-1"><Clock size={14} />{featured.readTime}</span>}
                   </div>
                   <h2 className="text-3xl font-bold text-gray-900 mb-4 group-hover:text-blue-700 transition-colors">{featured.title}</h2>
                   <p className="text-gray-600 text-lg leading-relaxed mb-4">{featured.excerpt}</p>
@@ -56,7 +91,6 @@ export default function BlogPage() {
         </div>
       </section>
 
-      {/* Rest of Posts */}
       <section className="py-12 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="max-w-5xl mx-auto">
@@ -66,15 +100,15 @@ export default function BlogPage() {
                 <Link key={post.slug} href={`/blog/${post.slug}`} className="group block">
                   <div className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 h-full flex flex-col">
                     <div className="relative aspect-[16/10]">
-                      <Image src={post.image} alt={post.imageAlt} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                      <PostImage post={post} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
                       <div className="absolute top-3 left-3">
-                        <span className="bg-blue-600 text-white text-xs font-bold px-2.5 py-1 rounded-full">{post.category}</span>
+                        <span className="bg-blue-600 text-white text-xs font-bold px-2.5 py-1 rounded-full capitalize">{post.category}</span>
                       </div>
                     </div>
                     <div className="p-6 flex-1 flex flex-col">
                       <div className="flex items-center gap-3 text-xs text-gray-500 mb-2">
                         <span className="flex items-center gap-1"><Calendar size={12} />{new Date(post.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                        <span className="flex items-center gap-1"><Clock size={12} />{post.readTime}</span>
+                        {post.readTime && <span className="flex items-center gap-1"><Clock size={12} />{post.readTime}</span>}
                       </div>
                       <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-700 transition-colors">{post.title}</h3>
                       <p className="text-gray-600 text-sm leading-relaxed flex-1">{post.excerpt}</p>
@@ -91,7 +125,6 @@ export default function BlogPage() {
         </div>
       </section>
 
-      {/* CTA */}
       <section className="py-12 bg-blue-900 text-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Have Insurance Questions?</h2>
