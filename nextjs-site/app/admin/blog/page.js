@@ -66,19 +66,19 @@ export default function AdminBlog() {
 
   // Auth
   useEffect(() => {
-    const t = sessionStorage.getItem('admin_token')
+    const t = sessionStorage.getItem('iwr_admin_token')
     if (t) { setToken(t); setAuthed(true) }
   }, [])
 
   const login = (e) => {
     e.preventDefault()
-    sessionStorage.setItem('admin_token', token)
+    sessionStorage.setItem('iwr_admin_token', token)
     setAuthed(true)
   }
 
   // Fetch posts
   const fetchPosts = useCallback(async () => {
-    const t = sessionStorage.getItem('admin_token')
+    const t = sessionStorage.getItem('iwr_admin_token')
     if (!t) return
     try {
       const r = await fetch('/api/admin/blog', { headers: { Authorization: `Bearer ${t}` } })
@@ -91,7 +91,7 @@ export default function AdminBlog() {
 
   // Image upload
   const handleImageUpload = async (file) => {
-    const t = sessionStorage.getItem('admin_token')
+    const t = sessionStorage.getItem('iwr_admin_token')
     const compressed = await compressImage(file)
     const form = new FormData()
     form.append('file', compressed)
@@ -127,7 +127,7 @@ export default function AdminBlog() {
 
   // Save post
   const savePost = async (status) => {
-    const t = sessionStorage.getItem('admin_token')
+    const t = sessionStorage.getItem('iwr_admin_token')
     setSaving(true)
     setMsg('')
     
@@ -173,7 +173,7 @@ export default function AdminBlog() {
   // Delete post
   const deletePost = async (id) => {
     if (!confirm('Delete this post? This cannot be undone.')) return
-    const t = sessionStorage.getItem('admin_token')
+    const t = sessionStorage.getItem('iwr_admin_token')
     await fetch('/api/admin/blog', {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${t}`, 'Content-Type': 'application/json' },

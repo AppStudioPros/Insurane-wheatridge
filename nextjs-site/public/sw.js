@@ -1,4 +1,4 @@
-const CACHE_NAME = 'iw-insurance-v1'
+const CACHE_NAME = 'iw-insurance-v2'
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(['/', '/manifest.json'])))
   self.skipWaiting()
@@ -11,6 +11,11 @@ self.addEventListener('fetch', (event) => {
   const { request } = event
   const url = new URL(request.url)
   if (url.origin !== location.origin) return
+  // Never cache admin, portal, or API routes
+  if (url.pathname.startsWith('/admin') || url.pathname.startsWith('/portal') || url.pathname.startsWith('/api')) {
+    event.respondWith(fetch(request))
+    return
+  }
   if (request.headers.get('accept')?.includes('text/html')) {
     event.respondWith(fetch(request).then((r) => { const c = r.clone(); caches.open(CACHE_NAME).then((cache) => cache.put(request, c)); return r }).catch(() => caches.match(request)))
     return
