@@ -39,12 +39,12 @@ export async function POST(request) {
     featured_image: body.featured_image || null,
     category: body.category || 'general',
     tags: body.tags || [],
-    status: body.status || 'draft',
+    status: ['draft','published','scheduled'].includes(body.status) ? body.status : 'draft',
     author: body.author || 'Jubal Terry',
     meta_title: body.meta_title || '',
     meta_description: body.meta_description || '',
     template: body.template || 'standard',
-    published_at: body.status === 'published' ? new Date().toISOString() : null,
+    published_at: body.published_at || (body.status === 'published' ? new Date().toISOString() : null),
   }
   
   const { data, error } = await supabaseInsert('blog_posts', row)

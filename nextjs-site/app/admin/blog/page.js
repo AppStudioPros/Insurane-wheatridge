@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
 import dynamic from 'next/dynamic'
-import { ArrowLeft, Plus, Edit, Trash2, Eye, Save, Send, FileText, X, Image as ImageIcon } from 'lucide-react'
+import { ArrowLeft, Plus, Edit, Trash2, Eye, Save, Send, FileText, X, Image as ImageIcon, Clock } from 'lucide-react'
 
 const BlogEditor = dynamic(() => import('@/components/blog-editor'), { ssr: false })
 
@@ -136,6 +136,13 @@ export default function AdminBlog() {
       status: status || current.status || 'draft',
       slug: current.slug || slugify(current.title || 'untitled'),
       published_at: current.published_at || (status === 'published' ? new Date().toISOString() : null),
+      status: status,
+    }
+    // If scheduling, ensure we have a future date
+    if (status === 'scheduled' && !current.published_at) {
+      setMsg('Please set a publish date before scheduling.')
+      setSaving(false)
+      return
     }
     
     try {
@@ -148,10 +155,10 @@ export default function AdminBlog() {
       if (r.ok) {
         const d = await r.json()
         setCurrent(d)
-        setMsg(status === 'published' ? 'Published!' : 'Saved as draft.')
+        setMsg(status === 'published' ? 'Published!' : status === 'scheduled' ? '⏰ Scheduled!' : 'Saved as draft.')
         fetchPosts()
-        if (status === 'published') {
-          setTimeout(() => { setView('list'); setCurrent(null); setMsg('') }, 1000)
+        if (status === 'published' || status === 'scheduled') {
+          setTimeout(() => { setView('list'); setCurrent(null); setMsg('') }, 1500)
         }
       } else {
         const err = await r.json()
@@ -283,6 +290,9 @@ export default function AdminBlog() {
               <button onClick={() => savePost('draft')} disabled={saving} className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm flex items-center gap-1 hover:bg-gray-200 disabled:opacity-60">
                 <Save size={14} /> {saving ? 'Saving...' : 'Save Draft'}
               </button>
+              <button onClick={() => savePost('scheduled')} disabled={saving} className="bg-amber-500 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-1 hover:bg-amber-600 disabled:opacity-60">
+                <Clock size={14} /> Schedule
+              </button>
               <button onClick={() => savePost('published')} disabled={saving} className="bg-[#0954a5] text-white px-4 py-2 rounded-lg text-sm flex items-center gap-1 hover:bg-[#073d7a] disabled:opacity-60">
                 <Send size={14} /> {saving ? 'Publishing...' : 'Publish'}
               </button>
@@ -357,7 +367,7 @@ export default function AdminBlog() {
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">Publish Date</label>
                   <input type="datetime-local" value={current.published_at ? new Date(current.published_at).toISOString().slice(0, 16) : ''} onChange={e => setCurrent({ ...current, published_at: e.target.value ? new Date(e.target.value).toISOString() : null })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
-                  <p className="text-[10px] text-gray-400 mt-0.5">Leave blank for current time on publish</p>
+                  <p className="text-[10px] text-gray-400 mt-0.5">{current.status === 'scheduled' ? '⏰ Post will auto-publish at this time' : 'Leave blank for current time, or set future date to schedule'}</p>
                 </div>
               </div>
 
@@ -422,8 +432,12 @@ export default function AdminBlog() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <h3 className="font-semibold text-gray-900 truncate">{post.title}</h3>
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${post.status === 'published' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                      {post.status}
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                      post.status === 'published' ? 'bg-green-100 text-green-700' : 
+                      post.status === 'scheduled' ? 'bg-amber-100 text-amber-700' : 
+                      'bg-yellow-100 text-yellow-700'
+                    }`}>
+                      {post.status}{post.status === 'scheduled' && post.published_at ? ` · ${new Date(post.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}` : ''}
                     </span>
                   </div>
                   <p className="text-sm text-gray-500 truncate">{post.excerpt || 'No excerpt'}</p>
