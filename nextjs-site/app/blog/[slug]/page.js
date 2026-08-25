@@ -102,7 +102,7 @@ function renderContent(content) {
           <p className="text-lg font-semibold text-gray-900 mb-3">Ready to talk?</p>
           <div className="flex flex-col sm:flex-row gap-4">
             <a href="tel:3034641911" className="flex items-center gap-2 bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-800 transition"><Phone size={18} />(303) 464-1911</a>
-            <a href="mailto:info@insurancewheatridge.com" className="flex items-center gap-2 bg-white text-blue-700 border border-blue-300 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition"><Mail size={18} />info@insurancewheatridge.com</a>
+            <a href="mailto:jubal.terry@insurancewheatridge.com" className="flex items-center gap-2 bg-white text-blue-700 border border-blue-300 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition"><Mail size={18} />jubal.terry@insurancewheatridge.com</a>
           </div>
         </div>
       )

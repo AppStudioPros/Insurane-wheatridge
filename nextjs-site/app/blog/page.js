@@ -131,7 +131,7 @@ export default async function BlogPage() {
           <p className="text-xl text-blue-200 mb-8 max-w-2xl mx-auto">I&apos;m always happy to answer your questions — no pressure, no sales pitch. Just honest advice from your local agent.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a href="tel:3034641911" className="bg-white text-blue-900 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-50 transition">(303) 464-1911</a>
-            <a href="mailto:info@insurancewheatridge.com" className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white/10 transition">info@insurancewheatridge.com</a>
+            <a href="mailto:jubal.terry@insurancewheatridge.com" className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white/10 transition">jubal.terry@insurancewheatridge.com</a>
           </div>
         </div>
       </section>
